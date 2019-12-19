@@ -20,8 +20,8 @@ namespace WebApplication.Controllers
         [HttpPost("post")]
         public async Task<IActionResult> Post()
         {
-            await this.SignInAsync(new Dictionary<string, string> { { "issuer", "issuer" } }, TimeSpan.FromMinutes(10), "issuer", "audience");
-            return View("Index");
+            await this.SignInAsync(new Dictionary<string, string> { { "issuer", "issuer" } }, TimeSpan.FromMinutes(10), "test1", "test2");
+            return Redirect("/");
         }
     }
 }

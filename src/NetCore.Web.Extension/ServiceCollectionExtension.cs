@@ -118,7 +118,7 @@ namespace NetCore.Web.Extension
 
             });
 
-            return services.AddSingleton<IJwtGenerator, JwtGenerator>().AddSingleton<JwtOptions>(options);
+            return services;
         }
     }
 }
