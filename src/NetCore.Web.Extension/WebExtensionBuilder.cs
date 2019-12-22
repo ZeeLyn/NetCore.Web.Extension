@@ -38,5 +38,7 @@ namespace NetCore.Web.Extension
         public string LoginPath { get; set; }
 
         public bool SlidingExpiration { get; set; }
+
+        public TimeSpan ExpireTimeSpan { get; set; }
     }
 }

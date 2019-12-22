@@ -1,0 +1,19 @@
+﻿@using NetCore.Web.Extension
+
+@{
+    ViewData["Title"] = "Paging";
+}
+
+@model WebApplication.Controllers.Search
+<div>
+    <form name="form1" method="post">
+        @Html.TextBoxFor(p => p.Title)
+        <input type="submit" value="搜索" />
+    </form>
+</div>
+@Html.Paging(Context.Request, 5, FormMethod.Get, options =>
+{
+    options.Position = PagerPosition.Left;
+    options.Size = PagerSize.Normal;
+})
+

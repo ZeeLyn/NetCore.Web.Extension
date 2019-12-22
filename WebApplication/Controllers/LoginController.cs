@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using NetCore.Web.Extension;
 
@@ -18,10 +16,15 @@ namespace WebApplication.Controllers
         }
 
         [HttpPost("post")]
-        public async Task<IActionResult> Post()
+        public async Task<IActionResult> Post([FromForm]Login form)
         {
-            await this.SignInAsync(new Dictionary<string, string> { { "issuer", "issuer" } }, TimeSpan.FromMinutes(10), "test1", "test2");
+            await this.SignInAsync(new Dictionary<string, string> { { "nick", form.NickName } }, TimeSpan.FromMinutes(10), "test1", "test2");
             return Redirect("/");
         }
+    }
+
+    public class Login
+    {
+        public string NickName { get; set; }
     }
 }

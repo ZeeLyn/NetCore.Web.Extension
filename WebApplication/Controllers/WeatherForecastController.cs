@@ -28,6 +28,8 @@ namespace WebApplication.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            var t = typeof(Info);
+            var t1 = typeof(WeatherForecastController);
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
@@ -37,5 +39,9 @@ namespace WebApplication.Controllers
             })
             .ToArray();
         }
+    }
+    public struct Info
+    {
+
     }
 }

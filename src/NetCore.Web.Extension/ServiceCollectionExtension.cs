@@ -43,6 +43,8 @@ namespace NetCore.Web.Extension
             builder?.Invoke(options);
             if (string.IsNullOrWhiteSpace(options.SecurityKey))
                 throw new ArgumentNullException(nameof(options.SecurityKey));
+            if (options.SecurityKey.Length < 16)
+                throw new ArgumentOutOfRangeException(nameof(options.SecurityKey), "SecurityKey length cannot be less than 16.");
             var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(options.SecurityKey));
             var validationParameters = new TokenValidationParameters
             {
@@ -81,6 +83,8 @@ namespace NetCore.Web.Extension
             builder?.Invoke(options);
             if (string.IsNullOrWhiteSpace(options.SecurityKey))
                 throw new ArgumentNullException(nameof(options.SecurityKey));
+            if (options.SecurityKey.Length < 16)
+                throw new ArgumentOutOfRangeException(nameof(options.SecurityKey), "SecurityKey length cannot be less than 16.");
             var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(options.SecurityKey));
             var validationParameters = new TokenValidationParameters
             {
@@ -115,6 +119,7 @@ namespace NetCore.Web.Extension
                 option.AccessDeniedPath = options.AccessDeniedPath;
                 option.TicketDataFormat = new JwtCookieDataFormat(SecurityAlgorithms.HmacSha512Signature, validationParameters, options);
                 option.SlidingExpiration = options.SlidingExpiration;
+                option.ExpireTimeSpan = options.ExpireTimeSpan;
 
             });
 

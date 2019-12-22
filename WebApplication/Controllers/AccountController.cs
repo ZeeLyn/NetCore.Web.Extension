@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,11 +27,10 @@ namespace WebApplication.Controllers
         }
 
         [HttpGet("nickname")]
-        [Authorize]
-        public IActionResult NickName()
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> NickName()
         {
-
-            return Ok(this.GetClaim("nick"));
+            return Ok(new { User.Identity.IsAuthenticated, c = User.Claims.FirstOrDefault(p => p.Type == "nick")?.Value });
         }
     }
 }

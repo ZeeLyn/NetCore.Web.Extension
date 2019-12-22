@@ -1,18 +1,5 @@
-﻿
-@{
-    Layout = null;
-}
-
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Login</title>
-</head>
-<body>
-    <form action="/login/post" method="post">
-        <button>Login</button>
-    </form>
-</body>
-</html>
+﻿@model WebApplication.Controllers.Login
+<form action="/login/post" method="post">
+    @Html.TextBoxFor(p => p.NickName, new { placeholder = "nick name" })
+    <button>Sign In</button>
+</form>
