@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>OWEN</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/1100100/NetCore.Web.Extension</RepositoryUrl>
+    <Version>0.0.1</Version>
+    <PackageId>DotNetCore.Web.Extension</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
