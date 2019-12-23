@@ -72,6 +72,7 @@ namespace NetCore.Web.Extension
             {
                 option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(option => { option.TokenValidationParameters = validationParameters; });
 
             return services.AddSingleton<IJwtGenerator, JwtGenerator>().AddSingleton(options);
@@ -112,6 +113,9 @@ namespace NetCore.Web.Extension
             {
                 option.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 option.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                option.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                option.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                option.DefaultSignOutScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             }).AddCookie(option =>
             {
                 option.Cookie = options.Cookie;

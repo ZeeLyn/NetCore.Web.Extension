@@ -1,0 +1,45 @@
+﻿
+@{
+    ViewData["Title"] = "Bearer Authorization";
+}
+
+<textarea id="bearer" placeholder="bearer" style="width:100%;"></textarea>
+<input type="button" id="getBearerBtn" value=" Get Bearer" />
+
+<input type="button" id="getUseInfo" value="Get Nickname" />
+
+
+@section Scripts{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        $(function () {
+            $("#getBearerBtn").click(function () {
+                $.ajax({
+                    url: "/api/account/token",
+                    type: "get",
+                    success: function (res) {
+                        console.log(res);
+                        $("#bearer").val(res.token);
+                    }
+                });
+            });
+
+            $("#getUseInfo").click(function () {
+                $.ajax({
+                    url: "/api/account/nickname",
+                    type: "get",
+                    headers: {
+                        "Authorization": "Bearer " + $("#bearer").val()
+                    },
+                    success: function (res) {
+                        alert("OK:" + res.c);
+                    },
+                    error: function (err, o, j) {
+                        alert(j);
+                    }
+                });
+            });
+        });
+    </script>
+}
+

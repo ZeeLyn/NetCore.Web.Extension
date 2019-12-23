@@ -6,7 +6,7 @@
     <Authors>OWEN</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/1100100/NetCore.Web.Extension</RepositoryUrl>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <PackageId>DotNetCore.Web.Extension</PackageId>
   </PropertyGroup>
 

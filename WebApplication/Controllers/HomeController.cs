@@ -11,7 +11,7 @@ namespace WebApplication.Controllers
 {
     public class HomeController : Controller
     {
-        [Authorize(AuthenticationSchemes = "Cookies")]
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             ViewBag.Nick = User.GetClaimValue("nick");
