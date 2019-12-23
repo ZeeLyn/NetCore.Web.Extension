@@ -117,10 +117,9 @@ namespace NetCore.Web.Extension
                 option.Cookie = options.Cookie;
                 option.LoginPath = options.LoginPath;
                 option.AccessDeniedPath = options.AccessDeniedPath;
-                option.TicketDataFormat = new JwtCookieDataFormat(SecurityAlgorithms.HmacSha512Signature, validationParameters, options);
+                option.TicketDataFormat = new JwtCookieDataFormat(validationParameters, options);
                 option.SlidingExpiration = options.SlidingExpiration;
                 option.ExpireTimeSpan = options.ExpireTimeSpan;
-
             });
 
             return services;

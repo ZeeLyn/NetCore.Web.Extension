@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace NetCore.Web.Extension
 {
@@ -27,6 +28,8 @@ namespace NetCore.Web.Extension
         public string ValidAudience { get; set; }
 
         public IEnumerable<string> ValidAudiences { get; set; }
+
+        public string SecurityAlgorithm { get; set; } = SecurityAlgorithms.HmacSha512Signature;
     }
 
     public class JwtCookieOptions : JwtOptions

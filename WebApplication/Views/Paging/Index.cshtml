@@ -11,7 +11,7 @@
         <input type="submit" value="搜索" />
     </form>
 </div>
-@Html.Paging(Context.Request, 5, FormMethod.Get, options =>
+@Html.Paging(Context, 5, FormMethod.Post, options =>
 {
     options.Position = PagerPosition.Left;
     options.Size = PagerSize.Normal;

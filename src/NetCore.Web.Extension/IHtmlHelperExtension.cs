@@ -11,8 +11,9 @@ namespace NetCore.Web.Extension
 {
     public static class IHtmlHelperExtension
     {
-        public static IHtmlContent Paging(this IHtmlHelper html, HttpRequest request, long pages, FormMethod method = FormMethod.Get, Action<PagingOptions> options = default)
+        public static IHtmlContent Paging(this IHtmlHelper html, HttpContext context, long pages, FormMethod method = FormMethod.Get, Action<PagingOptions> options = default)
         {
+            var request = context.Request;
             var option = new PagingOptions(request);
             options?.Invoke(option);
             var builder = new StringBuilder();
@@ -26,7 +27,7 @@ namespace NetCore.Web.Extension
 
             builder.AppendFormat("<ul class=\"pagination {0} {1}\">", PositionStyles[(int)option.Position], SizeStyles[(int)option.Size]);
             var pageIndex = GetPageIndex(request);
-            //上一页
+
             var prePageUrl = BuildQuery(option, request, pageIndex - 1 < 1 ? 1 : pageIndex - 1);
             builder.AppendFormat("<li class=\"page-item{2}\"><a class=\"page-link\" href=\"{0}\"{3}>{1}</a></li>", post ? $"javascript:{formId}.action='{prePageUrl}';{formId}.submit();" : prePageUrl, option.PreButtonText, pageIndex <= 1 ? " disabled" : "", pageIndex <= 1 ? " tabindex=\"-1\"" : "");
 
@@ -97,12 +98,6 @@ namespace NetCore.Web.Extension
             return request.Query.ContainsKey("page") ? long.Parse(request.Query["page"]) : 1;
         }
 
-        private static Dictionary<string, string> BuildQueryParam(HttpRequest request, long page)
-        {
-            var query = request.Query.ToDictionary(key => key.Key, val => val.Value.ToString());
-            query["page"] = page.ToString();
-            return query;
-        }
 
         private static string BuildQuery(PagingOptions options, HttpRequest request, long page)
         {
@@ -147,10 +142,6 @@ namespace NetCore.Web.Extension
         public PagerPosition Position { get; set; } = PagerPosition.Right;
 
         public PagerSize Size { get; set; } = PagerSize.Normal;
-
-        //public Dictionary<string, string> QueryParameter { get; } = new Dictionary<string, string>();
-
-        //public Dictionary<string, string> FormParameter { get; } = new Dictionary<string, string>();
     }
 
     public enum PagerPosition

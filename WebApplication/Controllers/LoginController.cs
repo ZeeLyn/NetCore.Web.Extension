@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NetCore.Web.Extension;
@@ -25,6 +26,7 @@ namespace WebApplication.Controllers
 
     public class Login
     {
+        [Required]
         public string NickName { get; set; }
     }
 }

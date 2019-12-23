@@ -24,7 +24,7 @@ namespace NetCore.Web.Extension
 
         public JwtResult Generate(TimeSpan expire, Dictionary<string, string> claims = null, string issuer = null, string audience = null)
         {
-            var jwtHeader = new JwtHeader(new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Options.SecurityKey)), SecurityAlgorithms.HmacSha512Signature));
+            var jwtHeader = new JwtHeader(new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Options.SecurityKey)), Options.SecurityAlgorithm));
             var now = DateTime.UtcNow;
             var jwtPayload = new JwtPayload(
                 issuer,

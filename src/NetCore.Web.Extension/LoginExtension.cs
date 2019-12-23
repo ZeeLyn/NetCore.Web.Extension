@@ -21,5 +21,10 @@ namespace NetCore.Web.Extension
             await controller.HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), prop);
         }
+
+        public static async Task SignOutAsync(this ControllerBase controller)
+        {
+            await controller.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        }
     }
 }
