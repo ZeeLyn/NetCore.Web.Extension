@@ -7,7 +7,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
     {
         public ButtonAttribute()
         {
-            ControlType = HtmlControl.Button;
+            ControlType = HtmlControlType.Button;
         }
 
         public string ButtonText { get; set; } = "Button";

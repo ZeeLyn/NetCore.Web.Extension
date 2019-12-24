@@ -3,6 +3,6 @@
 }
 @using NetCore.Web.AutoGenerateHtmlControl
 @model WebApplication.Controllers.ArticleModel
-@await Html.GenerateForm(Context, "index", "GenerateForm", null, FormMethod.Post, Model, null)
+@await Html.GenerateFormAsync("index", "GenerateForm", null, FormMethod.Post, Model, null)
 
 

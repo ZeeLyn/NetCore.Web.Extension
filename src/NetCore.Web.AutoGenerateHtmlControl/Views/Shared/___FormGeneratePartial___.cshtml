@@ -1,6 +1,4 @@
-﻿@using System
-@using System.Collections
-@using System.Collections.Generic
+﻿@using System.Collections
 @using Microsoft.Extensions.DependencyInjection
 @using NetCore.Web.AutoGenerateHtmlControl
 @using NetCore.Web.AutoGenerateHtmlControl.Attributes
@@ -19,33 +17,33 @@
             {
                 switch (control.ControlType)
                 {
-                    case HtmlControl.Label:
+                    case HtmlControlType.Label:
                         @Html.ExLabel(item.Value, control.Format, control.GetAttributes())
                         break;
 
-                    case HtmlControl.Hidden:
+                    case HtmlControlType.Hidden:
                         @Html.ExHidden(item.Name, item.Value, control.Format, control.GetAttributes())
                         break;
 
-                    case HtmlControl.TextBox:
+                    case HtmlControlType.TextBox:
                         @Html.ExTextBox(item.Name, item.Value, control.Format, control.GetAttributes())
                         break;
 
-                    case HtmlControl.Password:
+                    case HtmlControlType.Password:
                         @Html.ExPassword(item.Name, item.Value, control.Format, control.GetAttributes())
                         break;
 
-                    case HtmlControl.TextArea:
+                    case HtmlControlType.TextArea:
                         @Html.ExTextArea(item.Name, item.Value, control.Format, control.GetAttributes())
                         break;
 
-                    case HtmlControl.DropDownList:
+                    case HtmlControlType.DropDownList:
                         var dropDownAttr = (DropDownListAttribute)control;
                         var dropDownDataSource = (ISelectDataSource)ServiceProvider.GetRequiredService(dropDownAttr.DataSource);
                         @Html.ExDropDownList(item.Name, await dropDownDataSource.GetAsync(new[] { item.Value }), dropDownAttr.OptionLabel, control.GetAttributes())
                         break;
 
-                    case HtmlControl.ListBox:
+                    case HtmlControlType.ListBox:
                         var listBoxAttr = (ListBoxAttribute)control;
                         var listBoxDataSource = (ISelectDataSource)ServiceProvider.GetRequiredService(listBoxAttr.DataSource);
                         if (item.Value is IEnumerable)
@@ -58,7 +56,7 @@
                         }
                         break;
 
-                    case HtmlControl.Button:
+                    case HtmlControlType.Button:
                         var buttonAttr = (ButtonAttribute)control;
                         @Html.Button(buttonAttr.ButtonText, buttonAttr.GetAttributes())
                         break;
@@ -69,4 +67,3 @@
         </div>
     }
 }
-<select multiple="multiple"></select>

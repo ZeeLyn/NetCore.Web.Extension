@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NetCore.Web.Extension;
+using Newtonsoft.Json;
+
 
 namespace WebApplication.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     [Route("[controller]")]
 
     public class WeatherForecastController : ControllerBase
@@ -28,18 +30,10 @@ namespace WebApplication.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public IActionResult Get()
         {
-            var t = typeof(Info);
-            var t1 = typeof(WeatherForecastController);
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+            string jsonStr = "{name:'tom',age:11}";
+            return Ok();
         }
     }
     public struct Info

@@ -7,7 +7,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
     {
         public PasswordAttribute()
         {
-            ControlType = HtmlControl.Password;
+            ControlType = HtmlControlType.Password;
         }
 
         private string _placeholder;

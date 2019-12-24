@@ -4,7 +4,7 @@
     {
         public HiddenAttribute()
         {
-            ControlType = HtmlControl.Hidden;
+            ControlType = HtmlControlType.Hidden;
         }
     }
 }

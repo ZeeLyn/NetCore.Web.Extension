@@ -9,7 +9,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
     {
         public DropDownListAttribute()
         {
-            ControlType = HtmlControl.DropDownList;
+            ControlType = HtmlControlType.DropDownList;
         }
         public Type DataSource { get; set; }
 

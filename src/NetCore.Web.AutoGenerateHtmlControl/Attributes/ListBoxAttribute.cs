@@ -4,11 +4,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 {
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
     public class ListBoxAttribute : FormControlsAttribute
     {
         public ListBoxAttribute()
         {
-            ControlType = HtmlControl.ListBox;
+            ControlType = HtmlControlType.ListBox;
         }
         public Type DataSource { get; set; }
 

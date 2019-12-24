@@ -7,7 +7,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
     {
         public TextBoxAttribute()
         {
-            ControlType = HtmlControl.TextBox;
+            ControlType = HtmlControlType.TextBox;
         }
 
         private string _placeholder;

@@ -7,7 +7,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
     {
         public TextAreaAttribute()
         {
-            ControlType = HtmlControl.TextArea;
+            ControlType = HtmlControlType.TextArea;
         }
 
         private int _rows;

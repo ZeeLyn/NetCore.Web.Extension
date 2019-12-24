@@ -134,19 +134,5 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             }
             return builder;
         }
-
-
-        private static readonly ConcurrentDictionary<Type, IEnumerable<PropertyInfo>> ControlAttributes =
-            new ConcurrentDictionary<Type, IEnumerable<PropertyInfo>>();
-        internal static Dictionary<string, object> Object2Dictionary(this object attribute)
-        {
-            if (attribute == null)
-                return null;
-            var properties = ControlAttributes.GetOrAdd(attribute.GetType(), t =>
-              {
-                  return t.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanRead);
-              });
-            return properties.ToDictionary(k => k.Name.ToLower(), v => v.GetValue(attribute));
-        }
     }
 }

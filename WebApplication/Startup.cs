@@ -29,11 +29,7 @@ namespace WebApplication
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews().AddAutoGenerateForm(builder =>
-            {
-                builder.AddDataSource<ProfessionDataSource>();
-                builder.AddDataSource<HobbyDataSource>();
-            });
+            services.AddControllersWithViews();
             //services.AddGlobalExceptionFilter();
             //services.AddGlobalModelStateFilter();
             services.AddJwtBearerAuthentication(options =>
@@ -51,7 +47,7 @@ namespace WebApplication
                 options.LoginPath = "/login";
             });
 
-            //services.Configure<MvcRazorRuntimeCompilationOptions>(options => { options.FileProviders.Add(new EmbeddedFileProvider(typeof(FormGeneratorExtension).GetTypeInfo().Assembly)); });
+            services.AddAutoGenerateHtmlControl();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

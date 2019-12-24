@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NetCore.Web.AutoGenerateHtmlControl.Attributes;
 
@@ -16,7 +15,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
     {
         private static readonly ConcurrentDictionary<Type, IEnumerable<PropertyInfo>> ControlAttributes =
             new ConcurrentDictionary<Type, IEnumerable<PropertyInfo>>();
-        public static async Task<IHtmlContent> GenerateForm<TModel>(this IHtmlHelper html, HttpContext context, string actionName, string controllerName, object routeValues, FormMethod method, TModel model, object htmlAttributes = null, bool antiforgery = default)
+        public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, string actionName, string controllerName, object routeValues, FormMethod method, TModel model, object htmlAttributes = null, bool antiforgery = default)
         {
 
             var view = new FormViewModel

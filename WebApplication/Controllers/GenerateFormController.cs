@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using NetCore.Web.AutoGenerateHtmlControl.Attributes;
 
 
@@ -19,7 +20,8 @@ namespace WebApplication.Controllers
                 Id = 1024,
                 Title = "This is title",
                 Summary = "This is summary",
-                Profession = "Farmer"
+                Profession = "Farmer",
+                Birthday = new DateTime(1986, 10, 12)
             });
         }
     }
@@ -49,5 +51,8 @@ namespace WebApplication.Controllers
 
         [ListBox(DataSource = typeof(HobbyDataSource))]
         public List<string> Hobby { get; set; } = new List<string> { "Tourism", "Draw" };
+
+        [TextBox(HtmlAttributes = "{readonly:'readonly'}")]
+        public DateTime Birthday { get; set; }
     }
 }

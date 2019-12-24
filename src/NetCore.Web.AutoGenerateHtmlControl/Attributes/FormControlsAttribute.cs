@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 {
@@ -8,17 +9,25 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
     {
         public string Format { get; set; }
 
-        public object HtmlAttributes { get; set; }
+        public string HtmlAttributes { get; set; }
 
 
         protected readonly Dictionary<string, object> _attributes = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { { "class", "form-control" } };
 
         public Dictionary<string, object> GetAttributes()
         {
-            var attrs = HtmlAttributes.Object2Dictionary();
-            if (attrs == null) return _attributes;
-            foreach (var (key, o) in attrs)
-                _attributes[key] = o;
+            if (string.IsNullOrWhiteSpace(HtmlAttributes)) return _attributes;
+            try
+            {
+                var attrs = JsonConvert.DeserializeObject<Dictionary<string, object>>(HtmlAttributes);
+                if (attrs == null) return _attributes;
+                foreach (var (key, o) in attrs)
+                    _attributes[key] = o;
+            }
+            catch
+            {
+                throw new FormatException(HtmlAttributes);
+            }
             return _attributes;
         }
         protected void AddAttribute(string name, object value)
@@ -27,18 +36,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
         }
 
 
-        public HtmlControl ControlType { get; protected internal set; }
+        public HtmlControlType ControlType { get; protected internal set; }
     }
 
-    public enum HtmlControl
-    {
-        Label,
-        Hidden,
-        TextBox,
-        Password,
-        TextArea,
-        Button,
-        DropDownList,
-        ListBox
-    }
+
 }

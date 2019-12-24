@@ -4,7 +4,7 @@
     {
         public LabelAttribute()
         {
-            ControlType = HtmlControl.Label;
+            ControlType = HtmlControlType.Label;
         }
     }
 }
