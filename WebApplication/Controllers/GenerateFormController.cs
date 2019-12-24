@@ -34,7 +34,7 @@ namespace WebApplication.Controllers
         public int Id { get; set; }
 
         [TextBox(Placeholder = "Please enter a title")]
-        [Button(ButtonText = "点击")]
+        [Button(ButtonText = "点击", HtmlAttributes = "{class:''}")]
         [Required]
         [DisplayName("标题")]
         public string Title { get; set; }
