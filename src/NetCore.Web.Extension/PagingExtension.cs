@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Web;
 using Microsoft.AspNetCore.Html;
@@ -9,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace NetCore.Web.Extension
 {
-    public static class IHtmlHelperExtension
+    public static class PagingExtension
     {
         public static IHtmlContent Paging(this IHtmlHelper html, HttpContext context, long pages, FormMethod method = FormMethod.Get, Action<PagingOptions> options = default)
         {

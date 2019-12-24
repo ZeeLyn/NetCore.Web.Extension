@@ -1,0 +1,8 @@
+﻿@{
+    ViewData["Title"] = "Generator Form";
+}
+@using NetCore.Web.AutoGenerateHtmlControl
+@model WebApplication.Controllers.ArticleModel
+@await Html.GenerateForm(Context, "index", "GenerateForm", null, FormMethod.Post, Model, null)
+
+

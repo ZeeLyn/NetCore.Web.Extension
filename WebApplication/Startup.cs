@@ -1,14 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NetCore.Web.AutoGenerateHtmlControl;
 using NetCore.Web.Extension;
 
 namespace WebApplication
@@ -25,7 +29,11 @@ namespace WebApplication
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddAutoGenerateForm(builder =>
+            {
+                builder.AddDataSource<ProfessionDataSource>();
+                builder.AddDataSource<HobbyDataSource>();
+            });
             //services.AddGlobalExceptionFilter();
             //services.AddGlobalModelStateFilter();
             services.AddJwtBearerAuthentication(options =>
@@ -43,8 +51,7 @@ namespace WebApplication
                 options.LoginPath = "/login";
             });
 
-
-
+            //services.Configure<MvcRazorRuntimeCompilationOptions>(options => { options.FileProviders.Add(new EmbeddedFileProvider(typeof(FormGeneratorExtension).GetTypeInfo().Assembly)); });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
