@@ -14,6 +14,6 @@
         CheckBox,
         File,
         Uploader,
-        Editor
+        RichEditor
     }
 }

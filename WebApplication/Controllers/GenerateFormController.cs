@@ -23,7 +23,8 @@ namespace WebApplication.Controllers
                 Profession = "Farmer",
                 Birthday = new DateTime(1986, 10, 12),
                 Gender = 2,
-                FavoriteFood = new List<string> { "Eggplant", "Onion" }
+                FavoriteFood = new List<string> { "Eggplant", "Onion" },
+                Resume = "<h1>This is ckeditor5</h1>"
             });
         }
     }
@@ -67,5 +68,11 @@ namespace WebApplication.Controllers
         [DisplayName("Favorite food")]
         [CheckBox(DataSource = typeof(FavoriteFoodDataSource), HtmlAttributes = "{class:''}")]
         public List<string> FavoriteFood { get; set; }
+
+        [Uploader]
+        public string LivePhoto { get; set; }
+
+        [RichEditor]
+        public string Resume { get; set; }
     }
 }

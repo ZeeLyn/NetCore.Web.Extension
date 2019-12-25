@@ -18,9 +18,5 @@
     <ProjectReference Include="..\src\NetCore.Web.Extension\NetCore.Web.Extension.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\" />
-  </ItemGroup>
-
 
 </Project>

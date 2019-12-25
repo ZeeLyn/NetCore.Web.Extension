@@ -7,6 +7,9 @@
 @model NetCore.Web.AutoGenerateHtmlControl.FormViewModel
 
 @inject IServiceProvider ServiceProvider
+@inject AutoGenerateFormBuilder Options
+
+
 @using (Html.BeginForm(Model.FormOptions.ActionName, Model.FormOptions.ControllerName, Model.FormOptions.RouteValues, Model.FormOptions.Method, Model.FormOptions.Antiforgery, Model.FormOptions.HtmlAttributes))
 {
     foreach (var item in Model.FormItems)
@@ -84,6 +87,16 @@
 
                     case HtmlControlType.File:
                         @Html.ExFile(item.Name, control.GetAttributes(), Model.GlobalCssClass)
+                        break;
+
+                    case HtmlControlType.RichEditor:
+                        var editorAttr = (RichEditorAttribute)control;
+                        @Html.ExRichEditor(item.Name, item.Value?.ToString(), string.IsNullOrWhiteSpace(editorAttr.EditorScript) ? Options.EditorPresetScript : editorAttr.EditorScript)
+                        break;
+
+                    case HtmlControlType.Uploader:
+                        var uploaderAttr = (UploaderAttribute)control;
+                        @Html.Uploader(item.Name, item.Value?.ToString(), string.IsNullOrWhiteSpace(uploaderAttr.ServerUrl) ? Options.UploadServerUrl : uploaderAttr.ServerUrl, string.IsNullOrWhiteSpace(uploaderAttr.Script) ? Options.UploaderPresetScript : uploaderAttr.Script, uploaderAttr.GetAttributes(), Model.GlobalCssClass)
                         break;
                 }
 

@@ -214,5 +214,36 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             }
             return builder;
         }
+
+        public static IHtmlContent ExRichEditor(this IHtmlHelper html, string name, string value, string editorScript)
+        {
+            var container = new TagBuilder("div");
+            container.MergeAttribute("class", "editor");
+            var textArea = new TagBuilder("textarea");
+            textArea.MergeAttribute("id", name);
+            textArea.MergeAttribute("name", name);
+            textArea.MergeAttribute("style", "display:none");
+            textArea.InnerHtml.AppendHtml(value);
+            var script = new TagBuilder("script");
+            script.InnerHtml.AppendHtml(editorScript?.Replace("{Name}", name).Replace("{Value}", value));
+            container.InnerHtml.AppendHtml(textArea).AppendHtml(script);
+            return container;
+        }
+
+        public static IHtmlContent Uploader(this IHtmlHelper html, string name, string value, string serverUrl, string uploaderScript,
+            IDictionary<string, object> htmlAttributes, string globalCssClass = "")
+        {
+            var container = new TagBuilder("div");
+            container.MergeAttribute("class", "uploader");
+            container.MergeAttribute("id", name);
+            if (!string.IsNullOrWhiteSpace(globalCssClass))
+                container.MergeAttribute("class", globalCssClass, true);
+            container.MergeAttributes(htmlAttributes, true);
+
+            var script = new TagBuilder("script");
+            script.InnerHtml.AppendHtml(uploaderScript?.Replace("{Name}", name).Replace("{Value}", value).Replace("{ServerUrl}", serverUrl));
+            container.InnerHtml.AppendHtml(script);
+            return container;
+        }
     }
 }

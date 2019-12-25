@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 {
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
     public class CheckBoxAttribute : FormControlsAttribute
     {
         public CheckBoxAttribute()
