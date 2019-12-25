@@ -62,7 +62,7 @@ namespace WebApplication.Controllers
         public int Gender { get; set; }
 
         [File(HtmlAttributes = "{class:'',style:'display:block'}")]
-        [Button(ButtonText = "Upload", HtmlAttributes = "{class:'btn btn-primary btn-sm',onclick:'upload();'}")]
+        //[Button(ButtonText = "Upload", HtmlAttributes = "{class:'btn btn-primary btn-sm',onclick:'upload();'}")]
         public string Avatar { get; set; }
 
         [DisplayName("Favorite food")]

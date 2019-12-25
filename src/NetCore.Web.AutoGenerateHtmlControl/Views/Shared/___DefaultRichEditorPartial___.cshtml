@@ -1,5 +1,7 @@
 ﻿@model NetCore.Web.AutoGenerateHtmlControl.RichEditorContext
 <div class="rich-editor">
     @Html.TextArea(Model.Name, Model.Value, new { style = "display:none;" })
-    <script>window.onload = function () {ClassicEditor.create(document.querySelector("#@Model.Name")).catch(e => { console.error(e) });}</script>
+    <script>
+        window.onload=function(){if(window.ClassicEditor)ClassicEditor.create(document.querySelector("#@Model.Name")).catch(e=>{console.error(e)});else{var e=document.createElement("div");e.innerText="Please install CKEditor5 first.",e.setAttribute("style","color:red;"),document.querySelector("#@Model.Name").parentNode.appendChild(e)}};
+    </script>
 </div>

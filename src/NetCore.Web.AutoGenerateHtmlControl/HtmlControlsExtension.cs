@@ -36,6 +36,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             var builder = new TagBuilder("input");
             builder.MergeAttribute("type", "file");
             builder.MergeAttribute("name", name);
+            builder.MergeAttribute("id", name);
             if (!string.IsNullOrWhiteSpace(globalCssClass))
                 builder.MergeAttribute("class", globalCssClass);
             builder.MergeAttributes(htmlAttributes, true);

@@ -47,7 +47,7 @@ namespace WebApplication
                 options.LoginPath = "/login";
             });
 
-            services.AddAutoGenerateHtmlControl();
+            services.AddAutoGenerateHtmlControl(builder => { });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
