@@ -21,7 +21,9 @@ namespace WebApplication.Controllers
                 Title = "This is title",
                 Summary = "This is summary",
                 Profession = "Farmer",
-                Birthday = new DateTime(1986, 10, 12)
+                Birthday = new DateTime(1986, 10, 12),
+                Gender = 2,
+                FavoriteFood = new List<string> { "Eggplant", "Onion" }
             });
         }
     }
@@ -34,7 +36,7 @@ namespace WebApplication.Controllers
         public int Id { get; set; }
 
         [TextBox(Placeholder = "Please enter a title")]
-        [Button(ButtonText = "点击", HtmlAttributes = "{class:''}")]
+
         [Required]
         [DisplayName("标题")]
         public string Title { get; set; }
@@ -54,5 +56,16 @@ namespace WebApplication.Controllers
 
         [TextBox(HtmlAttributes = "{readonly:'readonly'}")]
         public DateTime Birthday { get; set; }
+
+        [RadioButton(DataSource = typeof(GenderDataSource))]
+        public int Gender { get; set; }
+
+        [File(Multiple = true)]
+        [Button(ButtonText = "Upload", HtmlAttributes = "{class:'',onclick:'upload();'}")]
+        public string Avatar { get; set; }
+
+        [DisplayName("Favorite food")]
+        [CheckBox(DataSource = typeof(FavoriteFoodDataSource))]
+        public List<string> FavoriteFood { get; set; }
     }
 }

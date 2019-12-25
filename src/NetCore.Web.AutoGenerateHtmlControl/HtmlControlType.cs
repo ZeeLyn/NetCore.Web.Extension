@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace NetCore.Web.AutoGenerateHtmlControl
+﻿namespace NetCore.Web.AutoGenerateHtmlControl
 {
     public enum HtmlControlType
     {
@@ -13,6 +9,11 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         TextArea,
         Button,
         DropDownList,
-        ListBox
+        ListBox,
+        RadioButton,
+        CheckBox,
+        File,
+        Uploader,
+        Editor
     }
 }

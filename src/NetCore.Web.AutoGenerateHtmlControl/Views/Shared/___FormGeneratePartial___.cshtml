@@ -18,37 +18,38 @@
                 switch (control.ControlType)
                 {
                     case HtmlControlType.Label:
-                        @Html.ExLabel(item.Value, control.Format, control.GetAttributes())
+                        @Html.ExLabel(item.Value, control.Format, control.GetAttributes(), Model.GlobalCssClass)
                         break;
 
                     case HtmlControlType.Hidden:
-                        @Html.ExHidden(item.Name, item.Value, control.Format, control.GetAttributes())
+                        @Html.ExHidden(item.Name, item.Value, control.Format, control.GetAttributes(), Model.GlobalCssClass)
                         break;
 
                     case HtmlControlType.TextBox:
-                        @Html.ExTextBox(item.Name, item.Value, control.Format, control.GetAttributes())
+                        @Html.ExTextBox(item.Name, item.Value, control.Format, control.GetAttributes(), Model.GlobalCssClass)
                         break;
 
                     case HtmlControlType.Password:
-                        @Html.ExPassword(item.Name, item.Value, control.Format, control.GetAttributes())
+                        @Html.ExPassword(item.Name, item.Value, control.Format, control.GetAttributes(), Model.GlobalCssClass)
                         break;
 
                     case HtmlControlType.TextArea:
-                        @Html.ExTextArea(item.Name, item.Value, control.Format, control.GetAttributes())
+                        @Html.ExTextArea(item.Name, item.Value, control.Format, control.GetAttributes(), Model.GlobalCssClass)
                         break;
 
                     case HtmlControlType.DropDownList:
                         var dropDownAttr = (DropDownListAttribute)control;
-                        var dropDownDataSource = (ISelectDataSource)ServiceProvider.GetRequiredService(dropDownAttr.DataSource);
-                        @Html.ExDropDownList(item.Name, await dropDownDataSource.GetAsync(new[] { item.Value }), dropDownAttr.OptionLabel, control.GetAttributes())
+                        var dropDownDataSource = (IDataSource)ServiceProvider.GetRequiredService(dropDownAttr.DataSource);
+                        @Html.ExDropDownList(item.Name, await dropDownDataSource.GetAsync(new[] { item.Value }), dropDownAttr.OptionLabel, control.GetAttributes(), Model.GlobalCssClass)
                         break;
 
                     case HtmlControlType.ListBox:
                         var listBoxAttr = (ListBoxAttribute)control;
-                        var listBoxDataSource = (ISelectDataSource)ServiceProvider.GetRequiredService(listBoxAttr.DataSource);
+                        var listBoxDataSource = (IDataSource)ServiceProvider.GetRequiredService(listBoxAttr.DataSource);
                         if (item.Value is IEnumerable)
                         {
-                            @Html.ExListBox(item.Name, await listBoxDataSource.GetAsync(item.Value as IEnumerable<object>), listBoxAttr.OptionLabel, control.GetAttributes())
+                            @Html.ExListBox(item.Name, await listBoxDataSource.GetAsync(item.Value as IEnumerable<object>
+                                ), listBoxAttr.OptionLabel, control.GetAttributes(), Model.GlobalCssClass)
                         }
                         else
                         {
@@ -56,9 +57,32 @@
                         }
                         break;
 
+                    case HtmlControlType.RadioButton:
+                        var radioButtonAttr = (RadioButtonAttribute)control;
+                        var radioButtonDataSource = (IDataSource)ServiceProvider.GetRequiredService(radioButtonAttr.DataSource);
+                        @Html.ExRadioButton(item.Name, await radioButtonDataSource.GetAsync(new[] { item.Value }), radioButtonAttr.GetAttributes(), Model.GlobalCssClass)
+                        break;
+
+                    case HtmlControlType.CheckBox:
+                        var checkBoxAttr = (CheckBoxAttribute)control;
+                        var checkBoxDataSource = (IDataSource)ServiceProvider.GetRequiredService(checkBoxAttr.DataSource);
+                        if (item.Value is IEnumerable)
+                        {
+                            @Html.ExCheckBox(item.Name, await checkBoxDataSource.GetAsync(item.Value as IEnumerable<object>), checkBoxAttr.GetAttributes(), Model.GlobalCssClass)
+                        }
+                        else
+                        {
+                            throw new NotSupportedException($"CheckBox does not support type {item.Value.GetType()}.");
+                        }
+                        break;
+
                     case HtmlControlType.Button:
                         var buttonAttr = (ButtonAttribute)control;
-                        @Html.Button(buttonAttr.ButtonText, buttonAttr.GetAttributes())
+                        @Html.Button(buttonAttr.ButtonText, buttonAttr.GetAttributes(), Model.GlobalCssClass)
+                        break;
+
+                    case HtmlControlType.File:
+                        @Html.ExFile(item.Name, control.GetAttributes(), Model.GlobalCssClass)
                         break;
                 }
 
@@ -67,3 +91,5 @@
         </div>
     }
 }
+
+

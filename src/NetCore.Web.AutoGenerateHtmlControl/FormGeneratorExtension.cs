@@ -15,11 +15,12 @@ namespace NetCore.Web.AutoGenerateHtmlControl
     {
         private static readonly ConcurrentDictionary<Type, IEnumerable<PropertyInfo>> ControlAttributes =
             new ConcurrentDictionary<Type, IEnumerable<PropertyInfo>>();
-        public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, string actionName, string controllerName, object routeValues, FormMethod method, TModel model, object htmlAttributes = null, bool antiforgery = default)
+        public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, string actionName, string controllerName, object routeValues, FormMethod method, TModel model, object htmlAttributes = null, bool antiforgery = default, string globalCssClass = "form-control")
         {
 
             var view = new FormViewModel
             {
+                GlobalCssClass = globalCssClass,
                 FormOptions = new FormOptions
                 {
                     ActionName = actionName,

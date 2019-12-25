@@ -8,15 +8,15 @@ namespace NetCore.Web.AutoGenerateHtmlControl
     {
         public static IServiceCollection AddAutoGenerateHtmlControl(this IServiceCollection services, Action<AutoGenerateFormBuilder> builder = null)
         {
-            var options = new AutoGenerateFormBuilder(services);
+            var options = new AutoGenerateFormBuilder();
             builder?.Invoke(options);
             var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(p => !p.FullName.StartsWith("System") && !p.FullName.StartsWith("Microsoft"));
-            var dataSourceType = typeof(ISelectDataSource);
+            var dataSourceType = typeof(IDataSource);
             foreach (var assembly in assemblies)
             {
-                foreach (var type in assembly.GetExportedTypes())
+                foreach (var type in assembly.GetExportedTypes().Where(p => !p.IsAbstract && !p.IsInterface))
                 {
-                    if (type != dataSourceType && dataSourceType.IsAssignableFrom(type))
+                    if (dataSourceType.IsAssignableFrom(type))
                     {
                         services.AddScoped(type);
                     }
@@ -28,14 +28,6 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
     public class AutoGenerateFormBuilder
     {
-        protected IServiceCollection Services { get; }
-        protected internal AutoGenerateFormBuilder(IServiceCollection services)
-        {
-            Services = services;
-        }
-        public IServiceCollection AddDataSource<TSelectDataSource>() where TSelectDataSource : ISelectDataSource
-        {
-            return Services.AddScoped(typeof(TSelectDataSource));
-        }
+        public string GlobalClassStyle { get; set; } = "form-control";
     }
 }

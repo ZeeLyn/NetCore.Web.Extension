@@ -7,14 +7,11 @@ using NetCore.Web.AutoGenerateHtmlControl;
 
 namespace WebApplication
 {
-    public class ProfessionDataSource : IDataSource
+    public class GenderDataSource : IDataSource
     {
         public async Task<IEnumerable<SelectListItem>> GetAsync(IEnumerable<object> values)
         {
-            return await Task.FromResult(new List<SelectListItem> {
-                new SelectListItem("Engineer","Engineer",values.Contains("Engineer"),true),
-                new SelectListItem("Farmer","Farmer",values.Contains("Farmer"))
-            });
+            return await Task.FromResult(new List<SelectListItem> { new SelectListItem("Male", "1", values.Contains(1)), new SelectListItem("Female", "2", values.Contains(2)) });
         }
     }
 }

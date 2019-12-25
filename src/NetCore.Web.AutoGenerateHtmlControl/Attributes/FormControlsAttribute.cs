@@ -12,7 +12,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
         public string HtmlAttributes { get; set; }
 
 
-        protected readonly Dictionary<string, object> _attributes = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { { "class", "form-control" } };
+        protected readonly Dictionary<string, object> _attributes = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
         public Dictionary<string, object> GetAttributes()
         {

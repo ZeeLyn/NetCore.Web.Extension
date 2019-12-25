@@ -9,6 +9,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         public FormOptions FormOptions { get; set; }
 
         public List<FormItem> FormItems { get; set; }
+
+        public string GlobalCssClass { get; set; }
     }
 
     public class FormItem

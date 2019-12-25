@@ -8,7 +8,7 @@ using NetCore.Web.AutoGenerateHtmlControl;
 
 namespace WebApplication
 {
-    public class HobbyDataSource : ISelectDataSource
+    public class HobbyDataSource : IDataSource
     {
         public async Task<IEnumerable<SelectListItem>> GetAsync(IEnumerable<object> values)
         {
