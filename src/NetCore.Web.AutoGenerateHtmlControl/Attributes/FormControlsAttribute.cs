@@ -7,10 +7,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
     public abstract class FormControlsAttribute : Attribute
     {
-        public string Format { get; set; }
-
         public string HtmlAttributes { get; set; }
-
 
         protected readonly Dictionary<string, object> _attributes = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
@@ -34,7 +31,6 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
         {
             _attributes[name.ToLower()] = value;
         }
-
 
         public HtmlControlType ControlType { get; protected internal set; }
     }

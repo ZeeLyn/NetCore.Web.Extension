@@ -18,23 +18,23 @@
                 switch (control.ControlType)
                 {
                     case HtmlControlType.Label:
-                        @Html.ExLabel(item.Value, control.Format, control.GetAttributes(), Model.GlobalCssClass)
+                        @Html.ExLabel(item.Name, item.Value, control.GetAttributes(), Model.GlobalCssClass)
                         break;
 
                     case HtmlControlType.Hidden:
-                        @Html.ExHidden(item.Name, item.Value, control.Format, control.GetAttributes(), Model.GlobalCssClass)
+                        @Html.ExHidden(item.Name, item.Value, control.GetAttributes(), Model.GlobalCssClass)
                         break;
 
                     case HtmlControlType.TextBox:
-                        @Html.ExTextBox(item.Name, item.Value, control.Format, control.GetAttributes(), Model.GlobalCssClass)
+                        @Html.ExTextBox(item.Name, item.Value, control.GetAttributes(), Model.GlobalCssClass)
                         break;
 
                     case HtmlControlType.Password:
-                        @Html.ExPassword(item.Name, item.Value, control.Format, control.GetAttributes(), Model.GlobalCssClass)
+                        @Html.ExPassword(item.Name, item.Value, control.GetAttributes(), Model.GlobalCssClass)
                         break;
 
                     case HtmlControlType.TextArea:
-                        @Html.ExTextArea(item.Name, item.Value, control.Format, control.GetAttributes(), Model.GlobalCssClass)
+                        @Html.ExTextArea(item.Name, item.Value, control.GetAttributes(), Model.GlobalCssClass)
                         break;
 
                     case HtmlControlType.DropDownList:
@@ -68,7 +68,8 @@
                         var checkBoxDataSource = (IDataSource)ServiceProvider.GetRequiredService(checkBoxAttr.DataSource);
                         if (item.Value is IEnumerable)
                         {
-                            @Html.ExCheckBox(item.Name, await checkBoxDataSource.GetAsync(item.Value as IEnumerable<object>), checkBoxAttr.GetAttributes(), Model.GlobalCssClass)
+                            @Html.ExCheckBox(item.Name, await checkBoxDataSource.GetAsync(item.Value as IEnumerable<object>
+                                ), checkBoxAttr.GetAttributes(), Model.GlobalCssClass)
                         }
                         else
                         {

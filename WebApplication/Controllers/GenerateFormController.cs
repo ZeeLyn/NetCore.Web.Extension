@@ -57,15 +57,15 @@ namespace WebApplication.Controllers
         [TextBox(HtmlAttributes = "{readonly:'readonly'}")]
         public DateTime Birthday { get; set; }
 
-        [RadioButton(DataSource = typeof(GenderDataSource))]
+        [RadioButton(DataSource = typeof(GenderDataSource), HtmlAttributes = "{class:''}")]
         public int Gender { get; set; }
 
-        [File(Multiple = true)]
-        [Button(ButtonText = "Upload", HtmlAttributes = "{class:'',onclick:'upload();'}")]
+        [File(HtmlAttributes = "{class:'',style:'display:block'}")]
+        [Button(ButtonText = "Upload", HtmlAttributes = "{class:'btn btn-primary btn-sm',onclick:'upload();'}")]
         public string Avatar { get; set; }
 
         [DisplayName("Favorite food")]
-        [CheckBox(DataSource = typeof(FavoriteFoodDataSource))]
+        [CheckBox(DataSource = typeof(FavoriteFoodDataSource), HtmlAttributes = "{class:''}")]
         public List<string> FavoriteFood { get; set; }
     }
 }

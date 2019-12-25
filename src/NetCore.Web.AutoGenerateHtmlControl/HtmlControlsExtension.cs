@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -10,22 +6,15 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 {
     public static class HtmlControlsExtension
     {
-        private static IDictionary<string, object> SetGlobalCssClass(this IDictionary<string, object> attributes, string globalCssClass)
-        {
-            if (string.IsNullOrWhiteSpace(globalCssClass))
-                return attributes;
-            if (attributes.ContainsKey("class"))
-                attributes["class"] = attributes["class"] + " " + globalCssClass;
-            else
-                attributes["class"] = globalCssClass;
-            return attributes;
-        }
-        public static IHtmlContent ExLabel(this IHtmlHelper html, object text, string format,
+        public static IHtmlContent ExLabel(this IHtmlHelper html, string name, object text,
             IDictionary<string, object> htmlAttributes, string globalCssClass = "")
         {
             var builder = new TagBuilder("label");
-            builder.InnerHtml.AppendHtml(html.FormatValue(text, format));
-            builder.MergeAttributes(htmlAttributes.SetGlobalCssClass(globalCssClass));
+            builder.MergeAttribute("for", name);
+            builder.InnerHtml.AppendHtml(text?.ToString());
+            if (!string.IsNullOrWhiteSpace(globalCssClass))
+                builder.MergeAttribute("class", globalCssClass);
+            builder.MergeAttributes(htmlAttributes, true);
             return builder;
         }
         public static IHtmlContent Button(this IHtmlHelper html, object value,
@@ -33,8 +22,10 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         {
             var builder = new TagBuilder("input");
             builder.MergeAttribute("type", "button");
-            builder.MergeAttribute("value", html.FormatValue(value, ""));
-            builder.MergeAttributes(htmlAttributes.SetGlobalCssClass(globalCssClass));
+            builder.MergeAttribute("value", value?.ToString());
+            if (!string.IsNullOrWhiteSpace(globalCssClass))
+                builder.MergeAttribute("class", globalCssClass);
+            builder.MergeAttributes(htmlAttributes, true);
             return builder;
         }
 
@@ -44,36 +35,40 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             var builder = new TagBuilder("input");
             builder.MergeAttribute("type", "file");
             builder.MergeAttribute("name", name);
-            builder.MergeAttributes(htmlAttributes.SetGlobalCssClass(globalCssClass));
+            if (!string.IsNullOrWhiteSpace(globalCssClass))
+                builder.MergeAttribute("class", globalCssClass);
+            builder.MergeAttributes(htmlAttributes, true);
             return builder;
         }
 
-        public static IHtmlContent ExHidden(this IHtmlHelper html, string name, object value, string format,
+        public static IHtmlContent ExHidden(this IHtmlHelper html, string name, object value,
             IDictionary<string, object> htmlAttributes, string globalCssClass = "")
         {
             var builder = new TagBuilder("input");
             builder.MergeAttribute("type", "hidden");
             builder.MergeAttribute("name", name);
             builder.MergeAttribute("id", name);
-            builder.MergeAttribute("value", html.FormatValue(value, format));
-            builder.MergeAttributes(htmlAttributes.SetGlobalCssClass(globalCssClass));
+            builder.MergeAttribute("value", value?.ToString());
+            builder.MergeAttributes(htmlAttributes, true);
             return builder;
         }
 
-        public static IHtmlContent ExTextBox(this IHtmlHelper html, string name, object value, string format,
+        public static IHtmlContent ExTextBox(this IHtmlHelper html, string name, object value,
             IDictionary<string, object> htmlAttributes, string globalCssClass = "")
         {
             var builder = new TagBuilder("input");
             builder.MergeAttribute("type", "text");
             builder.MergeAttribute("name", name);
             builder.MergeAttribute("id", name);
-            builder.MergeAttribute("value", html.FormatValue(value, format));
-            builder.MergeAttributes(htmlAttributes.SetGlobalCssClass(globalCssClass));
+            builder.MergeAttribute("value", value?.ToString());
+            if (!string.IsNullOrWhiteSpace(globalCssClass))
+                builder.MergeAttribute("class", globalCssClass);
+            builder.MergeAttributes(htmlAttributes, true);
             return builder;
         }
 
 
-        public static IHtmlContent ExPassword(this IHtmlHelper html, string name, object value, string format,
+        public static IHtmlContent ExPassword(this IHtmlHelper html, string name, object value,
             IDictionary<string, object> htmlAttributes, string globalCssClass = "")
         {
             var builder = new TagBuilder("input");
@@ -81,18 +76,22 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             builder.MergeAttribute("name", name);
             builder.MergeAttribute("id", name);
             builder.MergeAttribute("value", value?.ToString());
-            builder.MergeAttributes(htmlAttributes.SetGlobalCssClass(globalCssClass));
+            if (!string.IsNullOrWhiteSpace(globalCssClass))
+                builder.MergeAttribute("class", globalCssClass);
+            builder.MergeAttributes(htmlAttributes, true);
             return builder;
         }
 
-        public static IHtmlContent ExTextArea(this IHtmlHelper html, string name, object value, string format,
+        public static IHtmlContent ExTextArea(this IHtmlHelper html, string name, object value,
             IDictionary<string, object> htmlAttributes, string globalCssClass = "")
         {
             var builder = new TagBuilder("textarea");
             builder.MergeAttribute("name", name);
             builder.MergeAttribute("id", name);
-            builder.MergeAttribute("value", html.FormatValue(value, format));
-            builder.MergeAttributes(htmlAttributes.SetGlobalCssClass(globalCssClass));
+            builder.MergeAttribute("value", value?.ToString());
+            if (!string.IsNullOrWhiteSpace(globalCssClass))
+                builder.MergeAttribute("class", globalCssClass);
+            builder.MergeAttributes(htmlAttributes, true);
             return builder;
         }
 
@@ -102,7 +101,9 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             var builder = new TagBuilder("select");
             builder.MergeAttribute("name", name);
             builder.MergeAttribute("id", name);
-            builder.MergeAttributes(htmlAttributes.SetGlobalCssClass(globalCssClass));
+            if (!string.IsNullOrWhiteSpace(globalCssClass))
+                builder.MergeAttribute("class", globalCssClass);
+            builder.MergeAttributes(htmlAttributes, true);
             if (!string.IsNullOrWhiteSpace(optionLabel))
             {
                 var option = new TagBuilder("option");
@@ -132,7 +133,9 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             builder.MergeAttribute("multiple", "multiple");
             builder.MergeAttribute("name", name);
             builder.MergeAttribute("id", name);
-            builder.MergeAttributes(htmlAttributes.SetGlobalCssClass(globalCssClass));
+            if (!string.IsNullOrWhiteSpace(globalCssClass))
+                builder.MergeAttribute("class", globalCssClass);
+            builder.MergeAttributes(htmlAttributes, true);
             if (!string.IsNullOrWhiteSpace(optionLabel))
             {
                 var option = new TagBuilder("option");
@@ -143,7 +146,6 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             foreach (var item in selectList)
             {
                 var optionBuilder = new TagBuilder("option");
-
                 optionBuilder.MergeAttribute("value", item.Value);
                 if (item.Selected)
                     optionBuilder.MergeAttribute("selected", "selected");
@@ -161,8 +163,12 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             var builder = new HtmlContentBuilder();
             foreach (var item in selectList)
             {
+                var container = new TagBuilder("div");
+                container.MergeAttribute("class", "radio");
                 var label = new TagBuilder("label");
-                label.MergeAttributes(htmlAttributes.SetGlobalCssClass(globalCssClass));
+                if (!string.IsNullOrWhiteSpace(globalCssClass))
+                    label.MergeAttribute("class", globalCssClass);
+                label.MergeAttributes(htmlAttributes, true);
 
                 var radioButtonBuilder = new TagBuilder("input");
                 radioButtonBuilder.MergeAttribute("type", "radio");
@@ -174,7 +180,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                     radioButtonBuilder.MergeAttribute("disabled", "disabled");
                 label.InnerHtml.AppendHtml(radioButtonBuilder);
                 label.InnerHtml.AppendHtml(item.Text);
-                builder.AppendHtml(label);
+                container.InnerHtml.AppendHtml(label);
+                builder.AppendHtml(container);
             }
             return builder;
         }
@@ -185,9 +192,9 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             var builder = new HtmlContentBuilder();
             foreach (var item in selectList)
             {
+                var container = new TagBuilder("div");
+                container.MergeAttribute("class", "checkbox");
                 var label = new TagBuilder("label");
-                label.MergeAttributes(htmlAttributes.SetGlobalCssClass(globalCssClass));
-
                 var checkBoxBuilder = new TagBuilder("input");
                 checkBoxBuilder.MergeAttribute("type", "checkbox");
                 checkBoxBuilder.MergeAttribute("name", name);
@@ -196,9 +203,14 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                     checkBoxBuilder.MergeAttribute("checked", "checked");
                 if (item.Disabled)
                     checkBoxBuilder.MergeAttribute("disabled", "disabled");
+                if (!string.IsNullOrWhiteSpace(globalCssClass))
+                    checkBoxBuilder.MergeAttribute("class", globalCssClass);
+                checkBoxBuilder.MergeAttributes(htmlAttributes, true);
+
                 label.InnerHtml.AppendHtml(checkBoxBuilder);
                 label.InnerHtml.AppendHtml(item.Text);
-                builder.AppendHtml(label);
+                container.InnerHtml.AppendHtml(label);
+                builder.AppendHtml(container);
             }
             return builder;
         }
