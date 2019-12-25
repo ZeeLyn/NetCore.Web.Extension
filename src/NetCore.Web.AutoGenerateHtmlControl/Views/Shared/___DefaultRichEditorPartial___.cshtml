@@ -1,0 +1,5 @@
+﻿@model NetCore.Web.AutoGenerateHtmlControl.RichEditorContext
+<div class="rich-editor">
+    @Html.TextArea(Model.Name, Model.Value, new { style = "display:none;" })
+    <script>window.onload = function () {ClassicEditor.create(document.querySelector("#@Model.Name")).catch(e => { console.error(e) });}</script>
+</div>

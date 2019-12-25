@@ -10,6 +10,6 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
             ControlType = HtmlControlType.RichEditor;
         }
 
-        public string EditorScript { get; set; }
+        public string PartialName { get; set; }
     }
 }

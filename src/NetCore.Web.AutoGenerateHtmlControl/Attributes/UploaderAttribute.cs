@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 {
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
     public class UploaderAttribute : FormControlsAttribute
     {
         public UploaderAttribute()
@@ -13,6 +12,6 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 
         public string ServerUrl { get; set; }
 
-        public string Script { get; set; }
+        public string PartialName { get; set; }
     }
 }

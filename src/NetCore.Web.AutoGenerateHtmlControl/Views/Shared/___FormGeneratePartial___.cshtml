@@ -25,7 +25,7 @@
                         break;
 
                     case HtmlControlType.Hidden:
-                        @Html.ExHidden(item.Name, item.Value, control.GetAttributes(), Model.GlobalCssClass)
+                        @Html.ExHidden(item.Name, item.Value, control.GetAttributes())
                         break;
 
                     case HtmlControlType.TextBox:
@@ -91,12 +91,12 @@
 
                     case HtmlControlType.RichEditor:
                         var editorAttr = (RichEditorAttribute)control;
-                        @Html.ExRichEditor(item.Name, item.Value?.ToString(), string.IsNullOrWhiteSpace(editorAttr.EditorScript) ? Options.EditorPresetScript : editorAttr.EditorScript)
+                        @await Html.ExRichEditor(item.Name, item.Value?.ToString(), string.IsNullOrWhiteSpace(editorAttr.PartialName) ? Options.DefaultRichEditorPartialName : editorAttr.PartialName, editorAttr.GetAttributes())
                         break;
 
                     case HtmlControlType.Uploader:
                         var uploaderAttr = (UploaderAttribute)control;
-                        @Html.Uploader(item.Name, item.Value?.ToString(), string.IsNullOrWhiteSpace(uploaderAttr.ServerUrl) ? Options.UploadServerUrl : uploaderAttr.ServerUrl, string.IsNullOrWhiteSpace(uploaderAttr.Script) ? Options.UploaderPresetScript : uploaderAttr.Script, uploaderAttr.GetAttributes(), Model.GlobalCssClass)
+                        @await Html.Uploader(item.Name, item.Value?.ToString(), string.IsNullOrWhiteSpace(uploaderAttr.ServerUrl) ? Options.UploadServerUrl : uploaderAttr.ServerUrl, string.IsNullOrWhiteSpace(uploaderAttr.PartialName) ? Options.DefaultUploaderPartialName : uploaderAttr.PartialName, uploaderAttr.GetAttributes())
                         break;
                 }
 

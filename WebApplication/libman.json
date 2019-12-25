@@ -39,6 +39,11 @@
       "provider": "unpkg",
       "library": "@ckeditor/ckeditor5-build-classic@16.0.0",
       "destination": "wwwroot/lib/ckeditor/ckeditor5-build-classic/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "webuploader@0.1.1",
+      "destination": "wwwroot/lib/webuploader/"
     }
   ]
 }
