@@ -227,7 +227,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         public static async Task<IHtmlContent> ExRichEditor(this IHtmlHelper html, string name, string value, string partialName, IDictionary<string, object> htmlAttributes)
         {
             if (!string.IsNullOrWhiteSpace(partialName))
-                return await html.PartialAsync(name, new RichEditorContext { Name = name, Value = value, HtmlAttributes = htmlAttributes });
+                return await html.PartialAsync(partialName, new RichEditorContext { Name = name, Value = value, HtmlAttributes = htmlAttributes });
             var container = new TagBuilder("div");
             container.MergeAttribute("class", "editor");
             var textArea = new TagBuilder("textarea");
@@ -244,7 +244,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         public static async Task<IHtmlContent> Uploader(this IHtmlHelper html, string name, object value, string serverUrl, string partialName, IDictionary<string, object> htmlAttributes)
         {
             if (!string.IsNullOrWhiteSpace(partialName))
-                return await html.PartialAsync(name, new UploaderContext { Name = name, Value = value, ServerUrl = serverUrl, HtmlAttributes = htmlAttributes });
+                return await html.PartialAsync(partialName, new UploaderContext { Name = name, Value = value, ServerUrl = serverUrl, HtmlAttributes = htmlAttributes });
             var container = new TagBuilder("div");
             container.MergeAttribute("class", "uploader");
             container.MergeAttribute("id", name);
