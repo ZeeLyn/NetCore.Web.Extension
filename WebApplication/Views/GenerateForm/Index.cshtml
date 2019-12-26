@@ -3,14 +3,14 @@
 }
 @using NetCore.Web.AutoGenerateHtmlControl
 @model WebApplication.Controllers.ArticleModel
-@await Html.GenerateFormAsync("index", "GenerateForm", null, FormMethod.Post, Model, null, () => Html.Raw("<div class=\"box-footer text-center\"><button class=\"btn btn-primary\">Submit</button></div>"))
+@await Html.GenerateFormAsync(Context, "index", "GenerateForm", null, FormMethod.Post, Model, null, () => Html.Raw("<div class=\"box-footer text-center\"><button class=\"btn btn-primary\">Submit</button></div>"), true)
 
 @section Scripts{
 
-    <script src="~/lib/ckeditor/ckeditor5-build-classic/build/ckeditor.js"></script>
-    <script>
-        function upload() {
-            alert("upload");
-        }
-    </script>
+<script src="~/lib/ckeditor/ckeditor5-build-classic/build/ckeditor.js"></script>
+<script>
+    function upload() {
+        alert("upload");
+    }
+</script>
 }

@@ -4,7 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
+using NetCore.Web.AutoGenerateHtmlControl;
 using NetCore.Web.Extension;
 using Newtonsoft.Json;
 
@@ -32,8 +35,9 @@ namespace WebApplication.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            string jsonStr = "{name:'tom',age:11}";
-            return Ok();
+            var tag = new TagBuilder("div");
+
+            return Ok(tag.ConvertToHtmlString());
         }
     }
     public struct Info

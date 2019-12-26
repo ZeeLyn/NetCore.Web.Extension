@@ -9,6 +9,7 @@
 @inject IServiceProvider ServiceProvider
 @inject AutoGenerateFormBuilder Options
 
+@Html.AntiForgeryToken().ConvertToHtmlString()
 
 @using (Html.BeginForm(Model.FormOptions.ActionName, Model.FormOptions.ControllerName, Model.FormOptions.RouteValues, Model.FormOptions.Method, Model.FormOptions.Antiforgery, Model.FormOptions.HtmlAttributes))
 {

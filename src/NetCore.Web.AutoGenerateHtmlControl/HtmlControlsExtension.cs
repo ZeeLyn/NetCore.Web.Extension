@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -7,6 +8,12 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 {
     public static class HtmlControlsExtension
     {
+        public static string ConvertToHtmlString(this IHtmlContent content)
+        {
+            using var writer = new System.IO.StringWriter();
+            content.WriteTo(writer, HtmlEncoder.Default);
+            return writer.ToString();
+        }
         public static IHtmlContent ExLabel(this IHtmlHelper html, string name, object text,
             IDictionary<string, object> htmlAttributes, string globalCssClass = "")
         {
@@ -219,32 +226,33 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
         public static async Task<IHtmlContent> ExRichEditor(this IHtmlHelper html, string name, string value, string partialName, IDictionary<string, object> htmlAttributes)
         {
-            //var container = new TagBuilder("div");
-            //container.MergeAttribute("class", "editor");
-            //var textArea = new TagBuilder("textarea");
-            //textArea.MergeAttribute("id", name);
-            //textArea.MergeAttribute("name", name);
-            //textArea.MergeAttribute("style", "display:none");
-            //textArea.InnerHtml.AppendHtml(value);
-            //var script = new TagBuilder("script");
-            //script.InnerHtml.AppendHtml(editorScript?.Replace("{Name}", name).Replace("{Value}", value));
-            //container.InnerHtml.AppendHtml(textArea).AppendHtml(script);
-            return await html.PartialAsync(partialName, new RichEditorContext { Name = name, Value = value, HtmlAttributes = htmlAttributes });
+            if (!string.IsNullOrWhiteSpace(partialName))
+                return await html.PartialAsync(name, new RichEditorContext { Name = name, Value = value, HtmlAttributes = htmlAttributes });
+            var container = new TagBuilder("div");
+            container.MergeAttribute("class", "editor");
+            var textArea = new TagBuilder("textarea");
+            textArea.MergeAttribute("id", name);
+            textArea.MergeAttribute("name", name);
+            textArea.MergeAttribute("style", "display:none");
+            textArea.InnerHtml.AppendHtml(value);
+            var script = new TagBuilder("script");
+            script.InnerHtml.AppendHtml($"window.onload=function(){{if(window.ClassicEditor)ClassicEditor.create(document.querySelector(\"#{name}\")).catch(e=>{{console.error(e)}});else{{var e=document.createElement(\"div\");e.innerText=\"Please install CKEditor5 first.\",e.setAttribute(\"style\",\"color:red;\"),document.querySelector(\"#{name}\").parentNode.appendChild(e)}}}};");
+            container.InnerHtml.AppendHtml(textArea).AppendHtml(script);
+            return container;
         }
 
         public static async Task<IHtmlContent> Uploader(this IHtmlHelper html, string name, object value, string serverUrl, string partialName, IDictionary<string, object> htmlAttributes)
         {
-            //var container = new TagBuilder("div");
-            //container.MergeAttribute("class", "uploader");
-            //container.MergeAttribute("id", name);
-            //if (!string.IsNullOrWhiteSpace(globalCssClass))
-            //    container.MergeAttribute("class", globalCssClass, true);
-            //container.MergeAttributes(htmlAttributes, true);
-
-            //var script = new TagBuilder("script");
-            //script.InnerHtml.AppendHtml(uploaderScript?.Replace("{Name}", name).Replace("{Value}", value).Replace("{ServerUrl}", serverUrl));
-            //container.InnerHtml.AppendHtml(script);
-            return await html.PartialAsync(partialName, new UploaderContext { Name = name, Value = value, ServerUrl = serverUrl, HtmlAttributes = htmlAttributes });
+            if (!string.IsNullOrWhiteSpace(partialName))
+                return await html.PartialAsync(name, new UploaderContext { Name = name, Value = value, ServerUrl = serverUrl, HtmlAttributes = htmlAttributes });
+            var container = new TagBuilder("div");
+            container.MergeAttribute("class", "uploader");
+            container.MergeAttribute("id", name);
+            container.MergeAttributes(htmlAttributes, true);
+            var script = new TagBuilder("script");
+            script.InnerHtml.AppendHtml("var id=1;");
+            container.InnerHtml.AppendHtml(script);
+            return container;
         }
     }
 }
