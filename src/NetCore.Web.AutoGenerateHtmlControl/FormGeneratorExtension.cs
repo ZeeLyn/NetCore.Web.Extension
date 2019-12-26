@@ -187,6 +187,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 group.InnerHtml.AppendHtml(html.ValidationMessage(name));
                 form.InnerHtml.AppendHtml(group);
             }
+
+            form.InnerHtml.AppendHtml(appendHtmlContent);
             if (antiforgery.HasValue && antiforgery.Value)
                 form.InnerHtml.AppendHtml(html.AntiForgeryToken());
             return form;
