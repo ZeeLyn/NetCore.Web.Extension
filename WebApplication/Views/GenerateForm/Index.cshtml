@@ -3,7 +3,7 @@
 }
 @using NetCore.Web.AutoGenerateHtmlControl
 @model WebApplication.Controllers.ArticleModel
-@await Html.GenerateFormAsync("index", "GenerateForm", null, FormMethod.Post, Model, null, true)
+@await Html.GenerateFormAsync("index", "GenerateForm", null, FormMethod.Post, Model, null, () => Html.Raw("<div class=\"box-footer text-center\"><button class=\"btn btn-primary\">Submit</button></div>"))
 
 @section Scripts{
 
@@ -12,7 +12,5 @@
         function upload() {
             alert("upload");
         }
-
-
     </script>
 }

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NetCore.Web.AutoGenerateHtmlControl.Attributes;
 
@@ -11,6 +13,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         public List<FormItem> FormItems { get; set; }
 
         public string GlobalCssClass { get; set; }
+
+        public IHtmlContent AppendHtmlContent { get; set; }
     }
 
     public class FormItem

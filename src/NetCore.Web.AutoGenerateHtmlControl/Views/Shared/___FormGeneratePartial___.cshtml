@@ -52,7 +52,7 @@
                         if (item.Value is IEnumerable)
                         {
                             @Html.ExListBox(item.Name, await listBoxDataSource.GetAsync(item.Value as IEnumerable<object>
-                                ), listBoxAttr.OptionLabel, control.GetAttributes(), Model.GlobalCssClass)
+         ), listBoxAttr.OptionLabel, control.GetAttributes(), Model.GlobalCssClass)
                         }
                         else
                         {
@@ -72,7 +72,7 @@
                         if (item.Value is IEnumerable)
                         {
                             @Html.ExCheckBox(item.Name, await checkBoxDataSource.GetAsync(item.Value as IEnumerable<object>
-                                ), checkBoxAttr.GetAttributes(), Model.GlobalCssClass)
+         ), checkBoxAttr.GetAttributes(), Model.GlobalCssClass)
                         }
                         else
                         {
@@ -104,6 +104,8 @@
             @Html.ValidationMessage(item.Name)
         </div>
     }
+
+    @Model?.AppendHtmlContent
 }
 
 
