@@ -34,8 +34,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
         public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, HttpContext context, string actionName, string controllerName, object routeValues, FormMethod method, TModel model, object htmlAttributes = null, IHtmlContent appendHtmlContent = null, bool? antiforgery = default, string globalCssClass = "form-control")
         {
-            var ServiceProvider = context.RequestServices;
-            var Options = ServiceProvider.GetRequiredService<AutoGenerateFormBuilder>();
+            var serviceProvider = context.RequestServices;
+            var options = serviceProvider.GetRequiredService<AutoGenerateFormBuilder>();
             var view = new FormViewModel
             {
                 AppendHtmlContent = appendHtmlContent,
@@ -110,7 +110,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                         case HtmlControlType.DropDownList:
                             var dropDownAttr = (DropDownListAttribute)control;
-                            var dropDownDataSource = (IDataSource)ServiceProvider.GetRequiredService(dropDownAttr.DataSource);
+                            var dropDownDataSource = (IDataSource)serviceProvider.GetRequiredService(dropDownAttr.DataSource);
                             group.InnerHtml.AppendHtml(html.ExDropDownList(name,
                                 await dropDownDataSource.GetAsync(new[] { value }), dropDownAttr.OptionLabel,
                                 control.GetAttributes(), globalCssClass));
@@ -118,7 +118,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                         case HtmlControlType.ListBox:
                             var listBoxAttr = (ListBoxAttribute)control;
-                            var listBoxDataSource = (IDataSource)ServiceProvider.GetRequiredService(listBoxAttr.DataSource);
+                            var listBoxDataSource = (IDataSource)serviceProvider.GetRequiredService(listBoxAttr.DataSource);
                             if (value is IEnumerable)
                             {
                                 group.InnerHtml.AppendHtml(html.ExListBox(name, await listBoxDataSource.GetAsync(value as IEnumerable<object>), listBoxAttr.OptionLabel, control.GetAttributes(), globalCssClass));
@@ -131,7 +131,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                         case HtmlControlType.RadioButton:
                             var radioButtonAttr = (RadioButtonAttribute)control;
-                            var radioButtonDataSource = (IDataSource)ServiceProvider.GetRequiredService(radioButtonAttr.DataSource);
+                            var radioButtonDataSource = (IDataSource)serviceProvider.GetRequiredService(radioButtonAttr.DataSource);
                             group.InnerHtml.AppendHtml(html.ExRadioButton(name,
                                 await radioButtonDataSource.GetAsync(new[] { value }), radioButtonAttr.GetAttributes(),
                                 globalCssClass));
@@ -139,7 +139,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                         case HtmlControlType.CheckBox:
                             var checkBoxAttr = (CheckBoxAttribute)control;
-                            var checkBoxDataSource = (IDataSource)ServiceProvider.GetRequiredService(checkBoxAttr.DataSource);
+                            var checkBoxDataSource = (IDataSource)serviceProvider.GetRequiredService(checkBoxAttr.DataSource);
                             if (value is IEnumerable)
                             {
                                 group.InnerHtml.AppendHtml(html.ExCheckBox(name,
@@ -166,7 +166,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             var editorAttr = (RichEditorAttribute)control;
                             group.InnerHtml.AppendHtml(await html.ExRichEditor(name, value?.ToString(),
                                 string.IsNullOrWhiteSpace(editorAttr.PartialName)
-                                    ? Options.DefaultRichEditorPartialName
+                                    ? options.DefaultRichEditorPartialName
                                     : editorAttr.PartialName, editorAttr.GetAttributes()));
                             break;
 
@@ -174,10 +174,10 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             var uploaderAttr = (UploaderAttribute)control;
                             group.InnerHtml.AppendHtml(await html.Uploader(name, value?.ToString(),
                                 string.IsNullOrWhiteSpace(uploaderAttr.ServerUrl)
-                                    ? Options.UploadServerUrl
+                                    ? options.UploadServerUrl
                                     : uploaderAttr.ServerUrl,
                                 string.IsNullOrWhiteSpace(uploaderAttr.PartialName)
-                                    ? Options.DefaultUploaderPartialName
+                                    ? options.DefaultUploaderPartialName
                                     : uploaderAttr.PartialName, uploaderAttr.GetAttributes()));
                             break;
                     }
@@ -185,20 +185,11 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 }
 
                 group.InnerHtml.AppendHtml(html.ValidationMessage(name));
-
                 form.InnerHtml.AppendHtml(group);
             }
-
-
             if (antiforgery.HasValue && antiforgery.Value)
                 form.InnerHtml.AppendHtml(html.AntiForgeryToken());
             return form;
-
-            //return await html.PartialAsync("___FormGeneratePartial___", view);
         }
-
-
-
-
     }
 }
