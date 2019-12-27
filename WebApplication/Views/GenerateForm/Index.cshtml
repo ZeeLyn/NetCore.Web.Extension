@@ -1,16 +1,31 @@
 ﻿@{
     ViewData["Title"] = "Generator Form";
 }
-@using NetCore.Web.AutoGenerateHtmlControl
 @model WebApplication.Controllers.ArticleModel
-@await Html.GenerateFormAsync(Context, "index", "GenerateForm", null, FormMethod.Post, Model, null, () => Html.Raw("<div class=\"box-footer text-center\"><button class=\"btn btn-primary\">Submit</button></div>"), true)
+
+@using NetCore.Web.AutoGenerateHtmlControl
+
+@await Html.GenerateFormAsync(Context, "/GenerateForm/post", FormMethod.Post, Model, null, () => Html.Raw("<div class=\"box-footer text-center\"><button class=\"btn btn-primary\">Submit</button></div>"), true)
+
+@Html.CheckBoxFor(p => p.Archive)
 
 @section Scripts{
 
-<script src="~/lib/ckeditor/ckeditor5-build-classic/build/ckeditor.js"></script>
-<script>
-    function upload() {
-        alert("upload");
-    }
-</script>
+    <script src="~/lib/ckeditor/ckeditor5-build-classic/build/ckeditor.js"></script>
+    <script>
+        function upload() {
+            alert("upload");
+        }
+    </script>
+}
+
+@section Styles{
+    <style>
+        .input-group { flex-direction: column; }
+        #avatar-input-group { flex-direction: row; }
+        #avatar-input-group input[type='file'] { margin-right: 20px; }
+        .checkbox, .radio { flex: 1; }
+        .field-validation-error { color: #ff0000; font-size: 11px; }
+    </style>
+
 }

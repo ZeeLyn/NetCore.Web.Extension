@@ -37,7 +37,7 @@ namespace WebApplication.Controllers
         {
             var tag = new TagBuilder("div");
 
-            return Ok(tag.ConvertToHtmlString());
+            return Ok(tag);
         }
     }
     public struct Info

@@ -19,47 +19,48 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         private static readonly ConcurrentDictionary<Type, IEnumerable<PropertyInfo>> ControlAttributes =
             new ConcurrentDictionary<Type, IEnumerable<PropertyInfo>>();
 
+        private static readonly ConcurrentDictionary<Type, IEnumerable<PropertyInfo>> FormAttributes =
+            new ConcurrentDictionary<Type, IEnumerable<PropertyInfo>>();
 
-        public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, HttpContext context, string actionName, string controllerName, object routeValues, FormMethod method, TModel model, object htmlAttributes = null, string appendHtmlString = null, bool? antiforgery = default, string globalCssClass = "form-control")
+
+        private static Dictionary<string, object> GetAttributeFromObject(this object obj)
         {
-            return await html.GenerateFormAsync(context, actionName, controllerName, routeValues, method, model, htmlAttributes, string.IsNullOrWhiteSpace(appendHtmlString) ? null : html.Raw(appendHtmlString), antiforgery, globalCssClass);
+            if (obj == null)
+                return null;
+            var type = obj.GetType();
+            var props = FormAttributes.GetOrAdd(type, t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance));
+            return props.ToDictionary(k => k.Name, v => v.GetValue(obj));
         }
 
-        public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, HttpContext context, string actionName, string controllerName, object routeValues, FormMethod method, TModel model, object htmlAttributes = null, Func<IHtmlContent> appendHtmlBuilder = null, bool? antiforgery = default, string globalCssClass = "form-control")
+
+        public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, HttpContext context, string url, FormMethod method, TModel model, object htmlAttributes = null, string appendHtmlString = null, bool? antiforgery = default, string globalCssClass = "form-control")
+        {
+            return await html.GenerateFormAsync(context, url, method, model, htmlAttributes, string.IsNullOrWhiteSpace(appendHtmlString) ? null : html.Raw(appendHtmlString), antiforgery, globalCssClass);
+        }
+
+        public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, HttpContext context, string url, FormMethod method, TModel model, object htmlAttributes = null, Func<IHtmlContent> appendHtmlBuilder = null, bool? antiforgery = default, string globalCssClass = "form-control")
         {
             var htmlContent = appendHtmlBuilder?.Invoke();
-            return await html.GenerateFormAsync(context, actionName, controllerName, routeValues, method, model, htmlAttributes, htmlContent, antiforgery, globalCssClass);
+            return await html.GenerateFormAsync(context, url, method, model, htmlAttributes, htmlContent, antiforgery, globalCssClass);
         }
 
 
-        public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, HttpContext context, string actionName, string controllerName, object routeValues, FormMethod method, TModel model, object htmlAttributes = null, IHtmlContent appendHtmlContent = null, bool? antiforgery = default, string globalCssClass = "form-control")
+        public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, HttpContext context, string url, FormMethod method, TModel model, object htmlAttributes = null, IHtmlContent appendHtmlContent = null, bool? antiforgery = default, string globalCssClass = "form-control")
         {
             var serviceProvider = context.RequestServices;
             var options = serviceProvider.GetRequiredService<AutoGenerateFormBuilder>();
-            var view = new FormViewModel
-            {
-                AppendHtmlContent = appendHtmlContent,
-                GlobalCssClass = globalCssClass,
-                FormOptions = new FormOptions
-                {
-                    ActionName = actionName,
-                    ControllerName = controllerName,
-                    Method = method,
-                    Antiforgery = antiforgery,
-                    HtmlAttributes = htmlAttributes,
-                    RouteValues = routeValues
-                },
-                FormItems = new List<FormItem>()
-            };
 
             var properties = ControlAttributes.GetOrAdd(model.GetType(), t =>
             {
                 return t.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanRead);
             });
 
-
             var form = new TagBuilder("form");
-
+            form.MergeAttribute("method", method.ToString());
+            form.MergeAttribute("action", url);
+            var attribute = htmlAttributes.GetAttributeFromObject();
+            if (attribute != null)
+                form.MergeAttributes(attribute, true);
 
             foreach (var prop in properties)
             {
@@ -69,102 +70,133 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 var name = prop.Name;
                 var value = prop.GetValue(model);
                 var display = prop.GetCustomAttribute<DisplayNameAttribute>();
-                var displayName = display == null ? prop.Name : display.DisplayName;
-                view.FormItems.Add(new FormItem
-                {
-                    DisplayName = display == null ? prop.Name : display.DisplayName,
-                    Value = prop.GetValue(model),
-                    Name = prop.Name,
-                    Controls = controlAttrs
-                });
+                var displayName = display == null ? name : display.DisplayName;
 
                 var group = new TagBuilder("div");
                 group.MergeAttribute("class", "form-group");
 
                 var groupName = new TagBuilder("label");
-                groupName.InnerHtml.AppendHtml(name);
+                groupName.InnerHtml.AppendHtml(displayName);
                 group.InnerHtml.AppendHtml(groupName);
+
+
+                var controlContainer = new TagBuilder("div");
+                controlContainer.AddCssClass("input-group");
+                controlContainer.MergeAttribute("id", $"{name.ToLower()}-input-group");
                 foreach (var control in controlAttrs)
                 {
                     switch (control.ControlType)
                     {
                         case HtmlControlType.Label:
-                            group.InnerHtml.AppendHtml(html.ExLabel(name, value, control.GetAttributes(), globalCssClass));
+                            controlContainer.InnerHtml.AppendHtml(html.ExLabel(name, value, control.GetAttributes(), globalCssClass));
                             break;
 
                         case HtmlControlType.Hidden:
-                            group.InnerHtml.AppendHtml(html.ExHidden(name, value, control.GetAttributes()));
+                            controlContainer.InnerHtml.AppendHtml(html.ExHidden(name, value, control.GetAttributes()));
                             break;
 
                         case HtmlControlType.TextBox:
-                            group.InnerHtml.AppendHtml(html.ExTextBox(name, value, control.GetAttributes(), globalCssClass));
+                            controlContainer.InnerHtml.AppendHtml(html.ExTextBox(name, value, control.GetAttributes(), globalCssClass));
                             break;
 
                         case HtmlControlType.Password:
-                            group.InnerHtml.AppendHtml(html.ExPassword(name, value, control.GetAttributes(), globalCssClass));
+                            controlContainer.InnerHtml.AppendHtml(html.ExPassword(name, value, control.GetAttributes(), globalCssClass));
                             break;
 
                         case HtmlControlType.TextArea:
-                            group.InnerHtml.AppendHtml(html.ExTextArea(name, value, control.GetAttributes(), globalCssClass));
+                            controlContainer.InnerHtml.AppendHtml(html.ExTextArea(name, value, control.GetAttributes(), globalCssClass));
                             break;
 
                         case HtmlControlType.DropDownList:
+
                             var dropDownAttr = (DropDownListAttribute)control;
-                            var dropDownDataSource = (IDataSource)serviceProvider.GetRequiredService(dropDownAttr.DataSource);
-                            group.InnerHtml.AppendHtml(html.ExDropDownList(name,
+                            var dropDownDataSource = (IDataSource)serviceProvider.GetService(dropDownAttr.DataSource);
+                            if (dropDownDataSource == null)
+                            {
+                                controlContainer.MergeAttribute("style", "color:red;");
+                                controlContainer.InnerHtml.AppendHtml("Please bind the data source.");
+                                break;
+                            }
+                            controlContainer.InnerHtml.AppendHtml(html.ExDropDownList(name,
                                 await dropDownDataSource.GetAsync(new[] { value }), dropDownAttr.OptionLabel,
                                 control.GetAttributes(), globalCssClass));
+
                             break;
 
                         case HtmlControlType.ListBox:
                             var listBoxAttr = (ListBoxAttribute)control;
-                            var listBoxDataSource = (IDataSource)serviceProvider.GetRequiredService(listBoxAttr.DataSource);
+                            var listBoxDataSource = (IDataSource)serviceProvider.GetService(listBoxAttr.DataSource);
+                            if (listBoxDataSource == null)
+                            {
+                                controlContainer.MergeAttribute("style", "color:red;");
+                                controlContainer.InnerHtml.AppendHtml("Please bind the data source.");
+                                break;
+                            }
                             if (value is IEnumerable)
                             {
-                                group.InnerHtml.AppendHtml(html.ExListBox(name, await listBoxDataSource.GetAsync(value as IEnumerable<object>), listBoxAttr.OptionLabel, control.GetAttributes(), globalCssClass));
+                                controlContainer.InnerHtml.AppendHtml(html.ExListBox(name, await listBoxDataSource.GetAsync(value as IEnumerable<object>), listBoxAttr.OptionLabel, control.GetAttributes(), globalCssClass));
                             }
                             else
                             {
-                                throw new NotSupportedException($"ListBox does not support type {value.GetType()}.");
+                                controlContainer.MergeAttribute("style", "color:red;");
+                                controlContainer.InnerHtml.AppendHtml($"ListBox does not support type {value.GetType()}.");
                             }
                             break;
 
                         case HtmlControlType.RadioButton:
                             var radioButtonAttr = (RadioButtonAttribute)control;
-                            var radioButtonDataSource = (IDataSource)serviceProvider.GetRequiredService(radioButtonAttr.DataSource);
-                            group.InnerHtml.AppendHtml(html.ExRadioButton(name,
+                            var radioButtonDataSource = (IDataSource)serviceProvider.GetService(radioButtonAttr.DataSource);
+                            if (radioButtonDataSource == null)
+                            {
+                                controlContainer.MergeAttribute("style", "color:red;");
+                                controlContainer.InnerHtml.AppendHtml("Please bind the data source.");
+                                break;
+                            }
+                            controlContainer.InnerHtml.AppendHtml(html.ExRadioButton(name,
                                 await radioButtonDataSource.GetAsync(new[] { value }), radioButtonAttr.GetAttributes(),
                                 globalCssClass));
                             break;
 
                         case HtmlControlType.CheckBox:
                             var checkBoxAttr = (CheckBoxAttribute)control;
-                            var checkBoxDataSource = (IDataSource)serviceProvider.GetRequiredService(checkBoxAttr.DataSource);
                             if (value is IEnumerable)
                             {
-                                group.InnerHtml.AppendHtml(html.ExCheckBox(name,
+                                var checkBoxDataSource = (IDataSource)serviceProvider.GetService(checkBoxAttr.DataSource);
+                                if (checkBoxDataSource == null)
+                                {
+                                    controlContainer.MergeAttribute("style", "color:red;");
+                                    controlContainer.InnerHtml.AppendHtml("Please bind the data source.");
+                                    break;
+                                }
+                                controlContainer.InnerHtml.AppendHtml(html.ExCheckBox(name,
                                     await checkBoxDataSource.GetAsync(value as IEnumerable<object>),
                                     checkBoxAttr.GetAttributes(), globalCssClass));
                             }
+                            else if (value is bool isChecked)
+                            {
+                                controlContainer.InnerHtml.AppendHtml(html.ExSingleCheckBox(name, isChecked, checkBoxAttr.GetAttributes(), globalCssClass));
+                            }
                             else
                             {
-                                throw new NotSupportedException($"CheckBox does not support type {value.GetType()}.");
+
+                                controlContainer.MergeAttribute("style", "color:red;");
+                                controlContainer.InnerHtml.AppendHtml($"CheckBox does not support type {value.GetType()}.");
                             }
                             break;
 
                         case HtmlControlType.Button:
                             var buttonAttr = (ButtonAttribute)control;
-                            group.InnerHtml.AppendHtml(html.Button(buttonAttr.ButtonText, buttonAttr.GetAttributes(),
+                            controlContainer.InnerHtml.AppendHtml(html.Button(buttonAttr.ButtonText, buttonAttr.GetAttributes(),
                                 globalCssClass));
                             break;
 
                         case HtmlControlType.File:
-                            group.InnerHtml.AppendHtml(html.ExFile(name, control.GetAttributes(), globalCssClass));
+                            controlContainer.InnerHtml.AppendHtml(html.ExFile(name, control.GetAttributes(), globalCssClass));
                             break;
 
                         case HtmlControlType.RichEditor:
                             var editorAttr = (RichEditorAttribute)control;
-                            group.InnerHtml.AppendHtml(await html.ExRichEditor(name, value?.ToString(),
+                            controlContainer.InnerHtml.AppendHtml(await html.ExRichEditor(name, value?.ToString(),
                                 string.IsNullOrWhiteSpace(editorAttr.PartialName)
                                     ? options.DefaultRichEditorPartialName
                                     : editorAttr.PartialName, editorAttr.GetAttributes()));
@@ -172,7 +204,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                         case HtmlControlType.Uploader:
                             var uploaderAttr = (UploaderAttribute)control;
-                            group.InnerHtml.AppendHtml(await html.Uploader(name, value?.ToString(),
+                            controlContainer.InnerHtml.AppendHtml(await html.Uploader(name, value?.ToString(),
                                 string.IsNullOrWhiteSpace(uploaderAttr.ServerUrl)
                                     ? options.UploadServerUrl
                                     : uploaderAttr.ServerUrl,
@@ -184,6 +216,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                 }
 
+                group.InnerHtml.AppendHtml(controlContainer);
                 group.InnerHtml.AppendHtml(html.ValidationMessage(name));
                 form.InnerHtml.AppendHtml(group);
             }

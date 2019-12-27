@@ -18,8 +18,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
             {
                 var attrs = JsonConvert.DeserializeObject<Dictionary<string, object>>(HtmlAttributes);
                 if (attrs == null) return _attributes;
-                foreach (var (key, o) in attrs)
-                    _attributes[key] = o;
+                foreach (var attr in attrs)
+                    _attributes[attr.Key] = attr.Value;
             }
             catch
             {

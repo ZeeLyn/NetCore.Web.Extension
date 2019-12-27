@@ -11,7 +11,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             var options = new AutoGenerateFormBuilder();
             builder?.Invoke(options);
             services.AddSingleton(options);
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(p => !p.FullName.StartsWith("System") && !p.FullName.StartsWith("Microsoft"));
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(p => !p.IsDynamic && !p.FullName.StartsWith("System") && !p.FullName.StartsWith("Microsoft"));
             var dataSourceType = typeof(IDataSource);
             foreach (var assembly in assemblies)
             {

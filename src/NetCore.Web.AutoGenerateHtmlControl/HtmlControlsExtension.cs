@@ -8,12 +8,6 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 {
     public static class HtmlControlsExtension
     {
-        public static string ConvertToHtmlString(this IHtmlContent content)
-        {
-            using var writer = new System.IO.StringWriter();
-            content.WriteTo(writer, HtmlEncoder.Default);
-            return writer.ToString();
-        }
         public static IHtmlContent ExLabel(this IHtmlHelper html, string name, object text,
             IDictionary<string, object> htmlAttributes, string globalCssClass = "")
         {
@@ -221,6 +215,32 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 container.InnerHtml.AppendHtml(label);
                 builder.AppendHtml(container);
             }
+            return builder;
+        }
+
+        public static IHtmlContent ExSingleCheckBox(this IHtmlHelper html, string name, bool isChecked,
+            IDictionary<string, object> htmlAttributes, string globalCssClass = "")
+        {
+            var builder = new HtmlContentBuilder();
+            var container = new TagBuilder("div");
+            container.MergeAttribute("class", "checkbox");
+            var label = new TagBuilder("label");
+            var checkBoxBuilder = new TagBuilder("input");
+            checkBoxBuilder.MergeAttribute("type", "checkbox");
+            checkBoxBuilder.MergeAttribute("name", name);
+            checkBoxBuilder.MergeAttribute("value", "true");
+            if (isChecked)
+                checkBoxBuilder.MergeAttribute("checked", "checked");
+
+            if (!string.IsNullOrWhiteSpace(globalCssClass))
+                checkBoxBuilder.MergeAttribute("class", globalCssClass);
+            checkBoxBuilder.MergeAttributes(htmlAttributes, true);
+
+            label.InnerHtml.AppendHtml(checkBoxBuilder);
+            //label.InnerHtml.AppendHtml(name);
+            container.InnerHtml.AppendHtml(label);
+            builder.AppendHtml(container);
+
             return builder;
         }
 
