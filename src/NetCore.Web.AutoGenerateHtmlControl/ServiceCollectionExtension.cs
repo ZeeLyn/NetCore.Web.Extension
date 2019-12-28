@@ -23,6 +23,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                     }
                 }
             }
+
             return services;
         }
     }

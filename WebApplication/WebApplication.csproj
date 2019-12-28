@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <MvcRazorCompileOnPublish>false</MvcRazorCompileOnPublish>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,14 +10,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0" />
+    <PackageReference Include="UploadMiddleware.LocalStorage" Version="0.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\src\NetCore.Web.AutoGenerateHtmlControl\NetCore.Web.AutoGenerateHtmlControl.csproj" />
     <ProjectReference Include="..\src\NetCore.Web.Extension\NetCore.Web.Extension.csproj" />
   </ItemGroup>
+
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties wwwroot_4lib_4bootstrap_4dist_4css_4bootstrap_1css_1map__JsonSchema="http://json.schemastore.org/up.json" />
+    </VisualStudio>
+  </ProjectExtensions>
 
 
 </Project>

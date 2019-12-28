@@ -1,0 +1,20 @@
+[
+  {
+    "outputFileName": "js/uploader.min.js",
+    "inputFiles": [
+      "js/uploader.js"
+    ]
+  },
+  {
+    "outputFileName": "css/uploader.min.css",
+    "inputFiles": [
+      "css/uploader.css"
+    ]
+  },
+  {
+    "outputFileName": "js/init.min.js",
+    "inputFiles": [
+      "js/init.js"
+    ]
+  }
+]

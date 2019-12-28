@@ -270,7 +270,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             container.MergeAttribute("id", name);
             container.MergeAttributes(htmlAttributes, true);
             var script = new TagBuilder("script");
-            script.InnerHtml.AppendHtml("var id=1;");
+            script.InnerHtml.AppendHtml("");
             container.InnerHtml.AppendHtml(script);
             return container;
         }

@@ -61,7 +61,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             var attribute = htmlAttributes.GetAttributeFromObject();
             if (attribute != null)
                 form.MergeAttributes(attribute, true);
-
+            var hasUploader = false;
             foreach (var prop in properties)
             {
                 var controlAttrs = prop.GetCustomAttributes<FormControlsAttribute>().ToList();
@@ -211,6 +211,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                                 string.IsNullOrWhiteSpace(uploaderAttr.PartialName)
                                     ? options.DefaultUploaderPartialName
                                     : uploaderAttr.PartialName, uploaderAttr.GetAttributes()));
+                            if (!hasUploader)
+                                hasUploader = true;
                             break;
                     }
 
@@ -224,6 +226,12 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             form.InnerHtml.AppendHtml(appendHtmlContent);
             if (antiforgery.HasValue && antiforgery.Value)
                 form.InnerHtml.AppendHtml(html.AntiForgeryToken());
+            if (hasUploader)
+            {
+                var script = new TagBuilder("script");
+
+                form.InnerHtml.AppendHtml(script);
+            }
             return form;
         }
     }

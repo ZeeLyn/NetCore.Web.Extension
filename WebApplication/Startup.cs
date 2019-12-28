@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -14,6 +15,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NetCore.Web.AutoGenerateHtmlControl;
 using NetCore.Web.Extension;
+using UploadMiddleware.Core;
+using UploadMiddleware.LocalStorage;
 
 namespace WebApplication
 {
@@ -30,6 +33,11 @@ namespace WebApplication
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            //services.Configure<MvcRazorRuntimeCompilationOptions>(options =>
+            //{
+            //    options.FileProviders.Add(new EmbeddedFileProvider(typeof(UploaderContext).GetTypeInfo().Assembly));
+            //});
+
             //services.AddGlobalExceptionFilter();
             //services.AddGlobalModelStateFilter();
             services.AddJwtBearerAuthentication(options =>
@@ -48,6 +56,10 @@ namespace WebApplication
             });
 
             services.AddAutoGenerateHtmlControl(builder => { });
+            services.AddUploadLocalStorage(options =>
+            {
+
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,7 +69,9 @@ namespace WebApplication
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseUpload("/api/upload");
 
+            app.UseAutoGenerateHtmlControl();
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();

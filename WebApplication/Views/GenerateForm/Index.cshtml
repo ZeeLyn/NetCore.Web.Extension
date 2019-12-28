@@ -5,12 +5,57 @@
 
 @using NetCore.Web.AutoGenerateHtmlControl
 
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        if (!document.querySelector("script[id='uploader']")) {
+            var lib = document.createElement('script');
+            lib.setAttribute('src', '/resources/auto_generate_html_control/js/uploader.min.js');
+            lib.addEventListener("load", function () {
+                //console.log(1);
+                //var sc = document.createElement("script");
+                //sc.innerHTML = " console.log(123);$('#uploader').InitUploader({});";
+                //document.querySelector('body').appendChild(sc);
+                $('#uploader1').InitUploader({});
+            });
+            document.querySelector("body").appendChild(lib);
+            var css = document.createElement('link');
+            css.setAttribute("rel", "stylesheet");
+            css.setAttribute('href', '/resources/auto_generate_html_control/css/uploader.min.css');
+            document.querySelector('header').appendChild(css);
+        }
+    });
+
+</script>
+<div id="uploader1" class="uploader-container">
+    <div class="queueList">
+        <div id="dndArea" class="placeholder">
+            <div class="filePicker btn btn-primary btn-sm"></div>
+            <div>或将文件拖到这里，单次最多可选300个</div>
+        </div>
+        <ul class="filelist"></ul>
+    </div>
+    <div class="statusBar" style="display: none;">
+        <div class="status">
+            <div class="progress">
+                <span class="text">0%</span>
+                <span class="percentage"></span>
+            </div>
+            <div class="info"></div>
+        </div>
+        <div class="btns">
+            <div class="footer-add-btn btn btn-secondary btn-sm"></div>
+            <div class="uploadBtn btn btn-primary btn-sm">开始上传</div>
+        </div>
+    </div>
+</div>
 @await Html.GenerateFormAsync(Context, "/GenerateForm/post", FormMethod.Post, Model, null, () => Html.Raw("<div class=\"box-footer text-center\"><button class=\"btn btn-primary\">Submit</button></div>"), true)
 
-@Html.CheckBoxFor(p => p.Archive)
 
 @section Scripts{
-
+    @*<script src="/resources/auto_generate_html_control/js/uploader.min.js"></script>*@
+    @*<script src="/resources/auto_generate_html_control/js/init.min.js"></script>*@
+    <script src="~/lib/webuploader/webuploader.min.js"></script>
     <script src="~/lib/ckeditor/ckeditor5-build-classic/build/ckeditor.js"></script>
     <script>
         function upload() {
@@ -20,6 +65,8 @@
 }
 
 @section Styles{
+    @*<link href="~/lib/webuploader/webuploader.css" rel="stylesheet" />*@
+    @*<link href="/resources/auto_generate_html_control/css/uploader.min.css" rel="stylesheet" />*@
     <style>
         .input-group { flex-direction: column; }
         #avatar-input-group { flex-direction: row; }
