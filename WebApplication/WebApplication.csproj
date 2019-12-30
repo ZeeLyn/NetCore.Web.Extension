@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0" />
-    <PackageReference Include="UploadMiddleware.LocalStorage" Version="0.0.3" />
+    <PackageReference Include="UploadMiddleware.LocalStorage" Version="0.0.5" />
   </ItemGroup>
 
   <ItemGroup>

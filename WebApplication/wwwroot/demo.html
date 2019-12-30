@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link href="lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/demo.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="uploader1" class="uploader-container" data-form-name="file1">
+        <div class="queueList">
+            <div id="dndArea" class="placeholder">
+                <div class="filePicker btn btn-primary btn-sm"></div>
+                <div>或将文件拖拽 , 粘贴到这里</div>
+            </div>
+            <ul class="filelist"></ul>
+        </div>
+        <div class="statusBar" style="display: none;">
+            <div class="status">
+                <div class="progress">
+                    <span class="text">0%</span>
+                    <span class="percentage"></span>
+                </div>
+                <div class="info"></div>
+            </div>
+            <div class="btns">
+                <div class="footer-add-btn btn btn-secondary btn-sm"></div>
+                <div class="uploadBtn btn btn-primary btn-sm">开始上传</div>
+            </div>
+        </div>
+    </div>
+    <div id="uploader2" class="uploader-container" data-form-name="file2">
+        <div class="queueList">
+            <div id="dndArea" class="placeholder">
+                <div class="filePicker btn btn-primary btn-sm"></div>
+                <div>或将文件拖拽 , 粘贴到这里</div>
+            </div>
+            <ul class="filelist"></ul>
+        </div>
+        <div class="statusBar" style="display: none;">
+            <div class="status">
+                <div class="progress">
+                    <span class="text">0%</span>
+                    <span class="percentage"></span>
+                </div>
+                <div class="info"></div>
+            </div>
+            <div class="btns">
+                <div class="footer-add-btn btn btn-secondary btn-sm"></div>
+                <div class="uploadBtn btn btn-primary btn-sm">开始上传</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var BASE_URL = "";
+    </script>
+    <script src="lib/jquery/dist/jquery.min.js"></script>
+    <script src="lib/webuploader/dist/webuploader.min.js"></script>
+    <script src="demo.js"></script>
+    <script type="text/javascript">
+        var uploader1 = $("#uploader1").InitUploader({
+            multiple: true, server_url: "http://localhost:50861/api/upload", chunk: {
+                chunked: false,
+                chunkSize: 1024 * 1024 * 2,
+                chunkCheckServerUrl: "/api/upload?action=chunk",
+                chunkMergeServerUrl: "/api/upload?action=merge"
+            }
+        });
+        var uploader2 = $("#uploader2").InitUploader({
+            multiple: true, server_url: "http://localhost:50861/api/upload", chunk: {
+                chunked: true,
+                chunkSize: 1024 * 1024 * 2,
+                chunkCheckServerUrl: "/api/upload?action=chunk",
+                chunkMergeServerUrl: "/api/upload?action=merge"
+            }
+        });
+
+    </script>
+
+</body>
+</html>

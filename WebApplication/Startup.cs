@@ -54,12 +54,10 @@ namespace WebApplication
                 options.Cookie.Name = "access_token";
                 options.LoginPath = "/login";
             });
-
+            services.AddCors(option => option.AddPolicy("Cors", policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
             services.AddAutoGenerateHtmlControl(builder => { });
-            services.AddUploadLocalStorage(options =>
-            {
-
-            });
+            //services.AddChunkedUploadLocalStorage();
+            services.AddUploadLocalStorage();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,7 +68,7 @@ namespace WebApplication
                 app.UseDeveloperExceptionPage();
             }
             app.UseUpload("/api/upload");
-
+            app.UseCors("Cors");
             app.UseAutoGenerateHtmlControl();
             app.UseStaticFiles();
             app.UseRouting();
