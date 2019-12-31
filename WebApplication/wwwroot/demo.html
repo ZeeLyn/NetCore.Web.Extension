@@ -54,6 +54,7 @@
             </div>
         </div>
     </div>
+    <input type="file" id="file1" />
 
     <script>
         var BASE_URL = "";
@@ -63,6 +64,7 @@
     <script src="demo.js"></script>
     <script type="text/javascript">
         var uploader1 = $("#uploader1").InitUploader({
+            data: ["/b1110d9d193b4fd68b3a0c164688ba12.jpg"],
             multiple: true, server_url: "http://localhost:50861/api/upload", chunk: {
                 chunked: false,
                 chunkSize: 1024 * 1024 * 2,
@@ -71,20 +73,18 @@
             }
         });
         function Binding() {
-            var wrap = $("#uploader1");
-            wrap.find(".queueList").addClass("filled");
-            wrap.find(".placeholder").addClass("element-invisible");
-            //wrap.find(".uploadBtn ").addClass("state-ready");
-            wrap.find(".statusBar ").show();
+            //var wrap = $("#uploader1");
+            //wrap.find(".queueList").addClass("filled");
+            //wrap.find(".placeholder").addClass("element-invisible");
+            //wrap.find(".statusBar ").show();
 
-            //var img = new Image();
-            //img.src = "/b1110d9d193b4fd68b3a0c164688ba12.jpg";
-            //img.onload = function () {
-            //    console.log(img);
-            //    uploader1.addFiles(img);
-            //};
-
-            wrap.find(".filelist").append('<li class="state-complete"><p class="imgWrap"><img src="/b1110d9d193b4fd68b3a0c164688ba12.jpg"></p><div class="file-panel" style="height: 0px;"><span class="rotateLeft"></span><span class="rotateRight"></span><span class="cancel"></span></div><input type="hidden" name="file1" value="/20191230/84374235cf6e4384b7627c34a4edb8bd.jpg"><span class="success"></span></li>');
+            //wrap.find(".filelist").append('<li class="state-complete"><p class="imgWrap"><img data-src="/b1110d9d193b4fd68b3a0c164688ba12.jpg"></p><div class="file-panel" style="height: 0px;"><span class="rotateLeft"></span><span class="rotateRight"></span><span class="cancel"></span></div><input type="hidden" name="file1" value="/20191230/84374235cf6e4384b7627c34a4edb8bd.jpg"><span class="success"></span></li>');
+            //console.log(document.getElementById("file1").files[0]);
+            var file = document.getElementById("file1").files[0];
+            file.mark = "uploaded";
+            var id = uploader1.addFiles(file);
+            //uploader1.setStatus(file, 'complete ');
+            console.log(file);
         };
         var uploader2 = $("#uploader2").InitUploader({
             multiple: true, server_url: "http://localhost:50861/api/upload", chunk: {
@@ -94,7 +94,6 @@
                 chunkMergeServerUrl: "/api/upload?action=merge"
             }
         });
-
     </script>
 
 </body>

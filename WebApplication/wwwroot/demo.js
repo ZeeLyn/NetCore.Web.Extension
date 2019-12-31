@@ -71,6 +71,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
 (function ($) {
     $.fn.InitUploader = function (options) {
         options = $.extend({
+            data: null,
             container: this,
             base_url: "",
             server_url: "/api/upload",
@@ -105,9 +106,6 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
 
         var o;
         this.each(function () {
-            //if (options.chunk.chunked) {
-            //    register();
-            //}
             var $ = jQuery,    // just in case. Make sure it's not an other libaray.
                 $wrap = options.container,
                 // 图片容器
@@ -202,64 +200,65 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             });
 
 
-            $wrap.on('mouseenter', ".filelist li", function () {
-                $(this).find(".file-panel").stop().animate({ height: 27 });
+            //$wrap.on('mouseenter', ".filelist li", function () {
+            //    $(this).find(".file-panel").stop().animate({ height: 27 });
+            //});
+
+            //$wrap.on('mouseleave', ".filelist li", function () {
+            //    $(this).find(".file-panel").stop().animate({ height: 0 });
+            //});
+
+            //$wrap.on('click', '.filelist li span', function () {
+            //    var index = $(this).index(),
+            //        deg;
+            //    var fileId = $(this).parent().parent().attr("id");
+            //    var file = uploader.getFile(fileId);
+            //    switch (index) {
+            //        case 0:
+            //            if (file)
+            //                file.rotation -= 90;
+            //            break;
+
+            //        case 1:
+            //            if (file)
+            //                file.rotation += 90;
+            //            break;
+
+            //        case 2:
+            //            if (file)
+            //                uploader.removeFile(file, true);
+            //            else {
+            //                $(this).parent().parent().remove();
+            //                setPedding();
+            //            }
+            //            return;
+            //    }
+
+            //    if (file) {
+            //        $wrap = $(this).parent().parent().find("p.imgWrap");
+            //        if (supportTransition) {
+            //            deg = 'rotate(' + file.rotation + 'deg)';
+            //            $wrap.css({
+            //                '-webkit-transform': deg,
+            //                '-mos-transform': deg,
+            //                '-o-transform': deg,
+            //                'transform': deg
+            //            });
+            //        } else {
+            //            $wrap.css('filter', 'progid:DXImageTransform.Microsoft.BasicImage(rotation=' + (~~((file.rotation / 90) % 4 + 4) % 4) + ')');
+            //        }
+            //    }
+            //});
+
+
+            $(options.data).each(function (_, item) {
+                Url2File(item, "1.jpg", "image/jpeg").then(function (f) {
+                    f.mark = "uploaded";
+                    uploader.addFiles(f);
+
+                });
+
             });
-
-            $wrap.on('mouseleave', ".filelist li", function () {
-                $(this).find(".file-panel").stop().animate({ height: 0 });
-            });
-
-            $wrap.on('click', '.filelist li span', function () {
-                var index = $(this).index(),
-                    deg;
-                var fileId = $(this).parent().parent().attr("id");
-                var files = uploader.getFiles();
-                var file;
-                for (var f = 0; f < files.length; f++) {
-                    if (files[f].id === fileId) {
-                        file = files[f];
-                        break;
-                    }
-                }
-                console.log(file);
-                switch (index) {
-                    case 0:
-                        if (file)
-                            file.rotation -= 90;
-                        break;
-
-                    case 1:
-                        if (file)
-                            file.rotation += 90;
-                        break;
-
-                    case 2:
-                        if (file)
-                            uploader.removeFile(file, true);
-                        else {
-                            $(this).parent().parent().remove();
-                            setPedding();
-                        }
-                        return;
-                }
-
-                if (file) {
-                    $wrap = $(this).parent().parent().find("p.imgWrap");
-                    if (supportTransition) {
-                        deg = 'rotate(' + file.rotation + 'deg)';
-                        $wrap.css({
-                            '-webkit-transform': deg,
-                            '-mos-transform': deg,
-                            '-o-transform': deg,
-                            'transform': deg
-                        });
-                    } else {
-                        $wrap.css('filter', 'progid:DXImageTransform.Microsoft.BasicImage(rotation=' + (~~((file.rotation / 90) % 4 + 4) % 4) + ')');
-                    }
-                }
-            });
-
 
             // 当有文件添加进来时执行，负责view的创建
             function addFile(file) {
@@ -314,6 +313,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                 }
 
                 file.on('statuschange', function (cur, prev) {
+
                     if (prev === 'progress') {
                         $prgress.hide().width(0);
                     } else if (prev === 'queued') {
@@ -340,46 +340,49 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                     $li.removeClass('state-' + prev).addClass('state-' + cur);
                 });
 
-                //$li.on('mouseenter', function () {
-                //    $btns.stop().animate({ height: 30 });
-                //});
+                $li.on('mouseenter', function () {
+                    $btns.stop().animate({ height: 30 });
+                });
 
-                //$li.on('mouseleave', function () {
-                //    $btns.stop().animate({ height: 0 });
-                //});
+                $li.on('mouseleave', function () {
+                    $btns.stop().animate({ height: 0 });
+                });
 
-                //$btns.on('click', 'span', function () {
-                //    var index = $(this).index(),
-                //        deg;
+                $btns.on('click', 'span', function () {
+                    var index = $(this).index(),
+                        deg;
 
-                //    switch (index) {
-                //        case 0:
-                //            file.rotation -= 90;
-                //            break;
-                //        case 1:
-                //            file.rotation += 90;
-                //            break;
+                    switch (index) {
+                        case 0:
+                            file.rotation -= 90;
+                            break;
+                        case 1:
+                            file.rotation += 90;
+                            break;
 
-                //        case 2:
-                //            uploader.removeFile(file);
-                //            return;
-                //    }
+                        case 2:
+                            uploader.removeFile(file);
+                            return;
+                    }
 
-                //    if (supportTransition) {
-                //        deg = 'rotate(' + file.rotation + 'deg)';
-                //        $wrap.css({
-                //            '-webkit-transform': deg,
-                //            '-mos-transform': deg,
-                //            '-o-transform': deg,
-                //            'transform': deg
-                //        });
-                //    } else {
-                //        $wrap.css('filter', 'progid:DXImageTransform.Microsoft.BasicImage(rotation=' + (~~((file.rotation / 90) % 4 + 4) % 4) + ')');
-                //    }
-                //    console.log(file.rotation);
-                //});
+                    if (supportTransition) {
+                        deg = 'rotate(' + file.rotation + 'deg)';
+                        $wrap.css({
+                            '-webkit-transform': deg,
+                            '-mos-transform': deg,
+                            '-o-transform': deg,
+                            'transform': deg
+                        });
+                    } else {
+                        $wrap.css('filter', 'progid:DXImageTransform.Microsoft.BasicImage(rotation=' + (~~((file.rotation / 90) % 4 + 4) % 4) + ')');
+                    }
+                });
 
                 $li.appendTo($queue);
+
+                if (file.source.source.mark === 'uploaded') {
+                    file.setStatus('complete');
+                }
             }
 
             function removeFile(file) {
@@ -437,7 +440,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             }
 
             function setPedding() {
-                if ($wrap.find("li").length > 0)
+                if ($queue.find("li").length > 0)
                     return;
                 setState('pedding');
             }
@@ -510,7 +513,6 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             uploader.onUploadProgress = function (file, percentage) {
                 var $li = $('#' + file.id),
                     $percent = $li.find('.progress span');
-
                 $percent.css('width', percentage * 100 + '%');
                 percentages[file.id][1] = percentage;
                 updateTotalProgress();
@@ -527,8 +529,14 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
 
             uploader.onFileQueued = function (file) {
                 file.options = options;
-                fileCount++;
-                fileSize += file.size;
+                if (file.source.source.mark === 'uploaded') {
+                    $placeHolder.addClass('element-invisible');
+                    $statusBar.show();
+                }
+                else {
+                    fileCount++;
+                    fileSize += file.size;
+                }
                 if (fileCount === 1) {
                     $placeHolder.addClass('element-invisible');
                     $statusBar.show();
@@ -561,7 +569,6 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                     case 'stopUpload':
                         setState('paused');
                         break;
-
                 }
             });
 
@@ -590,6 +597,13 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
 
             $upload.addClass('state-' + state);
             updateTotalProgress();
+
+            function Url2File(url, filename, mimeType) {
+                return (fetch(url)
+                    .then(function (res) { return res.arrayBuffer(); })
+                    .then(function (buf) { return new File([buf], filename, { type: mimeType }); })
+                );
+            }
         });
         return o;
     };
