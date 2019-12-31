@@ -69,8 +69,9 @@ namespace WebApplication
             }
             app.UseUpload("/api/upload");
             app.UseCors("Cors");
-            app.UseAutoGenerateHtmlControl();
+
             app.UseStaticFiles();
+            app.UseAutoGenerateHtmlControl();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();

@@ -222,6 +222,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                         break;
                     }
                 }
+                console.log(file);
                 switch (index) {
                     case 0:
                         if (file)
@@ -236,6 +237,10 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                     case 2:
                         if (file)
                             uploader.removeFile(file, true);
+                        else {
+                            $(this).parent().parent().remove();
+                            setPedding();
+                        }
                         return;
                 }
 
@@ -431,6 +436,11 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                 $info.html(text);
             }
 
+            function setPedding() {
+                if ($wrap.find("li").length > 0)
+                    return;
+                setState('pedding');
+            }
             function setState(val) {
                 var stats;
 
@@ -440,6 +450,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
 
                 $upload.removeClass('state-' + state);
                 $upload.addClass('state-' + val);
+
                 state = val;
 
                 switch (state) {
@@ -530,14 +541,11 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             uploader.onFileDequeued = function (file) {
                 fileCount--;
                 fileSize -= file.size;
-
-                if (!fileCount) {
-                    setState('pedding');
-                }
-
                 removeFile(file);
                 updateTotalProgress();
-
+                if (!fileCount) {
+                    setPedding();
+                }
             };
 
             uploader.on('all', function (type) {

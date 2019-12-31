@@ -50,7 +50,7 @@
     100% { background-position: 17px 0; }
 }
 
-.uploader-container .filelist li p.imgWrap { position: relative; z-index: 2; vertical-align: middle; overflow: hidden; -webkit-transform-origin: 50% 50%; -moz-transform-origin: 50% 50%; -o-transform-origin: 50% 50%; -ms-transform-origin: 50% 50%; transform-origin: 50% 50%; -webit-transition: 200ms ease-out; -moz-transition: 200ms ease-out; -o-transition: 200ms ease-out; -ms-transition: 200ms ease-out; transition: 200ms ease-out; }
+.uploader-container .filelist li p.imgWrap { position: relative; z-index: 2; vertical-align: middle; overflow: hidden; -webkit-transform-origin: 50% 50%; -moz-transform-origin: 50% 50%; -o-transform-origin: 50% 50%; -ms-transform-origin: 50% 50%; transform-origin: 50% 50%; -webit-transition: 200ms ease-out; -moz-transition: 200ms ease-out; -o-transition: 200ms ease-out; -ms-transition: 200ms ease-out; transition: 200ms ease-out; width: 100px; height: 100px; }
 
 .uploader-container .filelist li img { width: 100%; }
 
