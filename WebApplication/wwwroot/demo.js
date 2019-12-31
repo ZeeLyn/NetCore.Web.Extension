@@ -202,6 +202,60 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             });
 
 
+            $wrap.on('mouseenter', ".filelist li", function () {
+                $(this).find(".file-panel").stop().animate({ height: 27 });
+            });
+
+            $wrap.on('mouseleave', ".filelist li", function () {
+                $(this).find(".file-panel").stop().animate({ height: 0 });
+            });
+
+            $wrap.on('click', '.filelist li span', function () {
+                var index = $(this).index(),
+                    deg;
+                var fileId = $(this).parent().parent().attr("id");
+                var files = uploader.getFiles();
+                var file;
+                for (var f = 0; f < files.length; f++) {
+                    if (files[f].id === fileId) {
+                        file = files[f];
+                        break;
+                    }
+                }
+                switch (index) {
+                    case 0:
+                        if (file)
+                            file.rotation -= 90;
+                        break;
+
+                    case 1:
+                        if (file)
+                            file.rotation += 90;
+                        break;
+
+                    case 2:
+                        if (file)
+                            uploader.removeFile(file, true);
+                        return;
+                }
+
+                if (file) {
+                    $wrap = $(this).parent().parent().find("p.imgWrap");
+                    if (supportTransition) {
+                        deg = 'rotate(' + file.rotation + 'deg)';
+                        $wrap.css({
+                            '-webkit-transform': deg,
+                            '-mos-transform': deg,
+                            '-o-transform': deg,
+                            'transform': deg
+                        });
+                    } else {
+                        $wrap.css('filter', 'progid:DXImageTransform.Microsoft.BasicImage(rotation=' + (~~((file.rotation / 90) % 4 + 4) % 4) + ')');
+                    }
+                }
+            });
+
+
             // 当有文件添加进来时执行，负责view的创建
             function addFile(file) {
                 var $li = $('<li id="' + file.id + '">' +
@@ -210,9 +264,9 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                     '</li>'),
 
                     $btns = $('<div class="file-panel">' +
-                        '<span class="cancel"></span>' +
+                        '<span class="rotateLeft"></span>' +
                         '<span class="rotateRight"></span>' +
-                        '<span class="rotateLeft"></span></div>').appendTo($li),
+                        '<span class="cancel"></span></div>').appendTo($li),
                     $prgress = $li.find('p.progress span'),
                     $wrap = $li.find('p.imgWrap'),
                     $info = $('<p class="error"></p>'),
@@ -281,44 +335,44 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                     $li.removeClass('state-' + prev).addClass('state-' + cur);
                 });
 
-                $li.on('mouseenter', function () {
-                    $btns.stop().animate({ height: 30 });
-                });
+                //$li.on('mouseenter', function () {
+                //    $btns.stop().animate({ height: 30 });
+                //});
 
-                $li.on('mouseleave', function () {
-                    $btns.stop().animate({ height: 0 });
-                });
+                //$li.on('mouseleave', function () {
+                //    $btns.stop().animate({ height: 0 });
+                //});
 
-                $btns.on('click', 'span', function () {
-                    var index = $(this).index(),
-                        deg;
+                //$btns.on('click', 'span', function () {
+                //    var index = $(this).index(),
+                //        deg;
 
-                    switch (index) {
-                        case 0:
-                            uploader.removeFile(file);
-                            return;
+                //    switch (index) {
+                //        case 0:
+                //            file.rotation -= 90;
+                //            break;
+                //        case 1:
+                //            file.rotation += 90;
+                //            break;
 
-                        case 1:
-                            file.rotation += 90;
-                            break;
+                //        case 2:
+                //            uploader.removeFile(file);
+                //            return;
+                //    }
 
-                        case 2:
-                            file.rotation -= 90;
-                            break;
-                    }
-
-                    if (supportTransition) {
-                        deg = 'rotate(' + file.rotation + 'deg)';
-                        $wrap.css({
-                            '-webkit-transform': deg,
-                            '-mos-transform': deg,
-                            '-o-transform': deg,
-                            'transform': deg
-                        });
-                    } else {
-                        $wrap.css('filter', 'progid:DXImageTransform.Microsoft.BasicImage(rotation=' + (~~((file.rotation / 90) % 4 + 4) % 4) + ')');
-                    }
-                });
+                //    if (supportTransition) {
+                //        deg = 'rotate(' + file.rotation + 'deg)';
+                //        $wrap.css({
+                //            '-webkit-transform': deg,
+                //            '-mos-transform': deg,
+                //            '-o-transform': deg,
+                //            'transform': deg
+                //        });
+                //    } else {
+                //        $wrap.css('filter', 'progid:DXImageTransform.Microsoft.BasicImage(rotation=' + (~~((file.rotation / 90) % 4 + 4) % 4) + ')');
+                //    }
+                //    console.log(file.rotation);
+                //});
 
                 $li.appendTo($queue);
             }

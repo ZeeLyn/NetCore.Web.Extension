@@ -30,9 +30,11 @@
             </div>
         </div>
     </div>
+    <input type="button" value="绑定已上传的图片" onclick="Binding();" />
+
     <div id="uploader2" class="uploader-container" data-form-name="file2">
         <div class="queueList">
-            <div id="dndArea" class="placeholder">
+            <div class="placeholder">
                 <div class="filePicker btn btn-primary btn-sm"></div>
                 <div>或将文件拖拽 , 粘贴到这里</div>
             </div>
@@ -68,6 +70,22 @@
                 chunkMergeServerUrl: "/api/upload?action=merge"
             }
         });
+        function Binding() {
+            var wrap = $("#uploader1");
+            wrap.find(".queueList").addClass("filled");
+            wrap.find(".placeholder").addClass("element-invisible");
+            //wrap.find(".uploadBtn ").addClass("state-ready");
+            wrap.find(".statusBar ").show();
+
+            //var img = new Image();
+            //img.src = "/b1110d9d193b4fd68b3a0c164688ba12.jpg";
+            //img.onload = function () {
+            //    console.log(img);
+            //    uploader1.addFiles(img);
+            //};
+
+            wrap.find(".filelist").append('<li id="WU_FILE_0" class="state-complete"><p class="imgWrap"><img src="https://csdnimg.cn/pubfooter/images/edu-QR.png"></p><div class="file-panel" style="height: 0px;"><span class="rotateLeft"></span><span class="rotateRight"></span><span class="cancel"></span></div><input type="hidden" name="file1" value="/20191230/84374235cf6e4384b7627c34a4edb8bd.jpg"><span class="success"></span></li>');
+        };
         var uploader2 = $("#uploader2").InitUploader({
             multiple: true, server_url: "http://localhost:50861/api/upload", chunk: {
                 chunked: true,
