@@ -253,7 +253,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
 
             $(options.data).each(function (_, item) {
                 var sp = item.split('/');
-                Url2File(item, sp[sp.length - 1], "image/jpeg").then(function (f) {
+                url2File(item, sp[sp.length - 1], "image/jpeg").then(function (f) {
                     f.uploaded = true;
                     f.remote_url = item;
                     uploader.addFiles(f);
@@ -523,7 +523,6 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
 
             uploader.on("uploadBeforeSend", function (block, data, headers) {
                 var file = block.file;
-                data.md5 = file.md5;
                 headers["file-md5"] = file.md5;
             });
 
@@ -537,6 +536,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                     fileCount++;
                     fileSize += file.size;
                 }
+
                 if (fileCount === 1) {
                     $placeHolder.addClass('element-invisible');
                     $statusBar.show();
@@ -547,11 +547,13 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             };
 
             uploader.onFileDequeued = function (file) {
-                fileCount--;
-                fileSize -= file.size;
+                if (!file.source.source.uploaded) {
+                    fileCount--;
+                    fileSize -= file.size;
+                }
                 removeFile(file);
                 updateTotalProgress();
-                if (!fileCount) {
+                if (fileCount <= 0 && $queue.find("li").length === 0) {
                     setState('pedding');
                 }
             };
@@ -589,7 +591,6 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                     uploader.stop();
                 }
             });
-
             $info.on('click', '.retry', function () {
                 uploader.retry();
             });
@@ -598,7 +599,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             $upload.addClass('state-' + state);
             updateTotalProgress();
 
-            function Url2File(url, filename, mimeType) {
+            function url2File(url, filename, mimeType) {
                 return (fetch(url)
                     .then(function (res) { return res.arrayBuffer(); })
                     .then(function (buf) { return new File([buf], filename, { type: mimeType }); })
