@@ -99,7 +99,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             },
             compress: false,
             formData: null,
-            fileNumLimit: 10,
+            fileNumLimit: 2,
             fileSingleSizeLimit: 1024 * 1024 * 10,
             threads: 1,
             thumb: {
@@ -189,7 +189,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                 chunkSize: options.chunk.chunkSize,
                 server: options.server_url,
                 fileNumLimit: options.fileNumLimit,
-                //fileSizeLimit: 5 * 1024 * 1024,    // 200 M
+                //fileSizeLimit: options.fileSizeLimit,
                 threads: options.threads,
                 fileSingleSizeLimit: options.fileSingleSizeLimit
             });
@@ -523,6 +523,8 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             uploader.onBeforeFileQueued = function (file) {
                 if (state === 'finish')
                     return false;
+                //var len = uploader.getFiles().length;
+                //return len < options.fileNumLimit;
             };
 
             uploader.on("uploadBeforeSend", function (block, data, headers) {
@@ -583,6 +585,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             });
 
             uploader.onError = function (code) {
+                console.log(uploader.getFiles());
                 alert('Error: ' + code);
             };
 
