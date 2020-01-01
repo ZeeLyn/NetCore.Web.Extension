@@ -434,7 +434,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                     stats = uploader.getStats();
                     text = '共' + fileCount + '个（' +
                         WebUploader.formatSize(fileSize) +
-                        '），已上传' + stats.successNum + '个';
+                        '），已上传' + (stats.successNum - (options.data ? options.data.length : 0)) + '个';
 
                     if (stats.uploadFailNum) {
                         text += '，失败' + stats.uploadFailNum + '个';
@@ -525,6 +525,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                 var file = block.file;
                 headers["file-md5"] = file.md5;
             });
+
 
             uploader.onFileQueued = function (file) {
                 file.options = options;
