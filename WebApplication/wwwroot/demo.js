@@ -1,4 +1,5 @@
 WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file": "beforeSendFile", "after-send-file": "afterSendFile" }, {
+    //发送分片之前检查分片完整性
     beforeSend: function (block) {
         var file = block.file;
         var options = file.options;
@@ -31,6 +32,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
         });
         return deferred.promise();
     },
+    //发送文件之前生成md5
     beforeSendFile: function (file) {
         var options = file.options;
         if (!options.chunk.chunked)
@@ -41,7 +43,9 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             deferred.resolve();
         });
         return deferred.promise();
-    }, afterSendFile: function (file, res) {
+    },
+    //分片上传完成合并分片
+    afterSendFile: function (file, res) {
         var options = file.options;
         if (!options.chunk.chunked) {
             options.container.find("#" + file.id).append('<input type="hidden" name="' + options.container.data("form-name") + '" value="' + res.data[0] + '" />');
@@ -541,7 +545,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                 if (fileCount === 1) {
                     $placeHolder.addClass('element-invisible');
                     $statusBar.show();
-                    //$upload.removeClass("disabled");
+                    $upload.removeClass("disabled");
                 }
                 addFile(file);
                 setState('ready');
@@ -555,8 +559,8 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                 }
                 removeFile(file);
                 updateTotalProgress();
-                //if (fileCount <= 0)
-                //    $upload.addClass("disabled");
+                if (fileCount <= 0)
+                    $upload.addClass("disabled");
                 if (fileCount <= 0 && $queue.find("li").length === 0) {
                     setState('pedding');
                 }
