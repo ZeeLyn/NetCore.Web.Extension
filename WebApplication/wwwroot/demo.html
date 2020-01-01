@@ -10,27 +10,24 @@
 <body>
     <div id="uploader1" class="uploader-container" data-form-name="file1">
         <div class="queueList">
-            <div id="dndArea" class="placeholder">
+            <div class="placeholder">
                 <div class="filePicker btn btn-primary btn-sm"></div>
                 <div>或将文件拖拽 , 粘贴到这里</div>
             </div>
             <ul class="filelist"></ul>
         </div>
         <div class="statusBar" style="display: none;">
-            <div class="status">
-                <div class="progress">
-                    <span class="text">0%</span>
-                    <span class="percentage"></span>
-                </div>
-                <div class="info"></div>
+            <div class="progress">
+                <span class="text">0%</span>
+                <span class="percentage"></span>
             </div>
+            <div class="info"></div>
             <div class="btns">
                 <div class="footer-add-btn btn btn-secondary btn-sm"></div>
                 <div class="uploadBtn btn btn-primary btn-sm">开始上传</div>
             </div>
         </div>
     </div>
-    <input type="button" value="绑定已上传的图片" onclick="Binding();" />
 
     <div id="uploader2" class="uploader-container" data-form-name="file2">
         <div class="queueList">
@@ -54,7 +51,7 @@
             </div>
         </div>
     </div>
-    <input type="file" id="file1" />
+
 
     <script>
         var BASE_URL = "";
@@ -80,11 +77,11 @@
 
             //wrap.find(".filelist").append('<li class="state-complete"><p class="imgWrap"><img data-src="/b1110d9d193b4fd68b3a0c164688ba12.jpg"></p><div class="file-panel" style="height: 0px;"><span class="rotateLeft"></span><span class="rotateRight"></span><span class="cancel"></span></div><input type="hidden" name="file1" value="/20191230/84374235cf6e4384b7627c34a4edb8bd.jpg"><span class="success"></span></li>');
             //console.log(document.getElementById("file1").files[0]);
-            var file = document.getElementById("file1").files[0];
-            file.mark = "uploaded";
-            var id = uploader1.addFiles(file);
+            //var file = document.getElementById("file1").files[0];
+            //file.mark = "uploaded";
+            //var id = uploader1.addFiles(file);
             //uploader1.setStatus(file, 'complete ');
-            console.log(file);
+            //console.log(file);
         };
         var uploader2 = $("#uploader2").InitUploader({
             multiple: true, server_url: "http://localhost:50861/api/upload", chunk: {

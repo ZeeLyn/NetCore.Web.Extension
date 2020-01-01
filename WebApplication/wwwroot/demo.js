@@ -400,15 +400,14 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             function updateTotalProgress() {
                 var loaded = 0,
                     total = 0,
-                    spans = $progress.children(),
-                    percent;
+                    spans = $progress.children();
 
                 $.each(percentages, function (k, v) {
                     total += v[0];
                     loaded += v[0] * v[1];
                 });
 
-                percent = total ? loaded / total : 0;
+                var percent = total ? loaded / total : 0;
 
                 spans.eq(0).text(Math.round(percent * 100) + '%');
                 spans.eq(1).css('width', Math.round(percent * 100) + '%');
@@ -518,7 +517,8 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                 updateTotalProgress();
             };
             uploader.onBeforeFileQueued = function (file) {
-
+                if (state === 'finish')
+                    return false;
             };
 
             uploader.on("uploadBeforeSend", function (block, data, headers) {
@@ -541,6 +541,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                 if (fileCount === 1) {
                     $placeHolder.addClass('element-invisible');
                     $statusBar.show();
+                    //$upload.removeClass("disabled");
                 }
                 addFile(file);
                 setState('ready');
@@ -554,6 +555,8 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                 }
                 removeFile(file);
                 updateTotalProgress();
+                //if (fileCount <= 0)
+                //    $upload.addClass("disabled");
                 if (fileCount <= 0 && $queue.find("li").length === 0) {
                     setState('pedding');
                 }
