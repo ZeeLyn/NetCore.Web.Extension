@@ -252,16 +252,17 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
 
 
             $(options.data).each(function (_, item) {
-                Url2File(item, "1.jpg", "image/jpeg").then(function (f) {
-                    f.mark = "uploaded";
+                var sp = item.split('/');
+                Url2File(item, sp[sp.length - 1], "image/jpeg").then(function (f) {
+                    f.uploaded = true;
+                    f.remote_url = item;
                     uploader.addFiles(f);
-
                 });
-
             });
 
             // 当有文件添加进来时执行，负责view的创建
             function addFile(file) {
+                console.log(file);
                 var $li = $('<li id="' + file.id + '">' +
                     '<p class="imgWrap"></p>' +
                     '<p class="progress"><span></span></p>' +
@@ -271,6 +272,8 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                         '<span class="rotateLeft"></span>' +
                         '<span class="rotateRight"></span>' +
                         '<span class="cancel"></span></div>').appendTo($li),
+                    source = file.source.source,
+
                     $prgress = $li.find('p.progress span'),
                     $wrap = $li.find('p.imgWrap'),
                     $info = $('<p class="error"></p>'),
@@ -292,7 +295,9 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
 
                         $info.text(text).appendTo($li);
                     };
-
+                if (source.uploaded && source.remote_url) {
+                    $li.append('<input type="hidden" name="' + options.container.data("form-name") + '" value="' + source.remote_url + '" />');
+                }
                 if (file.getStatus() === 'invalid') {
                     showError(file.statusText);
                 } else {
@@ -380,7 +385,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
 
                 $li.appendTo($queue);
 
-                if (file.source.source.mark === 'uploaded') {
+                if (file.source.source.uploaded) {
                     file.setStatus('complete');
                 }
             }
@@ -439,11 +444,6 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                 $info.html(text);
             }
 
-            function setPedding() {
-                if ($queue.find("li").length > 0)
-                    return;
-                setState('pedding');
-            }
             function setState(val) {
                 var stats;
 
@@ -529,7 +529,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
 
             uploader.onFileQueued = function (file) {
                 file.options = options;
-                if (file.source.source.mark === 'uploaded') {
+                if (file.source.source.uploaded) {
                     $placeHolder.addClass('element-invisible');
                     $statusBar.show();
                 }
@@ -552,7 +552,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                 removeFile(file);
                 updateTotalProgress();
                 if (!fileCount) {
-                    setPedding();
+                    setState('pedding');
                 }
             };
 
