@@ -31,6 +31,8 @@
 
 .uploader-container .filelist li p.log { position: relative; top: -45px; }
 
+.uploader-container .filelist li img.thumb { width: 80%; height: 80%; margin: 10%; }
+
 
 .uploader-container .filelist li p.progress { position: absolute; width: 100%; bottom: 0; left: 0; height: 8px; overflow: hidden; z-index: 50; margin: 0; border-radius: 0; background: none; -webkit-box-shadow: 0 0 0; }
 .uploader-container .filelist li p.progress span { display: none; overflow: hidden; width: 0; height: 100%; background: #1483d8 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAQCAYAAADwMZRfAAAAt0lEQVQ4EZXT2wrCMBCE4VZFpahYRFEoFBQRxQPV93+2X0ZyuZuNhd6Fj9nJpgJuwMf4B2BdlXxAC7wNRPAFGIcOUAMnBxG+DxEdABpA8a2xnsAshFKazkEE9yGS0kyBuwO9gGUptMmUfP6nZB22ulHJ29I0CwcRrHEnIZRK7jNQFyI6oCsFHg6kK29KoV2mZC1nHULACLg6aVRyGyJprJWDqGQ93DhNgo4Z6FCaZg5oY63d+b2rL0b0vy0Hc/YiAAAAAElFTkSuQmCC) repeat-x; -webit-transition: width 200ms linear; -moz-transition: width 200ms linear; -o-transition: width 200ms linear; -ms-transition: width 200ms linear; transition: width 200ms linear; -webkit-animation: progressmove 2s linear infinite; -moz-animation: progressmove 2s linear infinite; -o-animation: progressmove 2s linear infinite; -ms-animation: progressmove 2s linear infinite; animation: progressmove 2s linear infinite; -webkit-transform: translateZ(0); }

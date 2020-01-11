@@ -88,8 +88,8 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             },
             accept: {
                 title: 'Images',
-                extensions: 'gif,jpg,jpeg,bmp,png',
-                mimeTypes: 'image/*'
+                extensions: 'gif,jpg,jpeg,bmp,png,pdf,xls,xlsx,doc,docx,ppt,pptx',
+                mimeTypes: '*/*'
             },
             btns: {
                 uploadBtnText: "开始上传",
@@ -99,7 +99,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             },
             compress: false,
             formData: null,
-            fileNumLimit: 2,
+            fileNumLimit: 20,
             fileSingleSizeLimit: 1024 * 1024 * 10,
             threads: 1,
             thumb: {
@@ -266,7 +266,6 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
 
             // 当有文件添加进来时执行，负责view的创建
             function addFile(file) {
-                console.log(file);
                 var $li = $('<li id="' + file.id + '">' +
                     '<p class="imgWrap"></p>' +
                     '<p class="progress"><span></span></p>' +
@@ -309,10 +308,10 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                     $wrap.text('Loading...');
                     uploader.makeThumb(file, function (error, src) {
                         if (error) {
-                            $wrap.text('不能预览');
+                            //$wrap.text('不能预览');
+                            $wrap.empty().append($('<img class="thumb" src="/auto_generate_html_control/resources/icons/' + file.ext + '.png">'));
                             return;
                         }
-
                         var img = $('<img src="' + src + '">');
                         $wrap.empty().append(img);
                     }, thumbnailWidth, thumbnailHeight);
@@ -534,6 +533,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
 
 
             uploader.onFileQueued = function (file) {
+                console.log(file);
                 file.options = options;
                 if (file.source.source.uploaded) {
                     $placeHolder.addClass('element-invisible');
@@ -585,7 +585,6 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             });
 
             uploader.onError = function (code) {
-                console.log(uploader.getFiles());
                 alert('Error: ' + code);
             };
 

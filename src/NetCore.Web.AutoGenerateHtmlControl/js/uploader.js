@@ -10,7 +10,7 @@
             chunkSize: null,
             accept: {
                 title: 'Images',
-                extensions: 'gif,jpg,jpeg,bmp,png',
+                extensions: 'gif,jpg,jpeg,bmp,png,pdf',
                 mimeTypes: 'image/*'
             },
             btns: {
