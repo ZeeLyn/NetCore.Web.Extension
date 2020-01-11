@@ -9,8 +9,13 @@
 
     document.addEventListener("DOMContentLoaded", function () {
         if (!document.querySelector("script[id='uploader']")) {
+            var css = document.createElement('link');
+            css.setAttribute("rel", "stylesheet");
+            css.setAttribute('href', '/auto_generate_html_control/resources/css/uploader.min.css');
+            document.querySelector('header').appendChild(css);
+
             var lib = document.createElement('script');
-            lib.setAttribute('src', '/resources/auto_generate_html_control/js/uploader.min.js');
+            lib.setAttribute('src', '/auto_generate_html_control/resources/js/uploader.min.js');
             lib.addEventListener("load", function () {
                 //console.log(1);
                 //var sc = document.createElement("script");
@@ -19,10 +24,7 @@
                 $('#uploader1').InitUploader({});
             });
             document.querySelector("body").appendChild(lib);
-            var css = document.createElement('link');
-            css.setAttribute("rel", "stylesheet");
-            css.setAttribute('href', '/auto_generate_html_control/resources/css/uploader.min.css');
-            document.querySelector('header').appendChild(css);
+
         }
     });
 
