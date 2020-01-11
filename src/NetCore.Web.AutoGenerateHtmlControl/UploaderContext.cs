@@ -10,8 +10,6 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
         public object Value { get; set; }
 
-        public string ServerUrl { get; set; }
-
         public IDictionary<string, object> HtmlAttributes { get; set; }
     }
 }

@@ -261,10 +261,10 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             return container;
         }
 
-        public static async Task<IHtmlContent> Uploader(this IHtmlHelper html, string name, object value, string serverUrl, string partialName, IDictionary<string, object> htmlAttributes)
+        public static async Task<IHtmlContent> Uploader(this IHtmlHelper html, string name, object value, string partialName, IDictionary<string, object> htmlAttributes)
         {
             if (!string.IsNullOrWhiteSpace(partialName))
-                return await html.PartialAsync(partialName, new UploaderContext { Name = name, Value = value, ServerUrl = serverUrl, HtmlAttributes = htmlAttributes });
+                return await html.PartialAsync(partialName, new UploaderContext { Name = name, Value = value, HtmlAttributes = htmlAttributes });
             var container = new TagBuilder("div");
             container.MergeAttribute("class", "uploader");
             container.MergeAttribute("id", name);

@@ -17,10 +17,6 @@
             var lib = document.createElement('script');
             lib.setAttribute('src', '/auto_generate_html_control/resources/js/uploader.min.js');
             lib.addEventListener("load", function () {
-                //console.log(1);
-                //var sc = document.createElement("script");
-                //sc.innerHTML = " console.log(123);$('#uploader').InitUploader({});";
-                //document.querySelector('body').appendChild(sc);
                 $('#uploader1').InitUploader({});
             });
             document.querySelector("body").appendChild(lib);

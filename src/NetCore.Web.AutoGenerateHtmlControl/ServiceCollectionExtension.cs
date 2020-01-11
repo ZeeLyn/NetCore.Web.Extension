@@ -28,12 +28,5 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         }
     }
 
-    public class AutoGenerateFormBuilder
-    {
-        public string DefaultRichEditorPartialName { get; set; }
 
-        public string DefaultUploaderPartialName { get; set; }
-
-        public string UploadServerUrl { get; set; } = "/api/upload";
-    }
 }

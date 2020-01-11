@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NetCore.Web.AutoGenerateHtmlControl;
 using NetCore.Web.AutoGenerateHtmlControl.Attributes;
 
 
@@ -77,7 +78,7 @@ namespace WebApplication.Controllers
         [CheckBox(DataSource = typeof(FavoriteFoodDataSource), HtmlAttributes = "{class:''}")]
         public List<string> FavoriteFood { get; set; }
 
-        [Uploader]
+        [Uploader(Multiple = UploaderOptionEnum.True)]
         public string LivePhoto { get; set; }
 
         [Required(ErrorMessage = "Resume is required")]

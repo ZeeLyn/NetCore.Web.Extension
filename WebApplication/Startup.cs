@@ -55,7 +55,10 @@ namespace WebApplication
                 options.LoginPath = "/login";
             });
             services.AddCors(option => option.AddPolicy("Cors", policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
-            services.AddAutoGenerateHtmlControl(builder => { });
+            services.AddAutoGenerateHtmlControl(builder =>
+            {
+
+            });
             //services.AddChunkedUploadLocalStorage();
             services.AddUploadLocalStorage();
         }

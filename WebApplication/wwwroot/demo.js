@@ -1,84 +1,86 @@
-WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file": "beforeSendFile", "after-send-file": "afterSendFile" }, {
-    //发送分片之前检查分片完整性
-    beforeSend: function (block) {
-        var file = block.file;
-        var options = file.options;
-        if (!options.chunk.chunked)
-            return false;
-        if (!file.chunks)
-            file.chunks = block.chunks;
-        var deferred = WebUploader.Deferred();
-        (new WebUploader.Uploader()).md5File(file, block.start, block.end).then(function (md5) {
-            $.ajax({
-                type: "post",
-                url: options.chunk.chunkCheckServerUrl,
-                data: {
-                    chunk_md5: md5,
-                    md5: file.md5,
-                    chunk: block.chunk
-                },
-                success: function (res) {
-                    if (res.data === 1)
-                        deferred.reject();
-                    else
-                        deferred.resolve();
-                },
-                error: function (err) {
-                    console.error(err);
-                    deferred.reject();
-                }
-            });
-
-        });
-        return deferred.promise();
-    },
-    //发送文件之前生成md5
-    beforeSendFile: function (file) {
-        var options = file.options;
-        if (!options.chunk.chunked)
-            return false;
-        var deferred = WebUploader.Deferred();
-        (new WebUploader.Uploader()).md5File(file).then(function (md5) {
-            file.md5 = md5;
-            deferred.resolve();
-        });
-        return deferred.promise();
-    },
-    //分片上传完成合并分片
-    afterSendFile: function (file, res) {
-        var options = file.options;
-        if (!options.chunk.chunked) {
-            options.container.find("#" + file.id).append('<input type="hidden" name="' + options.container.data("form-name") + '" value="' + res.data[0] + '" />');
-        }
-        else {
+if (window.WebUploader) {
+    WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file": "beforeSendFile", "after-send-file": "afterSendFile" }, {
+        //发送分片之前检查分片完整性
+        beforeSend: function (block) {
+            var file = block.file;
+            var options = file.options;
+            if (!options.chunk.chunked)
+                return false;
+            if (!file.chunks)
+                file.chunks = block.chunks;
             var deferred = WebUploader.Deferred();
-            $.ajax({
-                type: "post",
-                url: options.chunk.chunkMergeServerUrl,
-                data: {
-                    md5: file.md5,
-                    chunks: file.chunks
-                },
-                success: function (res) {
-                    options.container.find("#" + file.id).append('<input type="hidden" name="' + options.container.data("form-name") + '" value="' + res.data + '" />');
-                    deferred.resolve();
-                },
-                error: function (err) {
-                    console.error(err);
-                    deferred.reject();
-                }
+            (new WebUploader.Uploader()).md5File(file, block.start, block.end).then(function (md5) {
+                $.ajax({
+                    type: "post",
+                    url: options.chunk.chunkCheckServerUrl,
+                    data: {
+                        chunk_md5: md5,
+                        md5: file.md5,
+                        chunk: block.chunk
+                    },
+                    success: function (res) {
+                        if (res.data === 1)
+                            deferred.reject();
+                        else
+                            deferred.resolve();
+                    },
+                    error: function (err) {
+                        console.error(err);
+                        deferred.reject();
+                    }
+                });
+
             });
             return deferred.promise();
+        },
+        //发送文件之前生成md5
+        beforeSendFile: function (file) {
+            var options = file.options;
+            if (!options.chunk.chunked)
+                return false;
+            var deferred = WebUploader.Deferred();
+            (new WebUploader.Uploader()).md5File(file).then(function (md5) {
+                file.md5 = md5;
+                deferred.resolve();
+            });
+            return deferred.promise();
+        },
+        //分片上传完成合并分片
+        afterSendFile: function (file, res) {
+            var options = file.options;
+            if (!options.chunk.chunked) {
+                options.container.find("#" + file.id).append('<input type="hidden" name="' + options.container.data("form-name") + '" value="' + res.data[0] + '" />');
+            }
+            else {
+                var deferred = WebUploader.Deferred();
+                $.ajax({
+                    type: "post",
+                    url: options.chunk.chunkMergeServerUrl,
+                    data: {
+                        md5: file.md5,
+                        chunks: file.chunks
+                    },
+                    success: function (res) {
+                        options.container.find("#" + file.id).append('<input type="hidden" name="' + options.container.data("form-name") + '" value="' + res.data + '" />');
+                        deferred.resolve();
+                    },
+                    error: function (err) {
+                        console.error(err);
+                        deferred.reject();
+                    }
+                });
+                return deferred.promise();
+            }
         }
-    }
-});
+    });
+}
 (function ($) {
     $.fn.InitUploader = function (options) {
         options = $.extend({
             data: null,
             container: this,
             base_url: "",
-            server_url: "/api/upload",
+            serverUrl: "/api/upload",
             multiple: false,
             chunk: {
                 chunked: false,
@@ -89,7 +91,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             accept: {
                 title: 'Images',
                 extensions: 'gif,jpg,jpeg,bmp,png,pdf,xls,xlsx,doc,docx,ppt,pptx',
-                mimeTypes: '*/*'
+                mimeTypes: 'Image/*'
             },
             btns: {
                 uploadBtnText: "开始上传",
@@ -187,7 +189,7 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
                 compress: options.compress,
                 chunked: options.chunk.chunked,
                 chunkSize: options.chunk.chunkSize,
-                server: options.server_url,
+                server: options.serverUrl,
                 fileNumLimit: options.fileNumLimit,
                 //fileSizeLimit: options.fileSizeLimit,
                 threads: options.threads,
@@ -202,58 +204,6 @@ WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file":
             }).then(function () {
                 footerAddFile.find("div:eq(1)").css({ "width": "100%", "height": "100%" });
             });
-
-
-            //$wrap.on('mouseenter', ".filelist li", function () {
-            //    $(this).find(".file-panel").stop().animate({ height: 27 });
-            //});
-
-            //$wrap.on('mouseleave', ".filelist li", function () {
-            //    $(this).find(".file-panel").stop().animate({ height: 0 });
-            //});
-
-            //$wrap.on('click', '.filelist li span', function () {
-            //    var index = $(this).index(),
-            //        deg;
-            //    var fileId = $(this).parent().parent().attr("id");
-            //    var file = uploader.getFile(fileId);
-            //    switch (index) {
-            //        case 0:
-            //            if (file)
-            //                file.rotation -= 90;
-            //            break;
-
-            //        case 1:
-            //            if (file)
-            //                file.rotation += 90;
-            //            break;
-
-            //        case 2:
-            //            if (file)
-            //                uploader.removeFile(file, true);
-            //            else {
-            //                $(this).parent().parent().remove();
-            //                setPedding();
-            //            }
-            //            return;
-            //    }
-
-            //    if (file) {
-            //        $wrap = $(this).parent().parent().find("p.imgWrap");
-            //        if (supportTransition) {
-            //            deg = 'rotate(' + file.rotation + 'deg)';
-            //            $wrap.css({
-            //                '-webkit-transform': deg,
-            //                '-mos-transform': deg,
-            //                '-o-transform': deg,
-            //                'transform': deg
-            //            });
-            //        } else {
-            //            $wrap.css('filter', 'progid:DXImageTransform.Microsoft.BasicImage(rotation=' + (~~((file.rotation / 90) % 4 + 4) % 4) + ')');
-            //        }
-            //    }
-            //});
-
 
             $(options.data).each(function (_, item) {
                 var sp = item.split('/');

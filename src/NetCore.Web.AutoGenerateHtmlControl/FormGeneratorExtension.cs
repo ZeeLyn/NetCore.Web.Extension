@@ -5,12 +5,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 using NetCore.Web.AutoGenerateHtmlControl.Attributes;
+using Newtonsoft.Json.Linq;
 
 namespace NetCore.Web.AutoGenerateHtmlControl
 {
@@ -62,6 +64,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             if (attribute != null)
                 form.MergeAttributes(attribute, true);
             var hasUploader = false;
+            var uploaderScripts = new StringBuilder();
             foreach (var prop in properties)
             {
                 var controlAttrs = prop.GetCustomAttributes<FormControlsAttribute>().ToList();
@@ -83,6 +86,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 var controlContainer = new TagBuilder("div");
                 controlContainer.AddCssClass("input-group");
                 controlContainer.MergeAttribute("id", $"{name.ToLower()}-input-group");
+
                 foreach (var control in controlAttrs)
                 {
                     switch (control.ControlType)
@@ -198,19 +202,45 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             var editorAttr = (RichEditorAttribute)control;
                             controlContainer.InnerHtml.AppendHtml(await html.ExRichEditor(name, value?.ToString(),
                                 string.IsNullOrWhiteSpace(editorAttr.PartialName)
-                                    ? options.DefaultRichEditorPartialName
+                                    ? options.RichEditorOptions.PartialName
                                     : editorAttr.PartialName, editorAttr.GetAttributes()));
                             break;
 
                         case HtmlControlType.Uploader:
                             var uploaderAttr = (UploaderAttribute)control;
-                            controlContainer.InnerHtml.AppendHtml(await html.Uploader(name, value?.ToString(),
-                                string.IsNullOrWhiteSpace(uploaderAttr.ServerUrl)
-                                    ? options.UploadServerUrl
-                                    : uploaderAttr.ServerUrl,
-                                string.IsNullOrWhiteSpace(uploaderAttr.PartialName)
-                                    ? options.DefaultUploaderPartialName
-                                    : uploaderAttr.PartialName, uploaderAttr.GetAttributes()));
+                            var partialName = string.IsNullOrWhiteSpace(uploaderAttr.PartialName) ? options.UploaderOptions.PartialName : uploaderAttr.PartialName;
+                            controlContainer.InnerHtml.AppendHtml(await html.Uploader(name, value?.ToString(), partialName, uploaderAttr.GetAttributes()));
+                            if (!string.IsNullOrWhiteSpace(partialName))
+                            {
+                                //合并参数
+                                var global = options.UploaderOptions;
+                                JToken root = new JObject();
+                                if (!string.IsNullOrWhiteSpace(uploaderAttr.ServerUrl))
+                                    root["serverUrl"] = uploaderAttr.ServerUrl;
+                                else
+                                    root["serverUrl"] = global.ServerUrl;
+
+                                if (ChooseOptionEnum(global.Multiple, uploaderAttr.Multiple))
+                                    root["multiple"] = true;
+
+                                if (ChooseOptionEnum(global.Chunked.Enable, uploaderAttr.Chunked))
+                                {
+                                    JToken chunk = new JObject
+                                    {
+                                        ["chunked"] = true
+                                    };
+                                    var chunkSize = ChooseOptionInt(global.Chunked.ChunkSize, uploaderAttr.ChunkSize);
+                                    if (chunkSize != 1024 * 1024 * 2)
+                                        chunk["chunkSize"] = chunkSize;
+
+                                    var checkUrl = ChooseOptionString(global.Chunked.ChunkCheckServerUrl, uploaderAttr.ChunkCheckServerUrl);
+                                    if (checkUrl != "/api/upload?action=chunk")
+                                        chunk["chunkCheckServerUrl"] = checkUrl;
+
+                                    root["chunk"] = chunk;
+                                }
+
+                            }
                             if (!hasUploader)
                                 hasUploader = true;
                             break;
@@ -229,10 +259,33 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             if (hasUploader)
             {
                 var script = new TagBuilder("script");
-
+                script.InnerHtml.AppendHtml(uploaderScripts.ToString());
                 form.InnerHtml.AppendHtml(script);
             }
             return form;
+        }
+
+        private static bool ChooseOptionEnum(bool globalValue, UploaderOptionEnum attributeValue)
+        {
+            switch (attributeValue)
+            {
+                case UploaderOptionEnum.Inherit:
+                    return globalValue;
+                case UploaderOptionEnum.True:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private static int ChooseOptionInt(int globalValue, int attributeValue)
+        {
+            return attributeValue == -1 ? globalValue : attributeValue;
+        }
+
+        private static string ChooseOptionString(string globalValue, string attributeValue)
+        {
+            return string.IsNullOrWhiteSpace(attributeValue) ? globalValue : attributeValue;
         }
     }
 }
