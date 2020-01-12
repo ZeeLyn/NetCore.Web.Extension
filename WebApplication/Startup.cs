@@ -61,10 +61,10 @@ namespace WebApplication
                 builder.UploaderOptions.FormData = new { summary = "this is summary" };
                 builder.UploaderOptions.FileSingleSizeLimit = 1024 * 1024 * 10;
                 builder.UploaderOptions.AutoUpload = true;
-                builder.UploaderOptions.FileBaseUrl = "http://www.baidu.com";
+                builder.UploaderOptions.FileBaseUrl = "/upload";
             });
             //services.AddChunkedUploadLocalStorage();
-            services.AddUploadLocalStorage(builder => { builder.RootDirectory = Path.Combine("wwwroot"); });
+            services.AddUploadLocalStorage(builder => { builder.RootDirectory = Path.Combine("wwwroot", "upload"); });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
