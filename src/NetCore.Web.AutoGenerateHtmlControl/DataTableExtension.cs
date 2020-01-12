@@ -76,7 +76,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 {
                     if (!mc.Success)
                         continue;
-                    var v = mc.Value.TrimStart('{').TrimEnd('}');
+                    var v = mc.Value.TrimStart('{').TrimEnd('}').Trim();
                     if (!hashSet.Contains(v))
                         hashSet.Add(v);
                 }
