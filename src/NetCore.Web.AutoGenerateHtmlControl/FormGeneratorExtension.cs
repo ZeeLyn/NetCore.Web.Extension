@@ -320,6 +320,19 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                                     translation ??= new JObject();
                                     translation["continueBtnText"] = continueBtnText;
                                 }
+
+                                var exceedFileNumLimitAlert = ChooseOptionString(global.Translation.ExceedFileNumLimitAlert, uploaderAttr.ExceedFileNumLimitAlert);
+                                if (exceedFileNumLimitAlert != DefaultOptionValue.ExceedFileNumLimitAlert)
+                                {
+                                    translation["ExceedFileNumLimitAlert"] = exceedFileNumLimitAlert;
+                                }
+
+                                var exceedFileSizeLimitAlert = ChooseOptionString(global.Translation.ExceedFileSizeLimitAlert, uploaderAttr.ExceedFileSizeLimitAlert);
+                                if (exceedFileSizeLimitAlert != DefaultOptionValue.ExceedFileSizeLimitAlert)
+                                {
+                                    translation["ExceedFileSizeLimitAlert"] = exceedFileSizeLimitAlert;
+                                }
+
                                 if (translation != null)
                                 {
                                     uploaderOptions["translation"] = translation;

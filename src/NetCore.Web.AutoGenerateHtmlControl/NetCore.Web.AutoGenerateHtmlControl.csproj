@@ -25,7 +25,6 @@
     <None Remove="icons\xls.png" />
     <None Remove="icons\xlsx.png" />
     <None Remove="icons\zip.png" />
-    <None Remove="js\init.min.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -77,7 +76,6 @@
 
   <ItemGroup>
     <EmbeddedResource Include="css\uploader.min.css" />
-    <EmbeddedResource Include="js\init.min.js" />
     <EmbeddedResource Include="js\uploader.min.js" />
   </ItemGroup>
 

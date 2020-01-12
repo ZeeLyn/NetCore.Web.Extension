@@ -42,6 +42,10 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 
         public string ContinueBtnText { get; set; }
 
+        public string ExceedFileNumLimitAlert { get; set; }
+
+        public string ExceedFileSizeLimitAlert { get; set; }
+
         public UploaderOptionEnum EnableCompress { get; set; } = UploaderOptionEnum.Inherit;
 
         public int CompressWidth { get; set; } = -1;
