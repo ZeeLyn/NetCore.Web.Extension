@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -59,9 +60,11 @@ namespace WebApplication
             {
                 builder.UploaderOptions.FormData = new { summary = "this is summary" };
                 builder.UploaderOptions.FileSingleSizeLimit = 1024 * 1024 * 10;
+                builder.UploaderOptions.AutoUpload = true;
+                builder.UploaderOptions.FileBaseUrl = "http://www.baidu.com";
             });
             //services.AddChunkedUploadLocalStorage();
-            services.AddUploadLocalStorage();
+            services.AddUploadLocalStorage(builder => { builder.RootDirectory = Path.Combine("wwwroot"); });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

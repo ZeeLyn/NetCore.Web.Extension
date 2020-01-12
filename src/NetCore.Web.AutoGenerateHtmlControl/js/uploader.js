@@ -13,13 +13,13 @@ if (window.WebUploader) {
                 $.ajax({
                     type: "post",
                     url: options.chunk.chunkCheckServerUrl,
-                    data: {
-                        chunk_md5: md5,
-                        md5: file.md5,
-                        chunk: block.chunk
+                    headers: {
+                        "file-md5": file.md5,
+                        chunk: block.chunk,
+                        "chunk-md5": md5
                     },
                     success: function (res) {
-                        if (res.data === 1)
+                        if (res.data.exist)
                             deferred.reject();
                         else
                             deferred.resolve();
@@ -56,8 +56,8 @@ if (window.WebUploader) {
                 $.ajax({
                     type: "post",
                     url: options.chunk.chunkMergeServerUrl,
-                    data: {
-                        md5: file.md5,
+                    headers: {
+                        "file-md5": file.md5,
                         chunks: file.chunks
                     },
                     success: function (res) {
@@ -79,7 +79,7 @@ if (window.WebUploader) {
         options = $.extend(true, {
             data: null,
             container: this,
-            base_url: "",
+            fileBaseUrl: "",
             serverUrl: "/api/upload",
             multiple: false,
             chunk: {
@@ -112,7 +112,6 @@ if (window.WebUploader) {
             auto: false
         }, options);
 
-        console.log(options);
         var o;
         this.each(function () {
             var $ = jQuery,    // just in case. Make sure it's not an other libaray.
@@ -209,7 +208,7 @@ if (window.WebUploader) {
 
             $(options.data).each(function (_, item) {
                 var sp = item.split('/');
-                url2File(item, sp[sp.length - 1], "image/jpeg").then(function (f) {
+                url2File(options.fileBaseUrl + item, sp[sp.length - 1], "image/jpeg").then(function (f) {
                     f.uploaded = true;
                     f.remote_url = item;
                     uploader.addFiles(f);
@@ -474,18 +473,16 @@ if (window.WebUploader) {
             uploader.onBeforeFileQueued = function (file) {
                 if (state === 'finish')
                     return false;
-                //var len = uploader.getFiles().length;
-                //return len < options.fileNumLimit;
             };
 
             uploader.on("uploadBeforeSend", function (block, data, headers) {
                 var file = block.file;
                 headers["file-md5"] = file.md5;
+                headers["chunk"] = block.chunk;
             });
 
 
             uploader.onFileQueued = function (file) {
-                //console.log(file);
                 file.options = options;
                 if (file.source.source.uploaded) {
                     $placeHolder.addClass('element-invisible');
@@ -537,7 +534,6 @@ if (window.WebUploader) {
             });
 
             uploader.onError = function (code) {
-                console.log(options);
                 switch (code) {
                     case "Q_EXCEED_NUM_LIMIT":
                         alert(options.translation.ExceedFileNumLimitAlert.replace(/{FileNumLimit}/g, options.fileNumLimit));
@@ -583,4 +579,3 @@ if (window.WebUploader) {
         return o;
     };
 })(jQuery);
-

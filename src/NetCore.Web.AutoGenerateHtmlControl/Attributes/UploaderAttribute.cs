@@ -12,6 +12,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 
         public string PartialName { get; set; }
 
+        public string FileBaseUrl { get; set; }
+
         public UploaderOptionEnum AutoUpload { get; set; } = UploaderOptionEnum.Inherit;
 
         public string ServerUrl { get; set; }

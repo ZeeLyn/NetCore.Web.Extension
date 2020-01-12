@@ -278,7 +278,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             extensionArgs?.TryGetValue("UploadBtnText", out uploadBtnText);
             var auto = string.Empty;
             extensionArgs?.TryGetValue("auto", out auto);
-            container.InnerHtml.AppendHtml("<div class=\"queueList\"><div class=\"placeholder\"><div class=\"filePicker btn btn-primary btn-sm\"></div><div>" + tips + "</div></div><ul class=\"filelist\"></ul></div><div class=\"statusBar\" style=\"display: none;\"><div class=\"progress\"><span class=\"text\">0%</span><span class=\"percentage\"></span></div><div class=\"info\"></div><div class=\"btns\"><div class=\"footer-add-btn btn btn-secondary btn-sm\"></div>" + (auto?.ToLower() == "true" ? "<div class=\"uploadBtn btn btn-primary btn-sm disabled\">" + uploadBtnText + "</div>" : "") + "</div></div>");
+            container.InnerHtml.AppendHtml("<div class=\"queueList\"><div class=\"placeholder\"><div class=\"filePicker btn btn-primary btn-sm\"></div><div>" + tips + "</div></div><ul class=\"filelist\"></ul></div><div class=\"statusBar\" style=\"display: none;\"><div class=\"progress\"><span class=\"text\">0%</span><span class=\"percentage\"></span></div><div class=\"info\"></div><div class=\"btns\"><div class=\"footer-add-btn btn btn-secondary btn-sm\"></div>" + (auto?.ToLower() == "true" ? "" : "<div class=\"uploadBtn btn btn-primary btn-sm disabled\">" + uploadBtnText + "</div>") + "</div></div>");
             return container;
         }
     }

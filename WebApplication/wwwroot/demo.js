@@ -79,7 +79,7 @@ if (window.WebUploader) {
         options = $.extend(true, {
             data: null,
             container: this,
-            base_url: "",
+            fileBaseUrl: "",
             serverUrl: "/api/upload",
             multiple: false,
             chunk: {
@@ -208,7 +208,7 @@ if (window.WebUploader) {
 
             $(options.data).each(function (_, item) {
                 var sp = item.split('/');
-                url2File(item, sp[sp.length - 1], "image/jpeg").then(function (f) {
+                url2File(options.fileBaseUrl + item, sp[sp.length - 1], "image/jpeg").then(function (f) {
                     f.uploaded = true;
                     f.remote_url = item;
                     uploader.addFiles(f);

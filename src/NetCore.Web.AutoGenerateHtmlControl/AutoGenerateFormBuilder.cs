@@ -20,6 +20,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
     {
         public string PartialName { get; set; }
 
+        public string FileBaseUrl { get; set; }
+
         /// <summary>
         /// 自动上传，不需要点击
         /// </summary>

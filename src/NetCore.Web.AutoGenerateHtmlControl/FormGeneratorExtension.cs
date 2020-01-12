@@ -223,7 +223,15 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             {
                                 //合并参数
 
-                                uploaderOptions = new JObject { ["data"] = JToken.FromObject(value) };
+                                uploaderOptions = new JObject();
+                                if (value != null)
+                                    uploaderOptions["data"] = JToken.FromObject(value);
+
+                                var fileBaseUrl = ChooseOptionString(global.FileBaseUrl, uploaderAttr.FileBaseUrl);
+                                if (!string.IsNullOrWhiteSpace(fileBaseUrl))
+                                {
+                                    uploaderOptions["fileBaseUrl"] = fileBaseUrl;
+                                }
 
                                 var auto = ChooseOptionEnum(global.AutoUpload, uploaderAttr.AutoUpload);
                                 if (auto)
