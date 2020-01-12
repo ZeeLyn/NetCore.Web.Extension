@@ -88,7 +88,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
     public class DataTableMeta
     {
-        public DataTableMeta(PropertyInfo property, Type type)
+        internal DataTableMeta(PropertyInfo property, Type type)
         {
             PropertyInfo = property;
             Attribute = property.GetCustomAttribute<DataTableAttribute>();
@@ -97,15 +97,15 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             Name = property.Name;
             Placeholder = DataTableHelper.GetPlaceholder(type, property.Name, Attribute);
         }
-        public string DisplayName { get; set; }
+        public string DisplayName { get; }
 
-        public string Name { get; set; }
+        public string Name { get; }
 
-        public PropertyInfo PropertyInfo { get; set; }
+        public PropertyInfo PropertyInfo { get; }
 
-        public DataTableAttribute Attribute { get; set; }
+        public DataTableAttribute Attribute { get; }
 
-        public HashSet<string> Placeholder { get; set; }
+        public HashSet<string> Placeholder { get; }
 
 
         public string GetValue(Type type, object obj)
@@ -118,7 +118,6 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             {
                 displayText = displayText.Replace("{" + ph + "}", metas.First(p => p.Name == ph).PropertyInfo.GetValue(obj).ToString());
             }
-
             return displayText;
         }
     }
