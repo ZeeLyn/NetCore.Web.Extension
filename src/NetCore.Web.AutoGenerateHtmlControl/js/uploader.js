@@ -15,8 +15,8 @@ if (window.WebUploader) {
                     url: options.chunk.chunkCheckServerUrl,
                     headers: {
                         "file-md5": file.md5,
-                        chunk: block.chunk,
-                        "chunk-md5": md5
+                        "chunk-md5": md5,
+                        chunk: block.chunk
                     },
                     success: function (res) {
                         if (res.data.exist)
