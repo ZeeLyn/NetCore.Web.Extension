@@ -180,9 +180,7 @@ if (window.WebUploader) {
                 },
                 dnd: $wrap.find('.queueList'),
                 paste: options.container,
-
                 accept: options.accept,
-
                 auto: options.auto,
                 formData: options.formData,
                 disableGlobalDnd: true,

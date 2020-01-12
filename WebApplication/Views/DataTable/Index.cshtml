@@ -1,0 +1,8 @@
+﻿@using NetCore.Web.AutoGenerateHtmlControl
+@model List<WebApplication.Controllers.DataTable>
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+@await Html.DataTableAsync(Model)
