@@ -7,7 +7,7 @@
 .uploader-container { color: #838383; font-size: 12px; }
 
 .uploader-container .queueList { border: 2px dashed #e6e6e6; }
-.uploader-container .queueList.filled { padding: 17px 17px 0 17px; margin: 0; border: 2px dashed transparent; }
+.uploader-container .queueList.filled { margin: 0; border: 2px dashed transparent; }
 .uploader-container .queueList.webuploader-dnd-over { border: 2px dashed #999999; }
 
 .uploader-container p { margin: 0; }
