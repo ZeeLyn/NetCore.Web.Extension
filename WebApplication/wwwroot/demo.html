@@ -61,13 +61,31 @@
     <script src="demo.js"></script>
     <script type="text/javascript">
         var uploader1 = $("#uploader1").InitUploader({
-            data: ["/b1110d9d193b4fd68b3a0c164688ba12.jpg", "/1.xlsx"],
-            multiple: true, server_url: "http://localhost:50861/api/upload", chunk: {
+            data: ["/b1110d9d193b4fd68b3a0c164688ba12.jpg"],
+            multiple: true,
+            server_url: "http://localhost:50861/api/upload",
+            chunk: {
                 chunked: false,
                 chunkSize: 1024 * 1024 * 2,
                 chunkCheckServerUrl: "/api/upload?action=chunk",
                 chunkMergeServerUrl: "/api/upload?action=merge"
-            }
+            },
+            fileNumLimit: 1,
+            //fileSingleSizeLimit: 1024 * 1024 * 10,
+            translation: {
+                uploadBtnText: "start"
+            },
+            thumb: {
+                width: 200,
+                height: 200
+            },
+            compress: {
+                width: 1280,
+                height: 1000,
+                allowMagnify: true,
+                crop: true
+            },
+            auto: true
         });
         function Binding() {
             //var wrap = $("#uploader1");

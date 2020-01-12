@@ -5,37 +5,52 @@
 
 @using NetCore.Web.AutoGenerateHtmlControl
 
-@*<script>
-        document.addEventListener("DOMContentLoaded", function () {
+<script>
+    //此脚本用于生成编辑器和上传组件的模板代码
 
-            if (!window.jQuery) {
-                document.querySelectorAll(".uploader-container").forEach(function (item, _) {
-                    item.innerHTML = '<label style="color:red;">Please install jQuery first.</label>';
-                });
-                return;
-            }
-            if (!window.WebUploader) {
-                document.querySelectorAll(".uploader-container").forEach(function (item, _) {
-                    item.innerHTML = '<label style="color:red;">Please install WebUploader first.</label>';
-                });
-                return;
-            }
+    //document.addEventListener("DOMContentLoaded", function () {
+    //    if (hasuploader) {
+    //        var uploaders = document.querySelectorAll(".uploader-container");
+    //        if (!window.jQuery) {
+    //            uploaders.forEach(function (item, _) {
+    //                item.innerHTML = '<label style="color:red;">Please install jQuery first.</label>';
+    //            });
+    //            return;
+    //        }
+    //        if (!window.WebUploader) {
+    //            uploaders.forEach(function (item, _) {
+    //                item.innerHTML = '<label style="color:red;">Please install WebUploader first.</label>';
+    //            });
+    //            return;
+    //        }
 
-            var css = document.createElement('link');
-            css.setAttribute("rel", "stylesheet");
-            css.setAttribute('href', '/auto-generate-html-control/resources/css/uploader.min.css');
-            document.querySelector('header').appendChild(css);
+    //        var css = document.createElement('link');
+    //        css.setAttribute("rel", "stylesheet");
+    //        css.setAttribute('href', '/auto-generate-html-control/resources/css/uploader.min.css');
+    //        document.querySelector('header').appendChild(css);
 
-            var lib = document.createElement('script');
-            lib.setAttribute('src', '/auto-generate-html-control/resources/js/uploader.min.js');
-            lib.addEventListener("load", function () {
-                $('#uploader1').InitUploader({});
-            });
-            document.querySelector("body").appendChild(lib);
+    //        var lib = document.createElement('script');
+    //        lib.setAttribute('src', '/auto-generate-html-control/resources/js/uploader.min.js');
+    //        lib.addEventListener("load", function () {
+    //            $('#uploader1').InitUploader({});
+    //        });
+    //        document.querySelector("body").appendChild(lib);
+    //    }
 
-        });
+    //    if (haseditor) {
+    //        if (window.ClassicEditor) {
+    //            console.log(111);
+    //            console.log(222);
+    //        }
+    //        else {
+    //            document.querySelectorAll(".editor-container").forEach(function (item, _) {
+    //                item.innerHTML = '<label style="color:red;">Please install CKEditor5 first.</label>';
+    //            });
+    //        }
+    //    }
+    //});
 
-    </script>*@
+</script>
 
 @await Html.GenerateFormAsync(Context, "/GenerateForm/post", FormMethod.Post, Model, null, () => Html.Raw("<div class=\"box-footer text-center\"><button class=\"btn btn-primary\">Submit</button></div>"), true)
 

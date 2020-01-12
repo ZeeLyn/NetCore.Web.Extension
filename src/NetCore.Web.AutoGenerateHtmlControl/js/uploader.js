@@ -76,7 +76,7 @@ if (window.WebUploader) {
 }
 (function ($) {
     $.fn.InitUploader = function (options) {
-        options = $.extend({
+        options = $.extend(true, {
             data: null,
             container: this,
             base_url: "",
@@ -90,14 +90,16 @@ if (window.WebUploader) {
             },
             accept: {
                 title: 'Images',
-                extensions: 'gif,jpg,jpeg,bmp,png,pdf,xls,xlsx,doc,docx,ppt,pptx',
-                mimeTypes: 'Image/*'
+                extensions: 'gif,jpg,jpeg,bmp,png',
+                mimeTypes: 'image/*'
             },
             translation: {
                 uploadBtnText: "开始上传",
                 addFileBtnText: "添加文件",
                 pauseBtnText: "暂停上传",
-                continueBtnText: "继续上传"
+                continueBtnText: "继续上传",
+                ExceedFileNumLimitAlert: "超出允许上传文件个数,最多只允许上传{FileNumLimit}个。",
+                ExceedFileSizeLimitAlert: "超出允许上传的文件大小,单个文件大小不能超过{FileSizeLimit}。"
             },
             compress: false,
             formData: null,
@@ -106,10 +108,11 @@ if (window.WebUploader) {
             threads: 1,
             thumb: {
                 width: 100, height: 100, quality: 60, crop: true, allowMagnify: false
-            }
+            },
+            auto: false
         }, options);
 
-
+        console.log(options);
         var o;
         this.each(function () {
             var $ = jQuery,    // just in case. Make sure it's not an other libaray.
@@ -181,8 +184,7 @@ if (window.WebUploader) {
 
                 accept: options.accept,
 
-                //// swf文件路径
-                //swf: options.base_url + '/js/Uploader.swf',
+                auto: options.auto,
                 formData: options.formData,
                 disableGlobalDnd: true,
                 thumb: options.thumb,
@@ -216,7 +218,7 @@ if (window.WebUploader) {
 
             // 当有文件添加进来时执行，负责view的创建
             function addFile(file) {
-                var $li = $('<li id="' + file.id + '">' +
+                var $li = $('<li id="' + file.id + '" style="width:' + thumbnailWidth + 'px;height:' + thumbnailHeight + 'px;">' +
                     '<p class="imgWrap"></p>' +
                     '<p class="progress"><span></span></p>' +
                     '</li>'),
@@ -259,7 +261,7 @@ if (window.WebUploader) {
                     uploader.makeThumb(file, function (error, src) {
                         if (error) {
                             //$wrap.text('不能预览');
-                            $wrap.empty().append($('<img class="thumb" src="/auto_generate_html_control/resources/icons/' + file.ext + '.png">'));
+                            $wrap.empty().append($('<img class="thumb" src="/auto-generate-html-control/resources/icons/' + file.ext + '.png">'));
                             return;
                         }
                         var img = $('<img src="' + src + '">');
@@ -483,7 +485,7 @@ if (window.WebUploader) {
 
 
             uploader.onFileQueued = function (file) {
-                console.log(file);
+                //console.log(file);
                 file.options = options;
                 if (file.source.source.uploaded) {
                     $placeHolder.addClass('element-invisible');
@@ -535,7 +537,19 @@ if (window.WebUploader) {
             });
 
             uploader.onError = function (code) {
-                alert('Error: ' + code);
+                console.log(options);
+                switch (code) {
+                    case "Q_EXCEED_NUM_LIMIT":
+                        alert(options.translation.ExceedFileNumLimitAlert.replace(/{FileNumLimit}/g, options.fileNumLimit));
+                        break;
+                    case "F_EXCEED_SIZE":
+                        alert(options.translation.ExceedFileSizeLimitAlert.replace(/{FileSizeLimit}/g, options.fileSingleSizeLimit / 1024 + "KB"));
+                        break;
+                    default:
+                        alert('Error: ' + code);
+                        break;
+                }
+
             };
 
             $upload.on('click', function () {
@@ -569,3 +583,4 @@ if (window.WebUploader) {
         return o;
     };
 })(jQuery);
+

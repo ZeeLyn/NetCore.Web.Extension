@@ -64,7 +64,9 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             if (attribute != null)
                 form.MergeAttributes(attribute, true);
             var hasUploader = false;
+            var hasEditor = false;
             var uploaderScripts = new StringBuilder();
+            var editorScripts = new StringBuilder();
             foreach (var prop in properties)
             {
                 var controlAttrs = prop.GetCustomAttributes<FormControlsAttribute>().ToList();
@@ -200,22 +202,34 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                         case HtmlControlType.RichEditor:
                             var editorAttr = (RichEditorAttribute)control;
-                            controlContainer.InnerHtml.AppendHtml(await html.ExRichEditor(name, value?.ToString(),
-                                string.IsNullOrWhiteSpace(editorAttr.PartialName)
-                                    ? options.RichEditorOptions.PartialName
-                                    : editorAttr.PartialName, editorAttr.GetAttributes()));
+                            var editorPartialName = string.IsNullOrWhiteSpace(editorAttr.PartialName)
+                                ? options.RichEditorOptions.PartialName
+                                : editorAttr.PartialName;
+                            controlContainer.InnerHtml.AppendHtml(await html.ExRichEditor(name, value?.ToString(), editorPartialName, editorAttr.GetAttributes()));
+                            if (string.IsNullOrWhiteSpace(editorPartialName))
+                            {
+                                editorScripts.AppendFormat("ClassicEditor.create(document.querySelector(\"#{0}\")).catch(function(err){{alert(err)}}),", name);
+                            }
+                            if (!hasEditor)
+                                hasEditor = true;
                             break;
 
                         case HtmlControlType.Uploader:
                             var uploaderAttr = (UploaderAttribute)control;
-                            var partialName = string.IsNullOrWhiteSpace(uploaderAttr.PartialName) ? options.UploaderOptions.PartialName : uploaderAttr.PartialName;
+                            var uploaderPartialName = string.IsNullOrWhiteSpace(uploaderAttr.PartialName) ? options.UploaderOptions.PartialName : uploaderAttr.PartialName;
                             var global = options.UploaderOptions;
                             JToken uploaderOptions = null;
-                            if (string.IsNullOrWhiteSpace(partialName))
+                            if (string.IsNullOrWhiteSpace(uploaderPartialName))
                             {
                                 //合并参数
 
                                 uploaderOptions = new JObject { ["data"] = JToken.FromObject(value) };
+
+                                var auto = ChooseOptionEnum(global.AutoUpload, uploaderAttr.AutoUpload);
+                                if (auto)
+                                {
+                                    uploaderOptions["auto"] = auto;
+                                }
 
                                 var serverUrl = ChooseOptionString(global.ServerUrl, uploaderAttr.ServerUrl);
                                 if (serverUrl != DefaultOptionValue.ServerUrl)
@@ -250,12 +264,12 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                                 #region Accept
                                 JToken accept = null;
-                                var acceptTitle = ChooseOptionString(global.Accept.Title, uploaderAttr.AcceptTitle);
-                                if (acceptTitle != DefaultOptionValue.AcceptTitle)
-                                {
-                                    accept ??= new JObject();
-                                    accept["title"] = acceptTitle;
-                                }
+                                //var acceptTitle = ChooseOptionString(global.Accept.Title, uploaderAttr.AcceptTitle);
+                                //if (acceptTitle != DefaultOptionValue.AcceptTitle)
+                                //{
+                                //    accept ??= new JObject();
+                                //    accept["title"] = acceptTitle;
+                                //}
 
                                 var acceptExtensions = ChooseOptionString(global.Accept.Extensions, uploaderAttr.AcceptExtensions);
                                 if (acceptExtensions != DefaultOptionValue.AcceptExtensions)
@@ -448,9 +462,9 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             var tips = ChooseOptionString(global.Translation.Tips, uploaderAttr.Tips);
 
 
-                            controlContainer.InnerHtml.AppendHtml(await html.Uploader(name, value?.ToString(), partialName, uploaderAttr.GetAttributes(), new Dictionary<string, string> { { "Tips", tips }, { "UploadBtnText", ChooseOptionString(global.Translation.UploadBtnText, uploaderAttr.UploadBtnText) } }));
+                            controlContainer.InnerHtml.AppendHtml(await html.Uploader(name, value?.ToString(), uploaderPartialName, uploaderAttr.GetAttributes(), new Dictionary<string, string> { { "Tips", tips }, { "UploadBtnText", ChooseOptionString(global.Translation.UploadBtnText, uploaderAttr.UploadBtnText) }, { "auto", uploaderOptions["auto"]?.ToObject<string>() } }));
 
-                            uploaderScripts.AppendFormat("var uploader_{0}=$(\"#{0}-container\").InitUploader({1})", name, uploaderOptions.ToString(Newtonsoft.Json.Formatting.None));
+                            uploaderScripts.AppendFormat("uploader_{0}=$(\"#{0}-container\").InitUploader({1}),", name, uploaderOptions.ToString(Newtonsoft.Json.Formatting.None));
 
                             if (!hasUploader)
                                 hasUploader = true;
@@ -467,10 +481,10 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             form.InnerHtml.AppendHtml(appendHtmlContent);
             if (antiforgery.HasValue && antiforgery.Value)
                 form.InnerHtml.AppendHtml(html.AntiForgeryToken());
-            if (hasUploader)
+            if (hasUploader || hasEditor)
             {
                 var script = new TagBuilder("script");
-                var scriptString = "document.addEventListener(\"DOMContentLoaded\",function(){if(window.jQuery)if(window.WebUploader){var e=document.createElement(\"link\");e.setAttribute(\"rel\",\"stylesheet\"),e.setAttribute(\"href\",\"/auto-generate-html-control/resources/css/uploader.min.css\"),document.querySelector(\"header\").appendChild(e);var t=document.createElement(\"script\");t.setAttribute(\"src\",\"/auto-generate-html-control/resources/js/uploader.min.js\"),t.addEventListener(\"load\",function(){" + uploaderScripts + "}),document.querySelector(\"body\").appendChild(t)}else document.querySelectorAll(\".uploader-container\").forEach(function(e,t){e.innerHTML=\'<label style=\"color:red;\">Please install WebUploader first.</label>\'});else document.querySelectorAll(\".uploader-container\").forEach(function(e,t){e.innerHTML=\'<label style=\"color:red;\">Please install jQuery first.</label>\'})});";
+                var scriptString = "document.addEventListener(\"DOMContentLoaded\",function(){if(" + hasUploader.ToString().ToLower() + "){var e=document.querySelectorAll(\".uploader-container\");if(!window.jQuery)return void e.forEach(function(e,t){e.innerHTML=\'<label style=\"color:red;\">Please install jQuery first.</label>\'});if(!window.WebUploader)return void e.forEach(function(e,t){e.innerHTML=\'<label style=\"color:red;\">Please install WebUploader first.</label>\'});var t=document.createElement(\"link\");t.setAttribute(\"rel\",\"stylesheet\"),t.setAttribute(\"href\",\"/auto-generate-html-control/resources/css/uploader.min.css\"),document.querySelector(\"header\").appendChild(t);var r=document.createElement(\"script\");r.setAttribute(\"src\",\"/auto-generate-html-control/resources/js/uploader.min.js\"),r.addEventListener(\"load\",function(){" + uploaderScripts.ToString().TrimEnd(',') + "}),document.querySelector(\"body\").appendChild(r)}" + hasEditor.ToString().ToLower() + "&&(window.ClassicEditor?(" + (hasEditor ? editorScripts.ToString().TrimEnd(',') : "a=0") + "):document.querySelectorAll(\".editor-container\").forEach(function(e,t){e.innerHTML=\'<label style=\"color:red;\">Please install CKEditor5 first.</label>\'}))});";
                 script.InnerHtml.AppendHtml(scriptString);
                 form.InnerHtml.AppendHtml(script);
             }

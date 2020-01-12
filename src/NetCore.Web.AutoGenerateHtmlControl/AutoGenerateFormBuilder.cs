@@ -20,6 +20,11 @@ namespace NetCore.Web.AutoGenerateHtmlControl
     {
         public string PartialName { get; set; }
 
+        /// <summary>
+        /// 自动上传，不需要点击
+        /// </summary>
+        public bool AutoUpload { get; set; }
+
         public string ServerUrl { get; set; } = DefaultOptionValue.ServerUrl;
 
         public bool Multiple { get; set; }
@@ -92,6 +97,9 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
         public int Width { get; set; } = DefaultOptionValue.CompressWidth;
 
+        /// <summary>
+        /// 缩略图的高度，启用Crop时才生效，否则跟Width等比例缩放
+        /// </summary>
         public int Height { get; set; } = DefaultOptionValue.CompressHeight;
 
         /// <summary>
@@ -137,14 +145,24 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         public string PauseBtnText { get; set; } = DefaultOptionValue.PauseBtnText;
 
         public string ContinueBtnText { get; set; } = DefaultOptionValue.ContinueBtnText;
+
+        public string ExceedFileNumLimitAlert { get; set; } = DefaultOptionValue.ExceedFileNumLimitAlert;
+
+        public string ExceedFileSizeLimitAlert { get; set; } = DefaultOptionValue.ExceedFileSizeLimitAlert;
     }
 
     public class AcceptOptions
     {
-        public string Title { get; set; } = DefaultOptionValue.AcceptTitle;
+        //public string Title { get; set; } = DefaultOptionValue.AcceptTitle;
 
+        /// <summary>
+        /// 允许上传的文件格式,默认：gif,jpg,jpeg,bmp,png
+        /// </summary>
         public string Extensions { get; set; } = DefaultOptionValue.AcceptExtensions;
 
+        /// <summary>
+        /// 类型,默认：images/*
+        /// </summary>
         public string MimeTypes { get; set; } = DefaultOptionValue.AcceptMimeTypes;
     }
 
@@ -181,7 +199,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
         public const int CompressHeight = 720;
 
-        public const int CompressQuality = 60;
+        public const int CompressQuality = 70;
 
         public const string UploadBtnText = "开始上传";
 
@@ -195,8 +213,12 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
         public const string AcceptExtensions = "gif,jpg,jpeg,bmp,png";
 
-        public const string AcceptMimeTypes = "Images/*";
+        public const string AcceptMimeTypes = "image/*";
 
         public const string Tips = "或将文件拖拽 , 粘贴到这里";
+
+        public const string ExceedFileNumLimitAlert = "超出允许上传文件个数,最多只允许上传{FileNumLimit}个。";
+
+        public const string ExceedFileSizeLimitAlert = "超出允许上传的文件大小,单个文件大小不能超过{FileSizeLimit}";
     }
 }

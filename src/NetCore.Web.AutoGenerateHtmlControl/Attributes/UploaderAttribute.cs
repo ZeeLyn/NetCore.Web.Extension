@@ -12,6 +12,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 
         public string PartialName { get; set; }
 
+        public UploaderOptionEnum AutoUpload { get; set; } = UploaderOptionEnum.Inherit;
+
         public string ServerUrl { get; set; }
 
         public UploaderOptionEnum Multiple { get; set; } = UploaderOptionEnum.Inherit;
@@ -24,7 +26,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 
         public string ChunkMergeServerUrl { get; set; }
 
-        public string AcceptTitle { get; set; }
+        //public string AcceptTitle { get; set; }
 
         public string AcceptExtensions { get; set; }
 

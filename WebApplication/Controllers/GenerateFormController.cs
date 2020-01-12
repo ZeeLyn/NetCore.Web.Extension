@@ -78,12 +78,19 @@ namespace WebApplication.Controllers
         [CheckBox(DataSource = typeof(FavoriteFoodDataSource), HtmlAttributes = "{class:''}")]
         public List<string> FavoriteFood { get; set; }
 
-        [Uploader(Multiple = UploaderOptionEnum.True)]
+        [Uploader(Multiple = UploaderOptionEnum.True, UploadBtnText = "Start")]
         public List<string> LivePhoto { get; set; } = new List<string> { "/b1110d9d193b4fd68b3a0c164688ba12.jpg" };
+
+        [Uploader(Multiple = UploaderOptionEnum.True, UploadBtnText = "Start")]
+        public List<string> LivePhoto2 { get; set; } = new List<string> { "/b1110d9d193b4fd68b3a0c164688ba12.jpg" };
 
         [Required(ErrorMessage = "Resume is required")]
         [RichEditor]
         public string Resume { get; set; }
+
+        [Required(ErrorMessage = "Resume is required")]
+        [RichEditor]
+        public string Resume2 { get; set; }
 
         [CheckBox(HtmlAttributes = "{class:''}")]
         public bool Archive { get; set; }
