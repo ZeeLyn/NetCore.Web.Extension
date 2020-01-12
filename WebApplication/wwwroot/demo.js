@@ -93,7 +93,7 @@ if (window.WebUploader) {
                 extensions: 'gif,jpg,jpeg,bmp,png,pdf,xls,xlsx,doc,docx,ppt,pptx',
                 mimeTypes: 'Image/*'
             },
-            btns: {
+            translation: {
                 uploadBtnText: "开始上传",
                 addFileBtnText: "添加文件",
                 pauseBtnText: "暂停上传",
@@ -101,11 +101,11 @@ if (window.WebUploader) {
             },
             compress: false,
             formData: null,
-            fileNumLimit: 20,
-            fileSingleSizeLimit: 1024 * 1024 * 10,
+            fileNumLimit: 1,
+            fileSingleSizeLimit: 1024 * 1024 * 4,
             threads: 1,
             thumb: {
-                width: 100, height: 100, quality: 70, crop: true, allowMagnify: false
+                width: 100, height: 100, quality: 60, crop: true, allowMagnify: false
             }
         }, options);
 
@@ -173,7 +173,7 @@ if (window.WebUploader) {
             o = uploader = WebUploader.create({
                 pick: {
                     id: $wrap.find(".filePicker"),
-                    label: options.btns.addFileBtnText,
+                    label: options.translation.addFileBtnText,
                     multiple: options.multiple
                 },
                 dnd: $wrap.find('.queueList'),
@@ -200,7 +200,7 @@ if (window.WebUploader) {
             // 添加“添加文件”的按钮，
             uploader.addButton({
                 id: footerAddFile,
-                label: options.btns.addFileBtnText
+                label: options.translation.addFileBtnText
             }).then(function () {
                 footerAddFile.find("div:eq(1)").css({ "width": "100%", "height": "100%" });
             });
@@ -429,17 +429,17 @@ if (window.WebUploader) {
                     case 'uploading':
                         footerAddFile.addClass('element-invisible');
                         $progress.show();
-                        $upload.text(options.btns.pauseBtnText);
+                        $upload.text(options.translation.pauseBtnText);
                         break;
 
                     case 'paused':
                         $progress.show();
-                        $upload.text(options.btns.continueBtnText);
+                        $upload.text(options.translation.continueBtnText);
                         break;
 
                     case 'confirm':
                         $progress.hide();
-                        $upload.text(options.btns.uploadBtnText).addClass('disabled');
+                        $upload.text(options.translation.uploadBtnText).addClass('disabled');
 
                         stats = uploader.getStats();
                         if (stats.successNum && !stats.uploadFailNum) {

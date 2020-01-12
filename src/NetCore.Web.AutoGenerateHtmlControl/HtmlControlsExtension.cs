@@ -3,6 +3,7 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json.Linq;
 
 namespace NetCore.Web.AutoGenerateHtmlControl
 {
@@ -261,17 +262,21 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             return container;
         }
 
-        public static async Task<IHtmlContent> Uploader(this IHtmlHelper html, string name, object value, string partialName, IDictionary<string, object> htmlAttributes)
+        public static async Task<IHtmlContent> Uploader(this IHtmlHelper html, string name, object value, string partialName, IDictionary<string, object> htmlAttributes, Dictionary<string, string> extensionArgs = default)
         {
             if (!string.IsNullOrWhiteSpace(partialName))
                 return await html.PartialAsync(partialName, new UploaderContext { Name = name, Value = value, HtmlAttributes = htmlAttributes });
             var container = new TagBuilder("div");
-            container.MergeAttribute("class", "uploader");
-            container.MergeAttribute("id", name);
+            container.MergeAttribute("class", "uploader-container");
+            container.MergeAttribute("id", $"{name}-container");
+            container.MergeAttribute("data-form-name", name);
             container.MergeAttributes(htmlAttributes, true);
-            var script = new TagBuilder("script");
-            script.InnerHtml.AppendHtml("");
-            container.InnerHtml.AppendHtml(script);
+
+            var tips = string.Empty;
+            extensionArgs?.TryGetValue("Tips", out tips);
+            var uploadBtnText = string.Empty;
+            extensionArgs?.TryGetValue("UploadBtnText", out uploadBtnText);
+            container.InnerHtml.AppendHtml("<div class=\"queueList\"><div class=\"placeholder\"><div class=\"filePicker btn btn-primary btn-sm\"></div><div>{Tips}</div></div><ul class=\"filelist\"></ul></div><div class=\"statusBar\" style=\"display: none;\"><div class=\"progress\"><span class=\"text\">0%</span><span class=\"percentage\"></span></div><div class=\"info\"></div><div class=\"btns\"><div class=\"footer-add-btn btn btn-secondary btn-sm\"></div><div class=\"uploadBtn btn btn-primary btn-sm disabled\">{UploadBtnText}</div></div></div>".Replace("{Tips}", tips).Replace("{UploadBtnText}", uploadBtnText));
             return container;
         }
     }

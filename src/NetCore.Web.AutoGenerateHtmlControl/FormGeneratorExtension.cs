@@ -209,20 +209,23 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                         case HtmlControlType.Uploader:
                             var uploaderAttr = (UploaderAttribute)control;
                             var partialName = string.IsNullOrWhiteSpace(uploaderAttr.PartialName) ? options.UploaderOptions.PartialName : uploaderAttr.PartialName;
-                            controlContainer.InnerHtml.AppendHtml(await html.Uploader(name, value?.ToString(), partialName, uploaderAttr.GetAttributes()));
-                            if (!string.IsNullOrWhiteSpace(partialName))
+                            var global = options.UploaderOptions;
+                            JToken uploaderOptions = null;
+                            if (string.IsNullOrWhiteSpace(partialName))
                             {
                                 //合并参数
-                                var global = options.UploaderOptions;
-                                JToken root = new JObject();
-                                if (!string.IsNullOrWhiteSpace(uploaderAttr.ServerUrl))
-                                    root["serverUrl"] = uploaderAttr.ServerUrl;
-                                else
-                                    root["serverUrl"] = global.ServerUrl;
+
+                                uploaderOptions = new JObject { ["data"] = JToken.FromObject(value) };
+
+                                var serverUrl = ChooseOptionString(global.ServerUrl, uploaderAttr.ServerUrl);
+                                if (serverUrl != DefaultOptionValue.ServerUrl)
+                                    uploaderOptions["serverUrl"] = serverUrl;
+
 
                                 if (ChooseOptionEnum(global.Multiple, uploaderAttr.Multiple))
-                                    root["multiple"] = true;
+                                    uploaderOptions["multiple"] = true;
 
+                                #region Chunked
                                 if (ChooseOptionEnum(global.Chunked.Enable, uploaderAttr.Chunked))
                                 {
                                     JToken chunk = new JObject
@@ -230,17 +233,225 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                                         ["chunked"] = true
                                     };
                                     var chunkSize = ChooseOptionInt(global.Chunked.ChunkSize, uploaderAttr.ChunkSize);
-                                    if (chunkSize != 1024 * 1024 * 2)
+                                    if (chunkSize != DefaultOptionValue.ChunkSize)
                                         chunk["chunkSize"] = chunkSize;
 
                                     var checkUrl = ChooseOptionString(global.Chunked.ChunkCheckServerUrl, uploaderAttr.ChunkCheckServerUrl);
-                                    if (checkUrl != "/api/upload?action=chunk")
+                                    if (checkUrl != DefaultOptionValue.ChunkCheckServerUrl)
                                         chunk["chunkCheckServerUrl"] = checkUrl;
 
-                                    root["chunk"] = chunk;
+                                    var mergeUrl = ChooseOptionString(global.Chunked.ChunkMergeServerUrl, uploaderAttr.ChunkMergeServerUrl);
+                                    if (mergeUrl != DefaultOptionValue.ChunkMergeServerUrl)
+                                        chunk["chunkMergeServerUrl"] = mergeUrl;
+
+                                    uploaderOptions["chunk"] = chunk;
+                                }
+                                #endregion
+
+                                #region Accept
+                                JToken accept = null;
+                                var acceptTitle = ChooseOptionString(global.Accept.Title, uploaderAttr.AcceptTitle);
+                                if (acceptTitle != DefaultOptionValue.AcceptTitle)
+                                {
+                                    accept ??= new JObject();
+                                    accept["title"] = acceptTitle;
                                 }
 
+                                var acceptExtensions = ChooseOptionString(global.Accept.Extensions, uploaderAttr.AcceptExtensions);
+                                if (acceptExtensions != DefaultOptionValue.AcceptExtensions)
+                                {
+                                    accept ??= new JObject();
+                                    accept["extensions"] = acceptExtensions;
+                                }
+
+                                var acceptMineTypes = ChooseOptionString(global.Accept.MimeTypes, uploaderAttr.AcceptMimeTypes);
+                                if (acceptMineTypes != DefaultOptionValue.AcceptMimeTypes)
+                                {
+                                    accept ??= new JObject();
+                                    accept["mimeTypes"] = acceptMineTypes;
+                                }
+
+                                if (accept != null)
+                                {
+                                    uploaderOptions["accept"] = accept;
+                                }
+                                #endregion
+
+                                #region Translation
+                                JToken translation = null;
+                                var uploadBtnText = ChooseOptionString(global.Translation.UploadBtnText, uploaderAttr.UploadBtnText);
+                                if (uploadBtnText != DefaultOptionValue.UploadBtnText)
+                                {
+                                    translation ??= new JObject();
+                                    translation["uploadBtnText"] = uploadBtnText;
+                                }
+
+                                var addBtnText = ChooseOptionString(global.Translation.AddFileBtnText, uploaderAttr.AddFileBtnText);
+                                if (addBtnText != DefaultOptionValue.AddFileBtnText)
+                                {
+                                    translation ??= new JObject();
+                                    translation["addFileBtnText"] = addBtnText;
+                                }
+
+                                var pauseBtnText = ChooseOptionString(global.Translation.PauseBtnText, uploaderAttr.PauseBtnText);
+                                if (pauseBtnText != DefaultOptionValue.PauseBtnText)
+                                {
+                                    translation ??= new JObject();
+                                    translation["pauseBtnText"] = pauseBtnText;
+                                }
+
+                                var continueBtnText = ChooseOptionString(global.Translation.ContinueBtnText, uploaderAttr.ContinueBtnText);
+                                if (continueBtnText != DefaultOptionValue.ContinueBtnText)
+                                {
+                                    translation ??= new JObject();
+                                    translation["continueBtnText"] = continueBtnText;
+                                }
+                                if (translation != null)
+                                {
+                                    uploaderOptions["translation"] = translation;
+                                }
+
+                                #endregion
+
+                                #region Compress
+
+                                var enableCompress = ChooseOptionEnum(global.Compress.Enable, uploaderAttr.EnableCompress);
+                                if (enableCompress)
+                                {
+                                    JToken compress = new JObject();
+                                    var width = ChooseOptionInt(global.Compress.Width, uploaderAttr.CompressWidth);
+                                    if (width != DefaultOptionValue.CompressWidth)
+                                    {
+                                        compress["width"] = width;
+                                    }
+
+                                    var height = ChooseOptionInt(global.Compress.Height, uploaderAttr.CompressHeight);
+                                    if (height != DefaultOptionValue.CompressHeight)
+                                    {
+                                        compress["height"] = height;
+                                    }
+
+                                    var quality = ChooseOptionInt(global.Compress.Quality, uploaderAttr.CompressQuality);
+                                    if (quality != DefaultOptionValue.CompressQuality)
+                                    {
+                                        compress["quality"] = quality;
+                                    }
+
+                                    var crop = ChooseOptionEnum(global.Compress.Crop, uploaderAttr.CompressCrop);
+                                    if (crop)
+                                    {
+                                        compress["crop"] = crop;
+                                    }
+
+                                    var preserveHeaders = ChooseOptionEnum(global.Compress.PreserveHeaders, uploaderAttr.CompressPreserveHeaders);
+                                    if (!preserveHeaders)
+                                    {
+                                        compress["preserveHeaders"] = preserveHeaders;
+                                    }
+
+                                    var noCompressIfLarger = ChooseOptionEnum(global.Compress.NoCompressIfLarger, uploaderAttr.CompressNoCompressIfLarger);
+                                    if (noCompressIfLarger)
+                                    {
+                                        compress["noCompressIfLarger"] = noCompressIfLarger;
+                                    }
+
+                                    var compressSize = ChooseOptionInt(global.Compress.CompressSize, uploaderAttr.CompressSize);
+                                    if (compressSize != 0)
+                                    {
+                                        compress["compressSize"] = compressSize;
+                                    }
+
+                                    uploaderOptions["compress"] = compress;
+                                }
+
+                                #endregion
+
+                                #region FormData
+                                if (uploaderAttr.FormData != null || global.FormData != null)
+                                {
+                                    uploaderOptions["formData"] = JObject.FromObject(uploaderAttr.FormData ?? global.FormData);
+                                }
+                                #endregion
+
+                                #region FileNumLimit
+                                var fileNumLimit = ChooseOptionInt(global.FileNumLimit, uploaderAttr.FileNumLimit);
+                                if (fileNumLimit != DefaultOptionValue.FileNumLimit)
+                                {
+                                    uploaderOptions["fileNumLimit"] = fileNumLimit;
+                                }
+                                #endregion
+
+                                #region FileSingleSizeLimit
+                                var fileSingleSizeLimit = ChooseOptionInt(global.FileSingleSizeLimit, uploaderAttr.FileSingleSizeLimit);
+                                if (fileSingleSizeLimit != DefaultOptionValue.FileSingleSizeLimit)
+                                {
+                                    uploaderOptions["fileSingleSizeLimit"] = fileSingleSizeLimit;
+                                }
+                                #endregion
+
+                                #region Threads
+
+                                var threads = ChooseOptionInt(global.Threads, uploaderAttr.Threads);
+                                if (threads != DefaultOptionValue.Threads)
+                                {
+                                    uploaderOptions["threads"] = threads;
+                                }
+
+                                #endregion
+
+                                #region Thumb
+
+                                JToken thumb = null;
+                                var thumbWidth = ChooseOptionInt(global.Thumb.Width, uploaderAttr.ThumbWidth);
+                                if (thumbWidth != DefaultOptionValue.ThumbWidth)
+                                {
+                                    thumb ??= new JObject();
+                                    thumb["width"] = thumbWidth;
+                                }
+
+                                var thumbHeight = ChooseOptionInt(global.Thumb.Height, uploaderAttr.ThumbHeight);
+                                if (thumbHeight != DefaultOptionValue.ThumbHeight)
+                                {
+                                    thumb ??= new JObject();
+                                    thumb["height"] = thumbHeight;
+                                }
+
+                                var thumbQuality = ChooseOptionInt(global.Thumb.Quality, uploaderAttr.ThumbQuality);
+                                if (thumbQuality != DefaultOptionValue.ThumbQuality)
+                                {
+                                    thumb ??= new JObject();
+                                    thumb["quality"] = thumbQuality;
+                                }
+
+                                var allowMagnify = ChooseOptionEnum(global.Thumb.AllowMagnify, uploaderAttr.ThumbAllowMagnify);
+                                if (allowMagnify)
+                                {
+                                    thumb ??= new JObject();
+                                    thumb["allowMagnify"] = allowMagnify;
+                                }
+
+                                var thumbCrop = ChooseOptionEnum(global.Thumb.Crop, uploaderAttr.ThumbCrop);
+                                if (!thumbCrop)
+                                {
+                                    thumb ??= new JObject();
+                                    thumb["crop"] = thumbCrop;
+                                }
+
+                                if (thumb != null)
+                                {
+                                    uploaderOptions["thumb"] = thumb;
+                                }
+
+                                #endregion
                             }
+
+                            var tips = ChooseOptionString(global.Translation.Tips, uploaderAttr.Tips);
+
+
+                            controlContainer.InnerHtml.AppendHtml(await html.Uploader(name, value?.ToString(), partialName, uploaderAttr.GetAttributes(), new Dictionary<string, string> { { "Tips", tips }, { "UploadBtnText", ChooseOptionString(global.Translation.UploadBtnText, uploaderAttr.UploadBtnText) } }));
+
+                            uploaderScripts.AppendFormat("var uploader_{0}=$(\"#{0}-container\").InitUploader({1})", name, uploaderOptions);
+
                             if (!hasUploader)
                                 hasUploader = true;
                             break;
@@ -259,7 +470,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             if (hasUploader)
             {
                 var script = new TagBuilder("script");
-                script.InnerHtml.AppendHtml(uploaderScripts.ToString());
+                var scriptString = "document.addEventListener(\"DOMContentLoaded\",function(){if(window.jQuery)if(window.WebUploader){var e=document.createElement(\"link\");e.setAttribute(\"rel\",\"stylesheet\"),e.setAttribute(\"href\",\"/auto-generate-html-control/resources/css/uploader.min.css\"),document.querySelector(\"header\").appendChild(e);var t=document.createElement(\"script\");t.setAttribute(\"src\",\"/auto-generate-html-control/resources/js/uploader.min.js\"),t.addEventListener(\"load\",function(){" + uploaderScripts + "}),document.querySelector(\"body\").appendChild(t)}else document.querySelectorAll(\".uploader-container\").forEach(function(e,t){e.innerHTML=\'<label style=\"color:red;\">Please install WebUploader first.</label>\'});else document.querySelectorAll(\".uploader-container\").forEach(function(e,t){e.innerHTML=\'<label style=\"color:red;\">Please install jQuery first.</label>\'})});";
+                script.InnerHtml.AppendHtml(scriptString);
                 form.InnerHtml.AppendHtml(script);
             }
             return form;

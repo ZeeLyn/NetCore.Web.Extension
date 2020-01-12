@@ -57,7 +57,8 @@ namespace WebApplication
             services.AddCors(option => option.AddPolicy("Cors", policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
             services.AddAutoGenerateHtmlControl(builder =>
             {
-
+                builder.UploaderOptions.FormData = new { summary = "this is summary" };
+                builder.UploaderOptions.FileSingleSizeLimit = 1024 * 1024 * 10;
             });
             //services.AddChunkedUploadLocalStorage();
             services.AddUploadLocalStorage();

@@ -81,3 +81,5 @@
 
 .uploader-container .statusBar .info { float: left; font-size: 13px; color: #666666; margin-top: 6px; }
 .uploader-container .state-complete .file-panel .rotateRight, .uploader-container .state-complete .file-panel .rotateLeft { display: none; }
+
+.uploader-container .btns .btn { margin-left: 15px; }

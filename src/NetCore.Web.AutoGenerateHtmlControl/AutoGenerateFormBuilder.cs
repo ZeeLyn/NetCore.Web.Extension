@@ -20,7 +20,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
     {
         public string PartialName { get; set; }
 
-        public string ServerUrl { get; set; } = "/api/upload";
+        public string ServerUrl { get; set; } = DefaultOptionValue.ServerUrl;
 
         public bool Multiple { get; set; }
 
@@ -37,40 +37,42 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         /// <summary>
         /// 允许上传文件最大数量,默认1
         /// </summary>
-        public int FileNumLimit { get; set; } = 1;
+        public int FileNumLimit { get; set; } = DefaultOptionValue.FileNumLimit;
 
         /// <summary>
         /// 允许上传的单个文件大小上限，默认4MB
         /// </summary>
-        public int FileSingleSizeLimit { get; set; } = 1024 * 1024 * 4;
+        public int FileSingleSizeLimit { get; set; } = DefaultOptionValue.FileSingleSizeLimit;
 
         /// <summary>
         /// 上传线程数,默认1
         /// </summary>
-        public int Threads { get; set; } = 1;
+        public int Threads { get; set; } = DefaultOptionValue.Threads;
 
         /// <summary>
         /// 缩略图
         /// </summary>
-        public ThumbOptions Thumb { get; set; }
+        public ThumbOptions Thumb { get; } = new ThumbOptions();
     }
     public class ChunkedOptions
     {
         public bool Enable { get; set; }
 
-        public int ChunkSize { get; set; } = 1024 * 1024 * 2;
+        public int ChunkSize { get; set; } = DefaultOptionValue.ChunkSize;
 
-        public string ChunkCheckServerUrl { get; set; } = "/api/upload?action=chunk";
+        public string ChunkCheckServerUrl { get; set; } = DefaultOptionValue.ChunkCheckServerUrl;
 
-        public string ChunkMergeServerUrl { get; set; } = "/api/upload?action=merge";
+        public string ChunkMergeServerUrl { get; set; } = DefaultOptionValue.ChunkMergeServerUrl;
     }
 
     public class ThumbOptions
     {
-        public int Width { get; set; } = 100;
+        public int Width { get; set; } = DefaultOptionValue.ThumbWidth;
 
-        public int Height { get; set; } = 100;
+        public int Height { get; set; } = DefaultOptionValue.ThumbHeight;
 
+
+        public int Quality { get; set; } = DefaultOptionValue.ThumbQuality;
         /// <summary>
         /// 是否允许放大，如果想要生成小图的时候不失真，此选项应该设置为false.
         /// </summary>
@@ -79,23 +81,23 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         /// <summary>
         /// 是否允许裁剪。
         /// </summary>
-        public bool Crop { get; set; }
+        public bool Crop { get; set; } = true;
 
     }
 
 
     public class CompressOptions
     {
-        public bool Enable { get; set; } = true;
+        public bool Enable { get; set; }
 
-        public int Width { get; set; } = 1280;
+        public int Width { get; set; } = DefaultOptionValue.CompressWidth;
 
-        public int Height { get; set; } = 900;
+        public int Height { get; set; } = DefaultOptionValue.CompressHeight;
 
         /// <summary>
         /// 图片质量，只有type为`image/jpeg`的时候才有效。
         /// </summary>
-        public int Quality { get; set; } = 60;
+        public int Quality { get; set; } = DefaultOptionValue.CompressQuality;
         /// <summary>
         /// 是否允许放大，如果想要生成小图的时候不失真，此选项应该设置为false.
         /// </summary>
@@ -125,22 +127,25 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
     public class TranslationOptions
     {
-        public string UploadBtnText { get; set; } = "开始上传";
 
-        public string AddFileBtnText { get; set; } = "添加文件";
+        public string Tips { get; set; } = DefaultOptionValue.Tips;
 
-        public string PauseBtnText { get; set; } = "暂停上传";
+        public string UploadBtnText { get; set; } = DefaultOptionValue.UploadBtnText;
 
-        public string ContinueBtnText { get; set; } = "继续上传";
+        public string AddFileBtnText { get; set; } = DefaultOptionValue.AddFileBtnText;
+
+        public string PauseBtnText { get; set; } = DefaultOptionValue.PauseBtnText;
+
+        public string ContinueBtnText { get; set; } = DefaultOptionValue.ContinueBtnText;
     }
 
     public class AcceptOptions
     {
-        public string Title { get; set; } = "Files";
+        public string Title { get; set; } = DefaultOptionValue.AcceptTitle;
 
-        public string Extensions { get; set; } = "gif,jpg,jpeg,bmp,png";
+        public string Extensions { get; set; } = DefaultOptionValue.AcceptExtensions;
 
-        public string MimeTypes { get; set; } = "Images/*";
+        public string MimeTypes { get; set; } = DefaultOptionValue.AcceptMimeTypes;
     }
 
     public enum UploaderOptionEnum
@@ -148,5 +153,50 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         Inherit = -1,
         True = 1,
         False = 0
+    }
+
+    public class DefaultOptionValue
+    {
+        public const string ServerUrl = "/api/upload";
+
+        public const string ChunkCheckServerUrl = "/api/upload?action=chunk";
+
+        public const string ChunkMergeServerUrl = "/api/upload?action=merge";
+
+        public const int FileNumLimit = 1;
+
+        public const int FileSingleSizeLimit = 1024 * 1024 * 4;
+
+        public const int Threads = 1;
+
+        public const int ChunkSize = 1024 * 1024 * 2;
+
+        public const int ThumbWidth = 100;
+
+        public const int ThumbHeight = 100;
+
+        public const int ThumbQuality = 60;
+
+        public const int CompressWidth = 1280;
+
+        public const int CompressHeight = 720;
+
+        public const int CompressQuality = 60;
+
+        public const string UploadBtnText = "开始上传";
+
+        public const string AddFileBtnText = "添加文件";
+
+        public const string PauseBtnText = "暂停上传";
+
+        public const string ContinueBtnText = "继续上传";
+
+        public const string AcceptTitle = "Files";
+
+        public const string AcceptExtensions = "gif,jpg,jpeg,bmp,png";
+
+        public const string AcceptMimeTypes = "Images/*";
+
+        public const string Tips = "或将文件拖拽 , 粘贴到这里";
     }
 }

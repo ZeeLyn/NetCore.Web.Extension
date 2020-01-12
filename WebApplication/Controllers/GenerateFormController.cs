@@ -79,7 +79,7 @@ namespace WebApplication.Controllers
         public List<string> FavoriteFood { get; set; }
 
         [Uploader(Multiple = UploaderOptionEnum.True)]
-        public string LivePhoto { get; set; }
+        public List<string> LivePhoto { get; set; } = new List<string> { "/b1110d9d193b4fd68b3a0c164688ba12.jpg" };
 
         [Required(ErrorMessage = "Resume is required")]
         [RichEditor]

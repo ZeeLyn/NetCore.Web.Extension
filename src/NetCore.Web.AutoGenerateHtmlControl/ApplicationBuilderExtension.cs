@@ -10,7 +10,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         {
             app.UseStaticFiles(new StaticFileOptions
             {
-                RequestPath = "/auto_generate_html_control/resources",
+                RequestPath = "/auto-generate-html-control/resources",
                 FileProvider = new EmbeddedFileProvider(typeof(UploaderContext).GetTypeInfo().Assembly)
             });
             return app;

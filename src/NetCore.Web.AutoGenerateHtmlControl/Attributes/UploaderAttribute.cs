@@ -30,6 +30,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 
         public string AcceptMimeTypes { get; set; }
 
+        public string Tips { get; set; }
+
         public string UploadBtnText { get; set; }
 
         public string AddFileBtnText { get; set; }
@@ -72,7 +74,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
         /// <summary>
         /// 单位字节，如果图片大小小于此值，不会采用压缩。
         /// </summary>
-        public int CompressCompressSize { get; set; } = -1;
+        public int CompressSize { get; set; } = -1;
 
 
         public string FormData { get; set; }
@@ -96,6 +98,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
         public int ThumbWidth { get; set; } = -1;
 
         public int ThumbHeight { get; set; } = -1;
+
+        public int ThumbQuality { get; set; } = -1;
 
         /// <summary>
         /// 是否允许放大，如果想要生成小图的时候不失真，此选项应该设置为false.

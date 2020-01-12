@@ -1,32 +1,115 @@
-; (function ($) {
+if (window.WebUploader) {
+    WebUploader.Uploader.register({ "before-send": "beforeSend", "before-send-file": "beforeSendFile", "after-send-file": "afterSendFile" }, {
+        //发送分片之前检查分片完整性
+        beforeSend: function (block) {
+            var file = block.file;
+            var options = file.options;
+            if (!options.chunk.chunked)
+                return false;
+            if (!file.chunks)
+                file.chunks = block.chunks;
+            var deferred = WebUploader.Deferred();
+            (new WebUploader.Uploader()).md5File(file, block.start, block.end).then(function (md5) {
+                $.ajax({
+                    type: "post",
+                    url: options.chunk.chunkCheckServerUrl,
+                    data: {
+                        chunk_md5: md5,
+                        md5: file.md5,
+                        chunk: block.chunk
+                    },
+                    success: function (res) {
+                        if (res.data === 1)
+                            deferred.reject();
+                        else
+                            deferred.resolve();
+                    },
+                    error: function (err) {
+                        console.error(err);
+                        deferred.reject();
+                    }
+                });
+
+            });
+            return deferred.promise();
+        },
+        //发送文件之前生成md5
+        beforeSendFile: function (file) {
+            var options = file.options;
+            if (!options.chunk.chunked)
+                return false;
+            var deferred = WebUploader.Deferred();
+            (new WebUploader.Uploader()).md5File(file).then(function (md5) {
+                file.md5 = md5;
+                deferred.resolve();
+            });
+            return deferred.promise();
+        },
+        //分片上传完成合并分片
+        afterSendFile: function (file, res) {
+            var options = file.options;
+            if (!options.chunk.chunked) {
+                options.container.find("#" + file.id).append('<input type="hidden" name="' + options.container.data("form-name") + '" value="' + res.data[0] + '" />');
+            }
+            else {
+                var deferred = WebUploader.Deferred();
+                $.ajax({
+                    type: "post",
+                    url: options.chunk.chunkMergeServerUrl,
+                    data: {
+                        md5: file.md5,
+                        chunks: file.chunks
+                    },
+                    success: function (res) {
+                        options.container.find("#" + file.id).append('<input type="hidden" name="' + options.container.data("form-name") + '" value="' + res.data + '" />');
+                        deferred.resolve();
+                    },
+                    error: function (err) {
+                        console.error(err);
+                        deferred.reject();
+                    }
+                });
+                return deferred.promise();
+            }
+        }
+    });
+}
+(function ($) {
     $.fn.InitUploader = function (options) {
         options = $.extend({
-            data: [],
+            data: null,
             container: this,
             base_url: "",
-            server_url: "/api/upload",
+            serverUrl: "/api/upload",
             multiple: false,
-            chunked: false,
-            chunkSize: null,
+            chunk: {
+                chunked: false,
+                chunkSize: 1024 * 1024 * 2,
+                chunkCheckServerUrl: "/api/upload?action=chunk",
+                chunkMergeServerUrl: "/api/upload?action=merge"
+            },
             accept: {
                 title: 'Images',
-                extensions: 'gif,jpg,jpeg,bmp,png,pdf',
-                mimeTypes: 'image/*'
+                extensions: 'gif,jpg,jpeg,bmp,png,pdf,xls,xlsx,doc,docx,ppt,pptx',
+                mimeTypes: 'Image/*'
             },
-            btns: {
+            translation: {
                 uploadBtnText: "开始上传",
                 addFileBtnText: "添加文件",
                 pauseBtnText: "暂停上传",
                 continueBtnText: "继续上传"
             },
+            compress: false,
             formData: null,
-            fileNumLimit: 10,
-            fileSingleSizeLimit: 1024 * 1024 * 5,
+            fileNumLimit: 1,
+            fileSingleSizeLimit: 1024 * 1024 * 4,
             threads: 1,
             thumb: {
-                width: 100, height: 100, quality: 70, crop: true, allowMagnify: false
+                width: 100, height: 100, quality: 60, crop: true, allowMagnify: false
             }
         }, options);
+
+
         var o;
         this.each(function () {
             var $ = jQuery,    // just in case. Make sure it's not an other libaray.
@@ -82,7 +165,7 @@
                 uploader;
 
             if (!WebUploader.Uploader.support()) {
-                alert('Web Uploader 不支持您的浏览器！如果你使用的是IE浏览器，请尝试升级 flash 播放器');
+                alert('WebUploader does not support the browser you are using.');
                 throw new Error('WebUploader does not support the browser you are using.');
             }
 
@@ -90,11 +173,11 @@
             o = uploader = WebUploader.create({
                 pick: {
                     id: $wrap.find(".filePicker"),
-                    label: options.btns.addFileBtnText,
+                    label: options.translation.addFileBtnText,
                     multiple: options.multiple
                 },
                 dnd: $wrap.find('.queueList'),
-                paste: document.body,
+                paste: options.container,
 
                 accept: options.accept,
 
@@ -104,11 +187,11 @@
                 disableGlobalDnd: true,
                 thumb: options.thumb,
                 compress: options.compress,
-                chunked: options.chunked,
-                chunkSize: options.chunkSize,
-                server: options.server_url,
+                chunked: options.chunk.chunked,
+                chunkSize: options.chunk.chunkSize,
+                server: options.serverUrl,
                 fileNumLimit: options.fileNumLimit,
-                //fileSizeLimit: 5 * 1024 * 1024,    // 200 M
+                //fileSizeLimit: options.fileSizeLimit,
                 threads: options.threads,
                 fileSingleSizeLimit: options.fileSingleSizeLimit
             });
@@ -117,11 +200,19 @@
             // 添加“添加文件”的按钮，
             uploader.addButton({
                 id: footerAddFile,
-                label: options.btns.addFileBtnText
+                label: options.translation.addFileBtnText
             }).then(function () {
                 footerAddFile.find("div:eq(1)").css({ "width": "100%", "height": "100%" });
             });
 
+            $(options.data).each(function (_, item) {
+                var sp = item.split('/');
+                url2File(item, sp[sp.length - 1], "image/jpeg").then(function (f) {
+                    f.uploaded = true;
+                    f.remote_url = item;
+                    uploader.addFiles(f);
+                });
+            });
 
             // 当有文件添加进来时执行，负责view的创建
             function addFile(file) {
@@ -131,9 +222,11 @@
                     '</li>'),
 
                     $btns = $('<div class="file-panel">' +
-                        '<span class="cancel"></span>' +
+                        '<span class="rotateLeft"></span>' +
                         '<span class="rotateRight"></span>' +
-                        '<span class="rotateLeft"></span></div>').appendTo($li),
+                        '<span class="cancel"></span></div>').appendTo($li),
+                    source = file.source.source,
+
                     $prgress = $li.find('p.progress span'),
                     $wrap = $li.find('p.imgWrap'),
                     $info = $('<p class="error"></p>'),
@@ -141,7 +234,7 @@
                     showError = function (code) {
                         switch (code) {
                             case 'exceed_size':
-                                text = '文件大小超出';
+                                text = '文件超出大小';
                                 break;
 
                             case 'interrupt':
@@ -155,7 +248,9 @@
 
                         $info.text(text).appendTo($li);
                     };
-
+                if (source.uploaded && source.remote_url) {
+                    $li.append('<input type="hidden" name="' + options.container.data("form-name") + '" value="' + source.remote_url + '" />');
+                }
                 if (file.getStatus() === 'invalid') {
                     showError(file.statusText);
                 } else {
@@ -163,10 +258,10 @@
                     $wrap.text('Loading...');
                     uploader.makeThumb(file, function (error, src) {
                         if (error) {
-                            $wrap.text('不能预览');
+                            //$wrap.text('不能预览');
+                            $wrap.empty().append($('<img class="thumb" src="/auto_generate_html_control/resources/icons/' + file.ext + '.png">'));
                             return;
                         }
-
                         var img = $('<img src="' + src + '">');
                         $wrap.empty().append(img);
                     }, thumbnailWidth, thumbnailHeight);
@@ -176,16 +271,17 @@
                 }
 
                 file.on('statuschange', function (cur, prev) {
+
                     if (prev === 'progress') {
                         $prgress.hide().width(0);
                     } else if (prev === 'queued') {
-                        $li.off('mouseenter mouseleave');
-                        $btns.remove();
+                        //$li.off('mouseenter mouseleave');
+                        //$btns.remove();
                     }
 
                     // 成功
                     if (cur === 'error' || cur === 'invalid') {
-                        console.log(file.statusText);
+                        //console.log(file.statusText);
                         showError(file.statusText);
                         percentages[file.id][1] = 1;
                     } else if (cur === 'interrupt') {
@@ -216,16 +312,15 @@
 
                     switch (index) {
                         case 0:
-                            uploader.removeFile(file);
-                            return;
-
+                            file.rotation -= 90;
+                            break;
                         case 1:
                             file.rotation += 90;
                             break;
 
                         case 2:
-                            file.rotation -= 90;
-                            break;
+                            uploader.removeFile(file);
+                            return;
                     }
 
                     if (supportTransition) {
@@ -242,11 +337,14 @@
                 });
 
                 $li.appendTo($queue);
+
+                if (file.source.source.uploaded) {
+                    file.setStatus('complete');
+                }
             }
 
             function removeFile(file) {
-                var $li = $('#' + file.id);
-
+                var $li = $wrap.find('#' + file.id);
                 delete percentages[file.id];
                 updateTotalProgress();
                 $li.off().find('.file-panel').off().end().remove();
@@ -255,15 +353,14 @@
             function updateTotalProgress() {
                 var loaded = 0,
                     total = 0,
-                    spans = $progress.children(),
-                    percent;
+                    spans = $progress.children();
 
                 $.each(percentages, function (k, v) {
                     total += v[0];
                     loaded += v[0] * v[1];
                 });
 
-                percent = total ? loaded / total : 0;
+                var percent = total ? loaded / total : 0;
 
                 spans.eq(0).text(Math.round(percent * 100) + '%');
                 spans.eq(1).css('width', Math.round(percent * 100) + '%');
@@ -289,7 +386,7 @@
                     stats = uploader.getStats();
                     text = '共' + fileCount + '个（' +
                         WebUploader.formatSize(fileSize) +
-                        '），已上传' + stats.successNum + '个';
+                        '），已上传' + (stats.successNum - (options.data ? options.data.length : 0)) + '个';
 
                     if (stats.uploadFailNum) {
                         text += '，失败' + stats.uploadFailNum + '个';
@@ -300,7 +397,7 @@
             }
 
             function setState(val) {
-                var file, stats;
+                var stats;
 
                 if (val === state) {
                     return;
@@ -308,6 +405,7 @@
 
                 $upload.removeClass('state-' + state);
                 $upload.addClass('state-' + val);
+
                 state = val;
 
                 switch (state) {
@@ -331,17 +429,17 @@
                     case 'uploading':
                         footerAddFile.addClass('element-invisible');
                         $progress.show();
-                        $upload.text(options.btns.pauseBtnText);
+                        $upload.text(options.translation.pauseBtnText);
                         break;
 
                     case 'paused':
                         $progress.show();
-                        $upload.text(options.btns.continueBtnText);
+                        $upload.text(options.translation.continueBtnText);
                         break;
 
                     case 'confirm':
                         $progress.hide();
-                        $upload.text(options.btns.uploadBtnText).addClass('disabled');
+                        $upload.text(options.translation.uploadBtnText).addClass('disabled');
 
                         stats = uploader.getStats();
                         if (stats.successNum && !stats.uploadFailNum) {
@@ -352,7 +450,7 @@
                     case 'finish':
                         stats = uploader.getStats();
                         if (stats.successNum) {
-                            alert('上传成功');
+                            //alert('上传成功');
                         } else {
                             // 没有成功的图片，重设
                             state = 'done';
@@ -367,41 +465,60 @@
             uploader.onUploadProgress = function (file, percentage) {
                 var $li = $('#' + file.id),
                     $percent = $li.find('.progress span');
-
                 $percent.css('width', percentage * 100 + '%');
                 percentages[file.id][1] = percentage;
                 updateTotalProgress();
             };
+            uploader.onBeforeFileQueued = function (file) {
+                if (state === 'finish')
+                    return false;
+                //var len = uploader.getFiles().length;
+                //return len < options.fileNumLimit;
+            };
+
+            uploader.on("uploadBeforeSend", function (block, data, headers) {
+                var file = block.file;
+                headers["file-md5"] = file.md5;
+            });
+
 
             uploader.onFileQueued = function (file) {
-                fileCount++;
-                fileSize += file.size;
+                console.log(file);
+                file.options = options;
+                if (file.source.source.uploaded) {
+                    $placeHolder.addClass('element-invisible');
+                    $statusBar.show();
+                }
+                else {
+                    fileCount++;
+                    fileSize += file.size;
+                }
 
                 if (fileCount === 1) {
                     $placeHolder.addClass('element-invisible');
                     $statusBar.show();
+                    $upload.removeClass("disabled");
                 }
-
                 addFile(file);
                 setState('ready');
                 updateTotalProgress();
             };
 
             uploader.onFileDequeued = function (file) {
-                fileCount--;
-                fileSize -= file.size;
-
-                if (!fileCount) {
-                    setState('pedding');
+                if (!file.source.source.uploaded) {
+                    fileCount--;
+                    fileSize -= file.size;
                 }
-
                 removeFile(file);
                 updateTotalProgress();
-
+                if (fileCount <= 0)
+                    $upload.addClass("disabled");
+                if (fileCount <= 0 && $queue.find("li").length === 0) {
+                    setState('pedding');
+                }
             };
 
             uploader.on('all', function (type) {
-                var stats;
                 switch (type) {
                     case 'uploadFinished':
                         setState('confirm');
@@ -414,12 +531,11 @@
                     case 'stopUpload':
                         setState('paused');
                         break;
-
                 }
             });
 
             uploader.onError = function (code) {
-                alert('Eroor: ' + code);
+                alert('Error: ' + code);
             };
 
             $upload.on('click', function () {
@@ -435,7 +551,6 @@
                     uploader.stop();
                 }
             });
-
             $info.on('click', '.retry', function () {
                 uploader.retry();
             });
@@ -443,6 +558,13 @@
 
             $upload.addClass('state-' + state);
             updateTotalProgress();
+
+            function url2File(url, filename, mimeType) {
+                return (fetch(url)
+                    .then(function (res) { return res.arrayBuffer(); })
+                    .then(function (buf) { return new File([buf], filename, { type: mimeType }); })
+                );
+            }
         });
         return o;
     };

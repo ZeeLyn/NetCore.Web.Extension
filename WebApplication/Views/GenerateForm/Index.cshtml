@@ -5,66 +5,50 @@
 
 @using NetCore.Web.AutoGenerateHtmlControl
 
-<script>
+@*<script>
+        document.addEventListener("DOMContentLoaded", function () {
 
-    document.addEventListener("DOMContentLoaded", function () {
-        if (!document.querySelector("script[id='uploader']")) {
+            if (!window.jQuery) {
+                document.querySelectorAll(".uploader-container").forEach(function (item, _) {
+                    item.innerHTML = '<label style="color:red;">Please install jQuery first.</label>';
+                });
+                return;
+            }
+            if (!window.WebUploader) {
+                document.querySelectorAll(".uploader-container").forEach(function (item, _) {
+                    item.innerHTML = '<label style="color:red;">Please install WebUploader first.</label>';
+                });
+                return;
+            }
+
             var css = document.createElement('link');
             css.setAttribute("rel", "stylesheet");
-            css.setAttribute('href', '/auto_generate_html_control/resources/css/uploader.min.css');
+            css.setAttribute('href', '/auto-generate-html-control/resources/css/uploader.min.css');
             document.querySelector('header').appendChild(css);
 
             var lib = document.createElement('script');
-            lib.setAttribute('src', '/auto_generate_html_control/resources/js/uploader.min.js');
+            lib.setAttribute('src', '/auto-generate-html-control/resources/js/uploader.min.js');
             lib.addEventListener("load", function () {
                 $('#uploader1').InitUploader({});
             });
             document.querySelector("body").appendChild(lib);
 
-        }
-    });
+        });
 
-</script>
-<div id="uploader1" class="uploader-container">
-    <div class="queueList">
-        <div id="dndArea" class="placeholder">
-            <div class="filePicker btn btn-primary btn-sm"></div>
-            <div>或将文件拖到这里，单次最多可选300个</div>
-        </div>
-        <ul class="filelist"></ul>
-    </div>
-    <div class="statusBar" style="display: none;">
-        <div class="status">
-            <div class="progress">
-                <span class="text">0%</span>
-                <span class="percentage"></span>
-            </div>
-            <div class="info"></div>
-        </div>
-        <div class="btns">
-            <div class="footer-add-btn btn btn-secondary btn-sm"></div>
-            <div class="uploadBtn btn btn-primary btn-sm">开始上传</div>
-        </div>
-    </div>
-</div>
+    </script>*@
+
 @await Html.GenerateFormAsync(Context, "/GenerateForm/post", FormMethod.Post, Model, null, () => Html.Raw("<div class=\"box-footer text-center\"><button class=\"btn btn-primary\">Submit</button></div>"), true)
 
 
 @section Scripts{
-    @*<script src="/resources/auto_generate_html_control/js/uploader.min.js"></script>*@
-    @*<script src="/resources/auto_generate_html_control/js/init.min.js"></script>*@
     <script src="~/lib/webuploader/dist/webuploader.min.js"></script>
     <script src="~/lib/ckeditor/ckeditor5-build-classic/build/ckeditor.js"></script>
-    <script>
-        function upload() {
-            alert("upload");
-        }
-    </script>
 }
 
 @section Styles{
     @*<link href="~/lib/webuploader/webuploader.css" rel="stylesheet" />*@
     @*<link href="/resources/auto_generate_html_control/css/uploader.min.css" rel="stylesheet" />*@
+
     <style>
         .input-group { flex-direction: column; }
         #avatar-input-group { flex-direction: row; }
