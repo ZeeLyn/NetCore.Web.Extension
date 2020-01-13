@@ -18,23 +18,29 @@ namespace WebApplication.Controllers
                 {
                     Id = 1,
                     Title = "This is title",
-                    CreatedOn = DateTime.Now
+                    CreatedOn = DateTime.Now,
+                    Published=true
                 }
             });
         }
     }
 
+    [DataListView(HtmlAttribute = "{id:'table1'}")]
     public class DataTable
     {
-        [DataTable(Format = "{Id}:{Title}")]
+        [DataListItemView(Format = "{Id}:{Title}")]
         [DisplayName("编号")]
         public int Id { get; set; }
 
-        [DataTable]
+        [DataListItemView(HeaderHtmlAttribute = "{class:'a'}")]
         [DisplayName("标题")]
         public string Title { get; set; }
 
-        [DataTable]
+        [DataListItemView(ValueMap = "{True:'<label>√</label>',False:'<label>×</label>'}")]
+        [DisplayName("发布")]
+        public bool Published { get; set; }
+
+        [DataListItemView]
         [DisplayName("添加时间")]
         public DateTime CreatedOn { get; set; }
     }
