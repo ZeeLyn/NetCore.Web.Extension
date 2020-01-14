@@ -1,0 +1,11 @@
+﻿
+@{
+    ViewData["Title"] = "Card Group";
+}
+@using NetCore.Web.AutoGenerateHtmlControl
+@model List<WebApplication.Controllers.DataCardViewModel>
+
+
+@Html.CardView(Model, @<div class="card-body"><a href="#" class="card-link">查看</a> <a href="#" class="card-link">删除</a></div>)
+
+

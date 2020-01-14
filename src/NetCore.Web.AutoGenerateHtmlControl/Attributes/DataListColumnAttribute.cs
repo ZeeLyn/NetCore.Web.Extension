@@ -23,5 +23,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
         /// 标题栏的Html属性
         /// </summary>
         public string HeaderHtmlAttribute { get; set; }
+
+        public CardContentContainer CardContentContainer { get; set; } = CardContentContainer.Body;
     }
 }

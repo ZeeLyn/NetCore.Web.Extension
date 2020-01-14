@@ -38,8 +38,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             {
                 var th = new TagBuilder("th");
                 th.MergeAttribute("scope", "col");
-                if (column.ThHtmlAttribute != null)
-                    th.MergeAttributes(column.ThHtmlAttribute, true);
+                if (column.HeaderHtmlAttribute != null)
+                    th.MergeAttributes(column.HeaderHtmlAttribute, true);
                 th.InnerHtml.AppendHtml(column.DisplayName);
                 header.InnerHtml.AppendHtml(th);
             }
@@ -56,8 +56,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 foreach (var column in columnMeta)
                 {
                     var td = new TagBuilder("td");
-                    if (column.TdHtmlAttribute != null)
-                        td.MergeAttributes(column.TdHtmlAttribute, true);
+                    if (column.ContentHtmlAttribute != null)
+                        td.MergeAttributes(column.ContentHtmlAttribute, true);
                     td.InnerHtml.AppendHtml(column.GetValue(type, item));
                     tr.InnerHtml.AppendHtml(td);
 
@@ -73,6 +73,111 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
             tableContainer.InnerHtml.AppendHtml(table);
             return tableContainer;
+        }
+
+        public static IHtmlContent CardView<TModel>(this IHtmlHelper html, IEnumerable<TModel> dataList, Func<TModel, IHtmlContent> operatingBuilder = default)
+        {
+            var type = typeof(TModel);
+            var columnMeta = DataListHelper.GetDataColumnMeta(type);
+            var groupMeta = DataListHelper.GetDataMeta(type);
+            var group = new TagBuilder("div");
+            group.AddCssClass("card-deck");
+            if (groupMeta.HtmlAttribute != null)
+                group.MergeAttributes(groupMeta.HtmlAttribute, true);
+
+            foreach (var item in dataList)
+            {
+                var card = new TagBuilder("div");
+                card.AddCssClass("card");
+                TagBuilder header = null;
+                TagBuilder body = null;
+                TagBuilder listGroup = null;
+                TagBuilder footer = null;
+                HtmlContentBuilder root = null;
+                foreach (var column in columnMeta)
+                {
+                    switch (column.CardContentContainer)
+                    {
+                        case CardContentContainer.Root:
+                            root ??= new HtmlContentBuilder();
+                            root.AppendHtml(column.GetValue(type, item));
+                            break;
+                        case CardContentContainer.Header:
+                            header ??= new TagBuilder("div");
+                            var headerItem = new TagBuilder("div");
+                            headerItem.AddCssClass("card-text");
+                            if (column.ContentHtmlAttribute != null)
+                                headerItem.MergeAttributes(column.ContentHtmlAttribute, true);
+                            headerItem.InnerHtml.AppendHtml(column.GetValue(type, item));
+                            header.InnerHtml.AppendHtml(headerItem);
+                            break;
+                        case CardContentContainer.Body:
+                            body ??= new TagBuilder("div");
+                            var bodyItem = new TagBuilder("div");
+                            bodyItem.AddCssClass("card-text");
+                            if (column.ContentHtmlAttribute != null)
+                                bodyItem.MergeAttributes(column.ContentHtmlAttribute, true);
+                            bodyItem.InnerHtml.AppendHtml(column.GetValue(type, item));
+                            body.InnerHtml.AppendHtml(bodyItem);
+                            break;
+                        case CardContentContainer.ListGroup:
+                            listGroup ??= new TagBuilder("ul");
+                            var listItem = new TagBuilder("li");
+                            listItem.AddCssClass("list-group-item");
+                            if (column.ContentHtmlAttribute != null)
+                                listItem.MergeAttributes(column.ContentHtmlAttribute, true);
+                            listItem.InnerHtml.AppendHtml(column.GetValue(type, item));
+                            listGroup.InnerHtml.AppendHtml(listItem);
+                            break;
+                        case CardContentContainer.Footer:
+                            footer ??= new TagBuilder("div");
+                            var footerItem = new TagBuilder("div");
+                            footerItem.AddCssClass("text-muted");
+                            if (column.ContentHtmlAttribute != null)
+                                footerItem.MergeAttributes(column.ContentHtmlAttribute, true);
+                            footerItem.InnerHtml.AppendHtml(column.GetValue(type, item));
+                            footer.InnerHtml.AppendHtml(footerItem);
+                            break;
+                    }
+
+
+                }
+                if (header != null)
+                {
+                    header.AddCssClass("card-header");
+                    card.InnerHtml.AppendHtml(header);
+                }
+                if (root != null)
+                {
+                    card.InnerHtml.AppendHtml(root);
+                }
+
+                if (body != null)
+                {
+                    body.AddCssClass("card-body");
+                    card.InnerHtml.AppendHtml(body);
+                }
+
+                if (listGroup != null)
+                {
+                    listGroup.AddCssClass("list-group list-group-flush");
+                    card.InnerHtml.AppendHtml(listGroup);
+                }
+
+                if (operatingBuilder != null)
+                {
+                    card.InnerHtml.AppendHtml(operatingBuilder(item));
+                }
+
+                if (footer != null)
+                {
+                    footer.AddCssClass("card-footer");
+                    card.InnerHtml.AppendHtml(footer);
+                }
+
+                group.InnerHtml.AppendHtml(card);
+            }
+            return group;
         }
     }
 
@@ -101,8 +206,9 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             FormatPlaceholder = GetFormatPlaceholder(attr),
                             ValueMapPlaceholder = GetValueMapPlaceholder(attr),
                             ValueMap = ParsingKeyValue(attr.ValueMap),
-                            TdHtmlAttribute = ParsingKeyValue(attr.ContentHtmlAttribute),
-                            ThHtmlAttribute = ParsingKeyValue(attr.HeaderHtmlAttribute)
+                            ContentHtmlAttribute = ParsingKeyValue(attr.ContentHtmlAttribute),
+                            HeaderHtmlAttribute = ParsingKeyValue(attr.HeaderHtmlAttribute),
+                            CardContentContainer = attr.CardContentContainer
                         }).ToList();
             });
         }
@@ -188,9 +294,11 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
         public Dictionary<string, string> ValueMap { get; internal set; }
 
-        public Dictionary<string, string> ThHtmlAttribute { get; internal set; }
+        public Dictionary<string, string> HeaderHtmlAttribute { get; internal set; }
 
-        public Dictionary<string, string> TdHtmlAttribute { get; internal set; }
+        public Dictionary<string, string> ContentHtmlAttribute { get; internal set; }
+
+        public CardContentContainer CardContentContainer { get; internal set; } = CardContentContainer.Body;
 
 
         public string GetValue(Type type, object obj)
@@ -217,5 +325,14 @@ namespace NetCore.Web.AutoGenerateHtmlControl
     public class DataMeta
     {
         public Dictionary<string, string> HtmlAttribute { get; internal set; }
+    }
+
+    public enum CardContentContainer
+    {
+        Root,
+        Header,
+        Body,
+        ListGroup,
+        Footer
     }
 }
