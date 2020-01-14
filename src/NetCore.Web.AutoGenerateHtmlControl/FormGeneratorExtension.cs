@@ -35,19 +35,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         }
 
 
-        public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, HttpContext context, string url, FormMethod method, TModel model, object htmlAttributes = null, string appendHtmlString = null, bool? antiforgery = default, string globalCssClass = "form-control")
-        {
-            return await html.GenerateFormAsync(context, url, method, model, htmlAttributes, string.IsNullOrWhiteSpace(appendHtmlString) ? null : html.Raw(appendHtmlString), antiforgery, globalCssClass);
-        }
-
-        public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, HttpContext context, string url, FormMethod method, TModel model, object htmlAttributes = null, Func<IHtmlContent> appendHtmlBuilder = null, bool? antiforgery = default, string globalCssClass = "form-control")
-        {
-            var htmlContent = appendHtmlBuilder?.Invoke();
-            return await html.GenerateFormAsync(context, url, method, model, htmlAttributes, htmlContent, antiforgery, globalCssClass);
-        }
-
-
-        public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, HttpContext context, string url, FormMethod method, TModel model, object htmlAttributes = null, IHtmlContent appendHtmlContent = null, bool? antiforgery = default, string globalCssClass = "form-control")
+        public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, HttpContext context, string url, FormMethod method, TModel model, object htmlAttributes = default, Func<TModel, IHtmlContent> appendHtmlContent = default, bool? antiforgery = default, string globalCssClass = "form-control")
         {
             var serviceProvider = context.RequestServices;
             var options = serviceProvider.GetRequiredService<AutoGenerateFormBuilder>();
@@ -498,8 +486,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 group.InnerHtml.AppendHtml(html.ValidationMessage(name));
                 form.InnerHtml.AppendHtml(group);
             }
-
-            form.InnerHtml.AppendHtml(appendHtmlContent);
+            if (appendHtmlContent != null)
+                form.InnerHtml.AppendHtml(appendHtmlContent(model));
             if (antiforgery.HasValue && antiforgery.Value)
                 form.InnerHtml.AppendHtml(html.AntiForgeryToken());
             if (hasUploader || hasEditor)

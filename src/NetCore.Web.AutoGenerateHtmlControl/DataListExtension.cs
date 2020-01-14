@@ -19,13 +19,16 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         /// </summary>
         /// <typeparam name="TModel"></typeparam>
         /// <param name="html"></param>
-        /// <param name="dataList"></param>
+        /// <param name="dataList">数据集合</param>
+        /// <param name="operatingBuilder">在table最后一列添加html</param>
         /// <returns></returns>
-        public static IHtmlContent TableView<TModel>(this IHtmlHelper html, IEnumerable<TModel> dataList)
+        public static IHtmlContent TableView<TModel>(this IHtmlHelper html, IEnumerable<TModel> dataList, Func<TModel, IHtmlContent> operatingBuilder = default)
         {
             var type = typeof(TModel);
             var columnMeta = DataListHelper.GetDataColumnMeta(type);
             var tableMeta = DataListHelper.GetDataMeta(type);
+            var tableContainer = new TagBuilder("div");
+            tableContainer.AddCssClass("table-responsive-md");
             var table = new TagBuilder("table");
             table.MergeAttribute("class", "table table-hover");
             if (tableMeta.HtmlAttribute != null)
@@ -40,6 +43,11 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 th.InnerHtml.AppendHtml(column.DisplayName);
                 header.InnerHtml.AppendHtml(th);
             }
+            if (operatingBuilder != null)
+            {
+                var action = new TagBuilder("th");
+                header.InnerHtml.AppendHtml(action);
+            }
             table.InnerHtml.AppendHtml(header);
 
             foreach (var item in dataList)
@@ -52,11 +60,19 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                         td.MergeAttributes(column.TdHtmlAttribute, true);
                     td.InnerHtml.AppendHtml(column.GetValue(type, item));
                     tr.InnerHtml.AppendHtml(td);
-                }
 
+                }
+                if (operatingBuilder != null)
+                {
+                    var td = new TagBuilder("td");
+                    td.InnerHtml.AppendHtml(operatingBuilder(item));
+                    tr.InnerHtml.AppendHtml(td);
+                }
                 table.InnerHtml.AppendHtml(tr);
             }
-            return table;
+
+            tableContainer.InnerHtml.AppendHtml(table);
+            return tableContainer;
         }
     }
 
@@ -75,7 +91,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 var props = t.GetProperties(BindingFlags.Public | BindingFlags.Instance);
                 return (from p in props
                         let display = p.GetCustomAttribute<DisplayNameAttribute>()
-                        let attr = p.GetCustomAttribute<DataListItemViewAttribute>()
+                        let attr = p.GetCustomAttribute<DataListColumnAttribute>()
                         select new DataColumnMeta
                         {
                             PropertyInfo = p,
@@ -95,7 +111,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         {
             return DataMeta.GetOrAdd(type, t =>
             {
-                var attr = t.GetCustomAttribute<DataListViewAttribute>();
+                var attr = t.GetCustomAttribute<DataListAttribute>();
                 if (attr == null)
                     return new DataMeta();
                 return new DataMeta
@@ -105,7 +121,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             });
         }
 
-        internal static HashSet<string> GetFormatPlaceholder(DataListItemViewAttribute attribute)
+        internal static HashSet<string> GetFormatPlaceholder(DataListColumnAttribute attribute)
         {
             if (string.IsNullOrWhiteSpace(attribute.Format)) return new HashSet<string>();
             var hashSet = new HashSet<string>();
@@ -120,7 +136,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             return hashSet;
         }
 
-        internal static HashSet<string> GetValueMapPlaceholder(DataListItemViewAttribute attribute)
+        internal static HashSet<string> GetValueMapPlaceholder(DataListColumnAttribute attribute)
         {
             if (string.IsNullOrWhiteSpace(attribute.ValueMap)) return new HashSet<string>();
             var hashSet = new HashSet<string>();
@@ -164,7 +180,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
         public PropertyInfo PropertyInfo { get; internal set; }
 
-        public DataListItemViewAttribute Attribute { get; internal set; }
+        public DataListColumnAttribute Attribute { get; internal set; }
 
         public HashSet<string> FormatPlaceholder { get; internal set; }
 

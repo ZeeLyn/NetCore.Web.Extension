@@ -52,7 +52,7 @@
 
 </script>
 
-@await Html.GenerateFormAsync(Context, "/GenerateForm/post", FormMethod.Post, Model, null, () => Html.Raw("<div class=\"box-footer text-center\"><button class=\"btn btn-primary\">Submit</button></div>"), true)
+@await Html.GenerateFormAsync(Context, "/GenerateForm/post", FormMethod.Post, Model, null, @<div class="box-footer text-center"><button class="btn btn-primary">Submit</button></div>, true)
 
 
 @section Scripts{

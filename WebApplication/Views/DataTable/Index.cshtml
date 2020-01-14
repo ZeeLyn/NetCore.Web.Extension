@@ -1,8 +1,12 @@
-﻿@using NetCore.Web.AutoGenerateHtmlControl
-@model List<WebApplication.Controllers.DataTable>
+﻿@using Microsoft.AspNetCore.Mvc.Razor
+@using NetCore.Web.AutoGenerateHtmlControl
+@using WebApplication.Controllers
+@model List<WebApplication.Controllers.DataTableViewModel>
 @{
     ViewData["Title"] = "Index";
 }
 
 
-@Html.TableView(Model)
+@Html.TableView(Model, @<a href="#" alt="@item.Title">查看</a>)
+
+

@@ -2,7 +2,7 @@
 
 namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 {
-    public class DataListItemViewAttribute : Attribute
+    public class DataListColumnAttribute : Attribute
     {
         /// <summary>
         /// 格式化显示，跟ValueMap只能二选一，可使用占位符代替对应的字段值，例如：{Title}

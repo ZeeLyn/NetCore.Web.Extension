@@ -2,7 +2,7 @@
 
 namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 {
-    public class DataListViewAttribute : Attribute
+    public class DataListAttribute : Attribute
     {
         public string HtmlAttribute { get; set; }
     }
