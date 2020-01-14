@@ -25,15 +25,6 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             new ConcurrentDictionary<Type, IEnumerable<PropertyInfo>>();
 
 
-        private static Dictionary<string, object> GetAttributeFromObject(this object obj)
-        {
-            if (obj == null)
-                return null;
-            var type = obj.GetType();
-            var props = FormAttributes.GetOrAdd(type, t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance));
-            return props.ToDictionary(k => k.Name, v => v.GetValue(obj));
-        }
-
 
         public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, HttpContext context, string url, FormMethod method, TModel model, object htmlAttributes = default, Func<TModel, IHtmlContent> appendHtmlContent = default, bool? antiforgery = default, string globalCssClass = "form-control")
         {
@@ -512,6 +503,17 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                     return false;
             }
         }
+
+
+        private static Dictionary<string, object> GetAttributeFromObject(this object obj)
+        {
+            if (obj == null)
+                return null;
+            var type = obj.GetType();
+            var props = FormAttributes.GetOrAdd(type, t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance));
+            return props.ToDictionary(k => k.Name, v => v.GetValue(obj));
+        }
+
 
         private static int ChooseOptionInt(int globalValue, int attributeValue)
         {
