@@ -25,6 +25,28 @@ namespace WebApplication.Controllers
                     Summary =
                         "Some quick example text to build on the card title and make up the bulk of the card's content.",
                     CreatedOn = DateTime.Now,
+                },
+                new DataCardViewModel
+                {
+                    Header="文章",
+                    Author="Jack",
+                    Tags="美食,时尚",
+                    Title = "Card title",
+                    Banner="/b1110d9d193b4fd68b3a0c164688ba12.jpg",
+                    Summary =
+                        "Some quick example text to build on the card title and make up the bulk of the card's content.",
+                    CreatedOn = DateTime.Now,
+                },
+                new DataCardViewModel
+                {
+                    Header="文章",
+                    Author="Jack",
+                    Tags="美食,时尚",
+                    Title = "Card title",
+                    Banner="/b1110d9d193b4fd68b3a0c164688ba12.jpg",
+                    Summary =
+                        "Some quick example text to build on the card title and make up the bulk of the card's content.",
+                    CreatedOn = DateTime.Now,
                 }
             });
         }
