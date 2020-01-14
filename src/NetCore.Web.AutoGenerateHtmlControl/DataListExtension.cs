@@ -93,7 +93,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 TagBuilder body = null;
                 TagBuilder listGroup = null;
                 TagBuilder footer = null;
-                HtmlContentBuilder root = null;
+                IHtmlContentBuilder root = null;
                 foreach (var column in columnMeta)
                 {
                     switch (column.CardContentContainer)

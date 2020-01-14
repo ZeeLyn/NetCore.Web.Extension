@@ -24,6 +24,9 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
         /// </summary>
         public string HeaderHtmlAttribute { get; set; }
 
+        /// <summary>
+        /// 卡片布局内容显示的位置，默认Body
+        /// </summary>
         public CardContentContainer CardContentContainer { get; set; } = CardContentContainer.Body;
     }
 }
