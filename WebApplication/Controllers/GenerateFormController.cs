@@ -27,7 +27,8 @@ namespace WebApplication.Controllers
                 Birthday = new DateTime(1986, 10, 12),
                 Gender = 2,
                 FavoriteFood = new List<string> { "Eggplant", "Onion" },
-                Resume = "<h1>This is ckeditor5</h1>"
+                Resume = "<h1>This is ckeditor5</h1>",
+                Archive = true
             });
         }
 

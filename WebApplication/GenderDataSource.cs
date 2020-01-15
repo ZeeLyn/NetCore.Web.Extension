@@ -11,7 +11,11 @@ namespace WebApplication
     {
         public async Task<IEnumerable<SelectListItem>> GetAsync(IEnumerable<object> values)
         {
-            return await Task.FromResult(new List<SelectListItem> { new SelectListItem("Male", "1", values.Contains(1)), new SelectListItem("Female", "2", values.Contains(2)) });
+            return await Task.FromResult(new List<SelectListItem>
+            {
+                new SelectListItem("Male", "1", values?.Contains(1)??false),
+                new SelectListItem("Female", "2", values?.Contains(2)??false)
+            });
         }
     }
 }

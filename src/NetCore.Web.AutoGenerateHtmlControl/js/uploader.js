@@ -204,14 +204,21 @@ if (window.WebUploader) {
                 footerAddFile.find("div:eq(1)").css({ "width": "100%", "height": "100%" });
             });
 
-            $(options.data).each(function (_, item) {
-                var sp = item.split('/');
-                url2File(options.fileBaseUrl + item, sp[sp.length - 1], "image/jpeg").then(function (f) {
-                    f.uploaded = true;
-                    f.remote_url = item;
-                    uploader.addFiles(f);
+            if (options.data) {
+                var data;
+                if (options.data instanceof Array)
+                    data = options;
+                else
+                    data = [options.data];
+                $(data).each(function (_, item) {
+                    var sp = item.split('/');
+                    url2File(options.fileBaseUrl + item, sp[sp.length - 1], "image/jpeg").then(function (f) {
+                        f.uploaded = true;
+                        f.remote_url = item;
+                        uploader.addFiles(f);
+                    });
                 });
-            });
+            }
 
             // 当有文件添加进来时执行，负责view的创建
             function addFile(file) {

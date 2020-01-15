@@ -4,10 +4,12 @@ using Newtonsoft.Json;
 
 namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Property)]
     public abstract class FormControlsAttribute : Attribute
     {
         public string HtmlAttributes { get; set; }
+
+        public bool Hide { get; set; }
 
         protected readonly Dictionary<string, object> _attributes = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 

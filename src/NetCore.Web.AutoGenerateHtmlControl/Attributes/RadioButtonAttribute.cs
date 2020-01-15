@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Property)]
     public class RadioButtonAttribute : FormControlsAttribute
     {
         public RadioButtonAttribute()

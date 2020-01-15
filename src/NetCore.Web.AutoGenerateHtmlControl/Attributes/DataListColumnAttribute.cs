@@ -2,6 +2,7 @@
 
 namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 {
+    [AttributeUsage(AttributeTargets.Property)]
     public class DataListColumnAttribute : Attribute
     {
         /// <summary>

@@ -13,9 +13,9 @@ namespace WebApplication
         public async Task<IEnumerable<SelectListItem>> GetAsync(IEnumerable<object> values)
         {
             return await Task.FromResult(new List<SelectListItem> {
-                new SelectListItem("Tourism","Tourism",values.Contains("Tourism")),
-                new SelectListItem("Run","Run",values.Contains("Run")),
-                new SelectListItem("Draw","Draw",values.Contains("Draw"))
+                new SelectListItem("Tourism","Tourism",values?.Contains("Tourism")??false),
+                new SelectListItem("Run","Run",values?.Contains("Run")??false),
+                new SelectListItem("Draw","Draw",values?.Contains("Draw")??false)
             });
         }
     }
