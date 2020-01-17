@@ -69,9 +69,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
 
                 var controlContainer = new TagBuilder("div");
-                //controlContainer.AddCssClass("input-group");
-
-                controlContainer.MergeAttribute("id", $"{name.ToLower()}-input-group");
+                controlContainer.AddCssClass($"control-group {name.ToLower()}-control-group");
 
                 foreach (var control in controlAttrs)
                 {

@@ -9,8 +9,6 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
     {
         public string HtmlAttributes { get; set; }
 
-        public bool Hide { get; set; }
-
         protected readonly Dictionary<string, object> Attributes = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
         public Dictionary<string, object> GetAttributes()
