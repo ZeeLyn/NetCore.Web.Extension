@@ -2,7 +2,7 @@
 
 namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 {
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
     public class TextAreaAttribute : FormControlsAttribute
     {
         public TextAreaAttribute()

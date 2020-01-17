@@ -49,8 +49,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             var editorScripts = new StringBuilder();
             foreach (var prop in properties)
             {
-                var control = prop.GetCustomAttribute<FormControlsAttribute>();
-                if (control == null)
+                var controlAttrs = prop.GetCustomAttributes<FormControlsAttribute>().ToList();
+                if (!controlAttrs.Any())
                     continue;
                 var name = prop.Name;
                 var value = model == null ? null : prop.GetValue(model);
@@ -60,7 +60,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                 var group = new TagBuilder("div");
                 group.MergeAttribute("class", "form-group");
-                if (control.Hide)
+                if (prop.GetCustomAttribute<HideAttribute>() != null)
                     group.MergeAttribute("style", "display:none");
 
                 var groupName = new TagBuilder("label");
@@ -73,411 +73,410 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                 controlContainer.MergeAttribute("id", $"{name.ToLower()}-input-group");
 
-                //foreach (var control in controlAttrs)
-                //{
-                switch (control.ControlType)
+                foreach (var control in controlAttrs)
                 {
-                    case HtmlControlType.Label:
-                        controlContainer.InnerHtml.AppendHtml(html.ExLabel(name, value, control.GetAttributes(), globalCssClass));
-                        break;
-
-                    case HtmlControlType.Hidden:
-                        controlContainer.InnerHtml.AppendHtml(html.ExHidden(name, value, control.GetAttributes()));
-                        break;
-
-                    case HtmlControlType.TextBox:
-                        controlContainer.InnerHtml.AppendHtml(html.ExTextBox(name, value, control.GetAttributes(), globalCssClass));
-                        break;
-
-                    case HtmlControlType.Password:
-                        controlContainer.InnerHtml.AppendHtml(html.ExPassword(name, value, control.GetAttributes(), globalCssClass));
-                        break;
-
-                    case HtmlControlType.TextArea:
-                        controlContainer.InnerHtml.AppendHtml(html.ExTextArea(name, value, control.GetAttributes(), globalCssClass));
-                        break;
-
-                    case HtmlControlType.DropDownList:
-
-                        var dropDownAttr = (DropDownListAttribute)control;
-                        var dropDownDataSource = (IDataSource)serviceProvider.GetService(dropDownAttr.DataSource);
-                        if (dropDownDataSource == null)
-                        {
-                            controlContainer.MergeAttribute("style", "color:red;");
-                            controlContainer.InnerHtml.AppendHtml("Please bind the data source.");
+                    switch (control.ControlType)
+                    {
+                        case HtmlControlType.Label:
+                            controlContainer.InnerHtml.AppendHtml(html.ExLabel(name, value, control.GetAttributes(), globalCssClass));
                             break;
-                        }
-                        controlContainer.InnerHtml.AppendHtml(html.ExDropDownList(name,
-                            await dropDownDataSource.GetAsync(value == null ? null : new[] { value }), dropDownAttr.OptionLabel,
-                            control.GetAttributes(), globalCssClass));
 
-                        break;
-
-                    case HtmlControlType.ListBox:
-                        var listBoxAttr = (ListBoxAttribute)control;
-                        var listBoxDataSource = (IDataSource)serviceProvider.GetService(listBoxAttr.DataSource);
-                        if (listBoxDataSource == null)
-                        {
-                            controlContainer.MergeAttribute("style", "color:red;");
-                            controlContainer.InnerHtml.AppendHtml("Please bind the data source.");
+                        case HtmlControlType.Hidden:
+                            controlContainer.InnerHtml.AppendHtml(html.ExHidden(name, value, control.GetAttributes()));
                             break;
-                        }
 
-                        if (typeof(ICollection).IsAssignableFrom(itemType))
-                        {
-                            controlContainer.InnerHtml.AppendHtml(html.ExListBox(name, await listBoxDataSource.GetAsync(value as IEnumerable<object>), listBoxAttr.OptionLabel, control.GetAttributes(), globalCssClass));
-                        }
-                        else
-                        {
-                            controlContainer.MergeAttribute("style", "color:red;");
-                            controlContainer.InnerHtml.AppendHtml($"ListBox does not support type {itemType}.");
-                        }
-                        break;
-
-                    case HtmlControlType.RadioButton:
-                        var radioButtonAttr = (RadioButtonAttribute)control;
-                        var radioButtonDataSource = (IDataSource)serviceProvider.GetService(radioButtonAttr.DataSource);
-                        if (radioButtonDataSource == null)
-                        {
-                            controlContainer.MergeAttribute("style", "color:red;");
-                            controlContainer.InnerHtml.AppendHtml("Please bind the data source.");
+                        case HtmlControlType.TextBox:
+                            controlContainer.InnerHtml.AppendHtml(html.ExTextBox(name, value, control.GetAttributes(), globalCssClass));
                             break;
-                        }
-                        controlContainer.InnerHtml.AppendHtml(html.ExRadioButton(name,
-                            await radioButtonDataSource.GetAsync(value == null ? null : new[] { value }), radioButtonAttr.GetAttributes(),
-                            globalCssClass));
-                        break;
 
-                    case HtmlControlType.CheckBox:
-                        var checkBoxAttr = (CheckBoxAttribute)control;
-                        if (typeof(ICollection).IsAssignableFrom(itemType))
-                        {
-                            var checkBoxDataSource = (IDataSource)serviceProvider.GetService(checkBoxAttr.DataSource);
-                            if (checkBoxDataSource == null)
+                        case HtmlControlType.Password:
+                            controlContainer.InnerHtml.AppendHtml(html.ExPassword(name, value, control.GetAttributes(), globalCssClass));
+                            break;
+
+                        case HtmlControlType.TextArea:
+                            controlContainer.InnerHtml.AppendHtml(html.ExTextArea(name, value, control.GetAttributes(), globalCssClass));
+                            break;
+
+                        case HtmlControlType.DropDownList:
+
+                            var dropDownAttr = (DropDownListAttribute)control;
+                            var dropDownDataSource = (IDataSource)serviceProvider.GetService(dropDownAttr.DataSource);
+                            if (dropDownDataSource == null)
                             {
                                 controlContainer.MergeAttribute("style", "color:red;");
                                 controlContainer.InnerHtml.AppendHtml("Please bind the data source.");
                                 break;
                             }
-                            controlContainer.InnerHtml.AppendHtml(html.ExCheckBox(name,
-                                await checkBoxDataSource.GetAsync(value as IEnumerable<object>),
-                                checkBoxAttr.GetAttributes(), globalCssClass));
-                        }
-                        else if (typeof(bool).IsAssignableFrom(itemType))
-                        {
-                            controlContainer.InnerHtml.AppendHtml(html.ExSingleCheckBox(name, value != null && bool.Parse(value?.ToString()), checkBoxAttr.GetAttributes(), globalCssClass));
-                        }
-                        else
-                        {
+                            controlContainer.InnerHtml.AppendHtml(html.ExDropDownList(name,
+                                await dropDownDataSource.GetAsync(value == null ? null : new[] { value }), dropDownAttr.OptionLabel,
+                                control.GetAttributes(), globalCssClass));
 
-                            controlContainer.MergeAttribute("style", "color:red;");
-                            controlContainer.InnerHtml.AppendHtml($"CheckBox does not support type {itemType}.");
-                        }
-                        break;
+                            break;
 
-                    case HtmlControlType.Button:
-                        var buttonAttr = (ButtonAttribute)control;
-                        controlContainer.InnerHtml.AppendHtml(html.Button(buttonAttr.ButtonText, buttonAttr.GetAttributes(),
-                            globalCssClass));
-                        break;
-
-                    case HtmlControlType.File:
-                        controlContainer.InnerHtml.AppendHtml(html.ExFile(name, control.GetAttributes(), globalCssClass));
-                        break;
-
-                    case HtmlControlType.RichEditor:
-                        var editorAttr = (RichEditorAttribute)control;
-                        var editorPartialName = string.IsNullOrWhiteSpace(editorAttr.PartialName)
-                            ? options.RichEditorOptions.PartialName
-                            : editorAttr.PartialName;
-                        controlContainer.InnerHtml.AppendHtml(await html.ExRichEditor(name, value?.ToString(), editorPartialName, editorAttr.GetAttributes()));
-                        if (string.IsNullOrWhiteSpace(editorPartialName))
-                        {
-                            editorScripts.AppendFormat("ClassicEditor.create(document.querySelector(\"#{0}\")).catch(function(err){{alert(err)}}),", name);
-                        }
-                        if (!hasEditor)
-                            hasEditor = true;
-                        break;
-
-                    case HtmlControlType.Uploader:
-                        var uploaderAttr = (UploaderAttribute)control;
-                        var uploaderPartialName = string.IsNullOrWhiteSpace(uploaderAttr.PartialName) ? options.UploaderOptions.PartialName : uploaderAttr.PartialName;
-                        var global = options.UploaderOptions;
-                        JToken uploaderOptions = null;
-                        if (string.IsNullOrWhiteSpace(uploaderPartialName))
-                        {
-                            //合并参数
-
-                            uploaderOptions = new JObject();
-                            if (value != null)
-                                uploaderOptions["data"] = JToken.FromObject(value);
-
-                            var fileBaseUrl = ChooseOptionString(global.FileBaseUrl, uploaderAttr.FileBaseUrl);
-                            if (!string.IsNullOrWhiteSpace(fileBaseUrl))
+                        case HtmlControlType.ListBox:
+                            var listBoxAttr = (ListBoxAttribute)control;
+                            var listBoxDataSource = (IDataSource)serviceProvider.GetService(listBoxAttr.DataSource);
+                            if (listBoxDataSource == null)
                             {
-                                uploaderOptions["fileBaseUrl"] = fileBaseUrl;
+                                controlContainer.MergeAttribute("style", "color:red;");
+                                controlContainer.InnerHtml.AppendHtml("Please bind the data source.");
+                                break;
                             }
 
-                            var auto = ChooseOptionEnum(global.AutoUpload, uploaderAttr.AutoUpload);
-                            if (auto)
+                            if (typeof(ICollection).IsAssignableFrom(itemType))
                             {
-                                uploaderOptions["auto"] = auto;
+                                controlContainer.InnerHtml.AppendHtml(html.ExListBox(name, await listBoxDataSource.GetAsync(value as IEnumerable<object>), listBoxAttr.OptionLabel, control.GetAttributes(), globalCssClass));
                             }
-
-                            var serverUrl = ChooseOptionString(global.ServerUrl, uploaderAttr.ServerUrl);
-                            if (serverUrl != DefaultOptionValue.ServerUrl)
-                                uploaderOptions["serverUrl"] = serverUrl;
-
-
-                            if (ChooseOptionEnum(global.Multiple, uploaderAttr.Multiple))
-                                uploaderOptions["multiple"] = true;
-
-                            #region Chunked
-                            if (ChooseOptionEnum(global.Chunked.Enable, uploaderAttr.Chunked))
+                            else
                             {
-                                JToken chunk = new JObject
+                                controlContainer.MergeAttribute("style", "color:red;");
+                                controlContainer.InnerHtml.AppendHtml($"ListBox does not support type {itemType}.");
+                            }
+                            break;
+
+                        case HtmlControlType.RadioButton:
+                            var radioButtonAttr = (RadioButtonAttribute)control;
+                            var radioButtonDataSource = (IDataSource)serviceProvider.GetService(radioButtonAttr.DataSource);
+                            if (radioButtonDataSource == null)
+                            {
+                                controlContainer.MergeAttribute("style", "color:red;");
+                                controlContainer.InnerHtml.AppendHtml("Please bind the data source.");
+                                break;
+                            }
+                            controlContainer.InnerHtml.AppendHtml(html.ExRadioButton(name,
+                                await radioButtonDataSource.GetAsync(value == null ? null : new[] { value }), radioButtonAttr.GetAttributes(),
+                                globalCssClass));
+                            break;
+
+                        case HtmlControlType.CheckBox:
+                            var checkBoxAttr = (CheckBoxAttribute)control;
+                            if (typeof(ICollection).IsAssignableFrom(itemType))
+                            {
+                                var checkBoxDataSource = (IDataSource)serviceProvider.GetService(checkBoxAttr.DataSource);
+                                if (checkBoxDataSource == null)
                                 {
-                                    ["chunked"] = true
-                                };
-                                var chunkSize = ChooseOptionInt(global.Chunked.ChunkSize, uploaderAttr.ChunkSize);
-                                if (chunkSize != DefaultOptionValue.ChunkSize)
-                                    chunk["chunkSize"] = chunkSize;
-
-                                var checkUrl = ChooseOptionString(global.Chunked.ChunkCheckServerUrl, uploaderAttr.ChunkCheckServerUrl);
-                                if (checkUrl != DefaultOptionValue.ChunkCheckServerUrl)
-                                    chunk["chunkCheckServerUrl"] = checkUrl;
-
-                                var mergeUrl = ChooseOptionString(global.Chunked.ChunkMergeServerUrl, uploaderAttr.ChunkMergeServerUrl);
-                                if (mergeUrl != DefaultOptionValue.ChunkMergeServerUrl)
-                                    chunk["chunkMergeServerUrl"] = mergeUrl;
-
-                                uploaderOptions["chunk"] = chunk;
+                                    controlContainer.MergeAttribute("style", "color:red;");
+                                    controlContainer.InnerHtml.AppendHtml("Please bind the data source.");
+                                    break;
+                                }
+                                controlContainer.InnerHtml.AppendHtml(html.ExCheckBox(name,
+                                    await checkBoxDataSource.GetAsync(value as IEnumerable<object>),
+                                    checkBoxAttr.GetAttributes(), globalCssClass));
                             }
-                            #endregion
-
-                            #region Accept
-                            JToken accept = null;
-                            //var acceptTitle = ChooseOptionString(global.Accept.Title, uploaderAttr.AcceptTitle);
-                            //if (acceptTitle != DefaultOptionValue.AcceptTitle)
-                            //{
-                            //    accept ??= new JObject();
-                            //    accept["title"] = acceptTitle;
-                            //}
-
-                            var acceptExtensions = ChooseOptionString(global.Accept.Extensions, uploaderAttr.AcceptExtensions);
-                            if (acceptExtensions != DefaultOptionValue.AcceptExtensions)
+                            else if (typeof(bool).IsAssignableFrom(itemType))
                             {
-                                accept ??= new JObject();
-                                accept["extensions"] = acceptExtensions;
+                                controlContainer.InnerHtml.AppendHtml(html.ExSingleCheckBox(name, value != null && bool.Parse(value?.ToString()), checkBoxAttr.GetAttributes(), globalCssClass));
                             }
-
-                            var acceptMineTypes = ChooseOptionString(global.Accept.MimeTypes, uploaderAttr.AcceptMimeTypes);
-                            if (acceptMineTypes != DefaultOptionValue.AcceptMimeTypes)
+                            else
                             {
-                                accept ??= new JObject();
-                                accept["mimeTypes"] = acceptMineTypes;
+
+                                controlContainer.MergeAttribute("style", "color:red;");
+                                controlContainer.InnerHtml.AppendHtml($"CheckBox does not support type {itemType}.");
                             }
+                            break;
 
-                            if (accept != null)
+                        case HtmlControlType.Button:
+                            var buttonAttr = (ButtonAttribute)control;
+                            controlContainer.InnerHtml.AppendHtml(html.Button(buttonAttr.ButtonText, buttonAttr.GetAttributes(),
+                                globalCssClass));
+                            break;
+
+                        case HtmlControlType.File:
+                            controlContainer.InnerHtml.AppendHtml(html.ExFile(name, control.GetAttributes(), globalCssClass));
+                            break;
+
+                        case HtmlControlType.RichEditor:
+                            var editorAttr = (RichEditorAttribute)control;
+                            var editorPartialName = string.IsNullOrWhiteSpace(editorAttr.PartialName)
+                                ? options.RichEditorOptions.PartialName
+                                : editorAttr.PartialName;
+                            controlContainer.InnerHtml.AppendHtml(await html.ExRichEditor(name, value?.ToString(), editorPartialName, editorAttr.GetAttributes()));
+                            if (string.IsNullOrWhiteSpace(editorPartialName))
                             {
-                                uploaderOptions["accept"] = accept;
+                                editorScripts.AppendFormat("ClassicEditor.create(document.querySelector(\"#{0}\")).catch(function(err){{alert(err)}}),", name);
                             }
-                            #endregion
+                            if (!hasEditor)
+                                hasEditor = true;
+                            break;
 
-                            #region Translation
-                            JToken translation = null;
-                            var uploadBtnText = ChooseOptionString(global.Translation.UploadBtnText, uploaderAttr.UploadBtnText);
-                            if (uploadBtnText != DefaultOptionValue.UploadBtnText)
+                        case HtmlControlType.Uploader:
+                            var uploaderAttr = (UploaderAttribute)control;
+                            var uploaderPartialName = string.IsNullOrWhiteSpace(uploaderAttr.PartialName) ? options.UploaderOptions.PartialName : uploaderAttr.PartialName;
+                            var global = options.UploaderOptions;
+                            JToken uploaderOptions = null;
+                            if (string.IsNullOrWhiteSpace(uploaderPartialName))
                             {
-                                translation ??= new JObject();
-                                translation["uploadBtnText"] = uploadBtnText;
-                            }
+                                //合并参数
 
-                            var addBtnText = ChooseOptionString(global.Translation.AddFileBtnText, uploaderAttr.AddFileBtnText);
-                            if (addBtnText != DefaultOptionValue.AddFileBtnText)
-                            {
-                                translation ??= new JObject();
-                                translation["addFileBtnText"] = addBtnText;
-                            }
+                                uploaderOptions = new JObject();
+                                if (value != null)
+                                    uploaderOptions["data"] = JToken.FromObject(value);
 
-                            var pauseBtnText = ChooseOptionString(global.Translation.PauseBtnText, uploaderAttr.PauseBtnText);
-                            if (pauseBtnText != DefaultOptionValue.PauseBtnText)
-                            {
-                                translation ??= new JObject();
-                                translation["pauseBtnText"] = pauseBtnText;
-                            }
-
-                            var continueBtnText = ChooseOptionString(global.Translation.ContinueBtnText, uploaderAttr.ContinueBtnText);
-                            if (continueBtnText != DefaultOptionValue.ContinueBtnText)
-                            {
-                                translation ??= new JObject();
-                                translation["continueBtnText"] = continueBtnText;
-                            }
-
-                            var exceedFileNumLimitAlert = ChooseOptionString(global.Translation.ExceedFileNumLimitAlert, uploaderAttr.ExceedFileNumLimitAlert);
-                            if (exceedFileNumLimitAlert != DefaultOptionValue.ExceedFileNumLimitAlert)
-                            {
-                                translation["ExceedFileNumLimitAlert"] = exceedFileNumLimitAlert;
-                            }
-
-                            var exceedFileSizeLimitAlert = ChooseOptionString(global.Translation.ExceedFileSizeLimitAlert, uploaderAttr.ExceedFileSizeLimitAlert);
-                            if (exceedFileSizeLimitAlert != DefaultOptionValue.ExceedFileSizeLimitAlert)
-                            {
-                                translation["ExceedFileSizeLimitAlert"] = exceedFileSizeLimitAlert;
-                            }
-
-                            if (translation != null)
-                            {
-                                uploaderOptions["translation"] = translation;
-                            }
-
-                            #endregion
-
-                            #region Compress
-
-                            var enableCompress = ChooseOptionEnum(global.Compress.Enable, uploaderAttr.EnableCompress);
-                            if (enableCompress)
-                            {
-                                JToken compress = new JObject();
-                                var width = ChooseOptionInt(global.Compress.Width, uploaderAttr.CompressWidth);
-                                if (width != DefaultOptionValue.CompressWidth)
+                                var fileBaseUrl = ChooseOptionString(global.FileBaseUrl, uploaderAttr.FileBaseUrl);
+                                if (!string.IsNullOrWhiteSpace(fileBaseUrl))
                                 {
-                                    compress["width"] = width;
+                                    uploaderOptions["fileBaseUrl"] = fileBaseUrl;
                                 }
 
-                                var height = ChooseOptionInt(global.Compress.Height, uploaderAttr.CompressHeight);
-                                if (height != DefaultOptionValue.CompressHeight)
+                                var auto = ChooseOptionEnum(global.AutoUpload, uploaderAttr.AutoUpload);
+                                if (auto)
                                 {
-                                    compress["height"] = height;
+                                    uploaderOptions["auto"] = auto;
                                 }
 
-                                var quality = ChooseOptionInt(global.Compress.Quality, uploaderAttr.CompressQuality);
-                                if (quality != DefaultOptionValue.CompressQuality)
+                                var serverUrl = ChooseOptionString(global.ServerUrl, uploaderAttr.ServerUrl);
+                                if (serverUrl != DefaultOptionValue.ServerUrl)
+                                    uploaderOptions["serverUrl"] = serverUrl;
+
+
+                                if (ChooseOptionEnum(global.Multiple, uploaderAttr.Multiple))
+                                    uploaderOptions["multiple"] = true;
+
+                                #region Chunked
+                                if (ChooseOptionEnum(global.Chunked.Enable, uploaderAttr.Chunked))
                                 {
-                                    compress["quality"] = quality;
+                                    JToken chunk = new JObject
+                                    {
+                                        ["chunked"] = true
+                                    };
+                                    var chunkSize = ChooseOptionInt(global.Chunked.ChunkSize, uploaderAttr.ChunkSize);
+                                    if (chunkSize != DefaultOptionValue.ChunkSize)
+                                        chunk["chunkSize"] = chunkSize;
+
+                                    var checkUrl = ChooseOptionString(global.Chunked.ChunkCheckServerUrl, uploaderAttr.ChunkCheckServerUrl);
+                                    if (checkUrl != DefaultOptionValue.ChunkCheckServerUrl)
+                                        chunk["chunkCheckServerUrl"] = checkUrl;
+
+                                    var mergeUrl = ChooseOptionString(global.Chunked.ChunkMergeServerUrl, uploaderAttr.ChunkMergeServerUrl);
+                                    if (mergeUrl != DefaultOptionValue.ChunkMergeServerUrl)
+                                        chunk["chunkMergeServerUrl"] = mergeUrl;
+
+                                    uploaderOptions["chunk"] = chunk;
+                                }
+                                #endregion
+
+                                #region Accept
+                                JToken accept = null;
+                                //var acceptTitle = ChooseOptionString(global.Accept.Title, uploaderAttr.AcceptTitle);
+                                //if (acceptTitle != DefaultOptionValue.AcceptTitle)
+                                //{
+                                //    accept ??= new JObject();
+                                //    accept["title"] = acceptTitle;
+                                //}
+
+                                var acceptExtensions = ChooseOptionString(global.Accept.Extensions, uploaderAttr.AcceptExtensions);
+                                if (acceptExtensions != DefaultOptionValue.AcceptExtensions)
+                                {
+                                    accept ??= new JObject();
+                                    accept["extensions"] = acceptExtensions;
                                 }
 
-                                var crop = ChooseOptionEnum(global.Compress.Crop, uploaderAttr.CompressCrop);
-                                if (crop)
+                                var acceptMineTypes = ChooseOptionString(global.Accept.MimeTypes, uploaderAttr.AcceptMimeTypes);
+                                if (acceptMineTypes != DefaultOptionValue.AcceptMimeTypes)
                                 {
-                                    compress["crop"] = crop;
+                                    accept ??= new JObject();
+                                    accept["mimeTypes"] = acceptMineTypes;
                                 }
 
-                                var preserveHeaders = ChooseOptionEnum(global.Compress.PreserveHeaders, uploaderAttr.CompressPreserveHeaders);
-                                if (!preserveHeaders)
+                                if (accept != null)
                                 {
-                                    compress["preserveHeaders"] = preserveHeaders;
+                                    uploaderOptions["accept"] = accept;
+                                }
+                                #endregion
+
+                                #region Translation
+                                JToken translation = null;
+                                var uploadBtnText = ChooseOptionString(global.Translation.UploadBtnText, uploaderAttr.UploadBtnText);
+                                if (uploadBtnText != DefaultOptionValue.UploadBtnText)
+                                {
+                                    translation ??= new JObject();
+                                    translation["uploadBtnText"] = uploadBtnText;
                                 }
 
-                                var noCompressIfLarger = ChooseOptionEnum(global.Compress.NoCompressIfLarger, uploaderAttr.CompressNoCompressIfLarger);
-                                if (noCompressIfLarger)
+                                var addBtnText = ChooseOptionString(global.Translation.AddFileBtnText, uploaderAttr.AddFileBtnText);
+                                if (addBtnText != DefaultOptionValue.AddFileBtnText)
                                 {
-                                    compress["noCompressIfLarger"] = noCompressIfLarger;
+                                    translation ??= new JObject();
+                                    translation["addFileBtnText"] = addBtnText;
                                 }
 
-                                var compressSize = ChooseOptionInt(global.Compress.CompressSize, uploaderAttr.CompressSize);
-                                if (compressSize != 0)
+                                var pauseBtnText = ChooseOptionString(global.Translation.PauseBtnText, uploaderAttr.PauseBtnText);
+                                if (pauseBtnText != DefaultOptionValue.PauseBtnText)
                                 {
-                                    compress["compressSize"] = compressSize;
+                                    translation ??= new JObject();
+                                    translation["pauseBtnText"] = pauseBtnText;
                                 }
 
-                                uploaderOptions["compress"] = compress;
+                                var continueBtnText = ChooseOptionString(global.Translation.ContinueBtnText, uploaderAttr.ContinueBtnText);
+                                if (continueBtnText != DefaultOptionValue.ContinueBtnText)
+                                {
+                                    translation ??= new JObject();
+                                    translation["continueBtnText"] = continueBtnText;
+                                }
+
+                                var exceedFileNumLimitAlert = ChooseOptionString(global.Translation.ExceedFileNumLimitAlert, uploaderAttr.ExceedFileNumLimitAlert);
+                                if (exceedFileNumLimitAlert != DefaultOptionValue.ExceedFileNumLimitAlert)
+                                {
+                                    translation["ExceedFileNumLimitAlert"] = exceedFileNumLimitAlert;
+                                }
+
+                                var exceedFileSizeLimitAlert = ChooseOptionString(global.Translation.ExceedFileSizeLimitAlert, uploaderAttr.ExceedFileSizeLimitAlert);
+                                if (exceedFileSizeLimitAlert != DefaultOptionValue.ExceedFileSizeLimitAlert)
+                                {
+                                    translation["ExceedFileSizeLimitAlert"] = exceedFileSizeLimitAlert;
+                                }
+
+                                if (translation != null)
+                                {
+                                    uploaderOptions["translation"] = translation;
+                                }
+
+                                #endregion
+
+                                #region Compress
+
+                                var enableCompress = ChooseOptionEnum(global.Compress.Enable, uploaderAttr.EnableCompress);
+                                if (enableCompress)
+                                {
+                                    JToken compress = new JObject();
+                                    var width = ChooseOptionInt(global.Compress.Width, uploaderAttr.CompressWidth);
+                                    if (width != DefaultOptionValue.CompressWidth)
+                                    {
+                                        compress["width"] = width;
+                                    }
+
+                                    var height = ChooseOptionInt(global.Compress.Height, uploaderAttr.CompressHeight);
+                                    if (height != DefaultOptionValue.CompressHeight)
+                                    {
+                                        compress["height"] = height;
+                                    }
+
+                                    var quality = ChooseOptionInt(global.Compress.Quality, uploaderAttr.CompressQuality);
+                                    if (quality != DefaultOptionValue.CompressQuality)
+                                    {
+                                        compress["quality"] = quality;
+                                    }
+
+                                    var crop = ChooseOptionEnum(global.Compress.Crop, uploaderAttr.CompressCrop);
+                                    if (crop)
+                                    {
+                                        compress["crop"] = crop;
+                                    }
+
+                                    var preserveHeaders = ChooseOptionEnum(global.Compress.PreserveHeaders, uploaderAttr.CompressPreserveHeaders);
+                                    if (!preserveHeaders)
+                                    {
+                                        compress["preserveHeaders"] = preserveHeaders;
+                                    }
+
+                                    var noCompressIfLarger = ChooseOptionEnum(global.Compress.NoCompressIfLarger, uploaderAttr.CompressNoCompressIfLarger);
+                                    if (noCompressIfLarger)
+                                    {
+                                        compress["noCompressIfLarger"] = noCompressIfLarger;
+                                    }
+
+                                    var compressSize = ChooseOptionInt(global.Compress.CompressSize, uploaderAttr.CompressSize);
+                                    if (compressSize != 0)
+                                    {
+                                        compress["compressSize"] = compressSize;
+                                    }
+
+                                    uploaderOptions["compress"] = compress;
+                                }
+
+                                #endregion
+
+                                #region FormData
+                                if (uploaderAttr.FormData != null || global.FormData != null)
+                                {
+                                    uploaderOptions["formData"] = JObject.FromObject(uploaderAttr.FormData ?? global.FormData);
+                                }
+                                #endregion
+
+                                #region FileNumLimit
+                                var fileNumLimit = ChooseOptionInt(global.FileNumLimit, uploaderAttr.FileNumLimit);
+                                if (fileNumLimit != DefaultOptionValue.FileNumLimit)
+                                {
+                                    uploaderOptions["fileNumLimit"] = fileNumLimit;
+                                }
+                                #endregion
+
+                                #region FileSingleSizeLimit
+                                var fileSingleSizeLimit = ChooseOptionInt(global.FileSingleSizeLimit, uploaderAttr.FileSingleSizeLimit);
+                                if (fileSingleSizeLimit != DefaultOptionValue.FileSingleSizeLimit)
+                                {
+                                    uploaderOptions["fileSingleSizeLimit"] = fileSingleSizeLimit;
+                                }
+                                #endregion
+
+                                #region Threads
+
+                                var threads = ChooseOptionInt(global.Threads, uploaderAttr.Threads);
+                                if (threads != DefaultOptionValue.Threads)
+                                {
+                                    uploaderOptions["threads"] = threads;
+                                }
+
+                                #endregion
+
+                                #region Thumb
+
+                                JToken thumb = null;
+                                var thumbWidth = ChooseOptionInt(global.Thumb.Width, uploaderAttr.ThumbWidth);
+                                if (thumbWidth != DefaultOptionValue.ThumbWidth)
+                                {
+                                    thumb ??= new JObject();
+                                    thumb["width"] = thumbWidth;
+                                }
+
+                                var thumbHeight = ChooseOptionInt(global.Thumb.Height, uploaderAttr.ThumbHeight);
+                                if (thumbHeight != DefaultOptionValue.ThumbHeight)
+                                {
+                                    thumb ??= new JObject();
+                                    thumb["height"] = thumbHeight;
+                                }
+
+                                var thumbQuality = ChooseOptionInt(global.Thumb.Quality, uploaderAttr.ThumbQuality);
+                                if (thumbQuality != DefaultOptionValue.ThumbQuality)
+                                {
+                                    thumb ??= new JObject();
+                                    thumb["quality"] = thumbQuality;
+                                }
+
+                                var allowMagnify = ChooseOptionEnum(global.Thumb.AllowMagnify, uploaderAttr.ThumbAllowMagnify);
+                                if (allowMagnify)
+                                {
+                                    thumb ??= new JObject();
+                                    thumb["allowMagnify"] = allowMagnify;
+                                }
+
+                                var thumbCrop = ChooseOptionEnum(global.Thumb.Crop, uploaderAttr.ThumbCrop);
+                                if (!thumbCrop)
+                                {
+                                    thumb ??= new JObject();
+                                    thumb["crop"] = thumbCrop;
+                                }
+
+                                if (thumb != null)
+                                {
+                                    uploaderOptions["thumb"] = thumb;
+                                }
+
+                                #endregion
                             }
 
-                            #endregion
-
-                            #region FormData
-                            if (uploaderAttr.FormData != null || global.FormData != null)
-                            {
-                                uploaderOptions["formData"] = JObject.FromObject(uploaderAttr.FormData ?? global.FormData);
-                            }
-                            #endregion
-
-                            #region FileNumLimit
-                            var fileNumLimit = ChooseOptionInt(global.FileNumLimit, uploaderAttr.FileNumLimit);
-                            if (fileNumLimit != DefaultOptionValue.FileNumLimit)
-                            {
-                                uploaderOptions["fileNumLimit"] = fileNumLimit;
-                            }
-                            #endregion
-
-                            #region FileSingleSizeLimit
-                            var fileSingleSizeLimit = ChooseOptionInt(global.FileSingleSizeLimit, uploaderAttr.FileSingleSizeLimit);
-                            if (fileSingleSizeLimit != DefaultOptionValue.FileSingleSizeLimit)
-                            {
-                                uploaderOptions["fileSingleSizeLimit"] = fileSingleSizeLimit;
-                            }
-                            #endregion
-
-                            #region Threads
-
-                            var threads = ChooseOptionInt(global.Threads, uploaderAttr.Threads);
-                            if (threads != DefaultOptionValue.Threads)
-                            {
-                                uploaderOptions["threads"] = threads;
-                            }
-
-                            #endregion
-
-                            #region Thumb
-
-                            JToken thumb = null;
-                            var thumbWidth = ChooseOptionInt(global.Thumb.Width, uploaderAttr.ThumbWidth);
-                            if (thumbWidth != DefaultOptionValue.ThumbWidth)
-                            {
-                                thumb ??= new JObject();
-                                thumb["width"] = thumbWidth;
-                            }
-
-                            var thumbHeight = ChooseOptionInt(global.Thumb.Height, uploaderAttr.ThumbHeight);
-                            if (thumbHeight != DefaultOptionValue.ThumbHeight)
-                            {
-                                thumb ??= new JObject();
-                                thumb["height"] = thumbHeight;
-                            }
-
-                            var thumbQuality = ChooseOptionInt(global.Thumb.Quality, uploaderAttr.ThumbQuality);
-                            if (thumbQuality != DefaultOptionValue.ThumbQuality)
-                            {
-                                thumb ??= new JObject();
-                                thumb["quality"] = thumbQuality;
-                            }
-
-                            var allowMagnify = ChooseOptionEnum(global.Thumb.AllowMagnify, uploaderAttr.ThumbAllowMagnify);
-                            if (allowMagnify)
-                            {
-                                thumb ??= new JObject();
-                                thumb["allowMagnify"] = allowMagnify;
-                            }
-
-                            var thumbCrop = ChooseOptionEnum(global.Thumb.Crop, uploaderAttr.ThumbCrop);
-                            if (!thumbCrop)
-                            {
-                                thumb ??= new JObject();
-                                thumb["crop"] = thumbCrop;
-                            }
-
-                            if (thumb != null)
-                            {
-                                uploaderOptions["thumb"] = thumb;
-                            }
-
-                            #endregion
-                        }
-
-                        var tips = ChooseOptionString(global.Translation.Tips, uploaderAttr.Tips);
+                            var tips = ChooseOptionString(global.Translation.Tips, uploaderAttr.Tips);
 
 
-                        controlContainer.InnerHtml.AppendHtml(await html.Uploader(name, value?.ToString(), uploaderPartialName, uploaderAttr.GetAttributes(), new Dictionary<string, string> { { "Tips", tips }, { "UploadBtnText", ChooseOptionString(global.Translation.UploadBtnText, uploaderAttr.UploadBtnText) }, { "auto", uploaderOptions["auto"]?.ToObject<string>() } }));
+                            controlContainer.InnerHtml.AppendHtml(await html.Uploader(name, value?.ToString(), uploaderPartialName, uploaderAttr.GetAttributes(), new Dictionary<string, string> { { "Tips", tips }, { "UploadBtnText", ChooseOptionString(global.Translation.UploadBtnText, uploaderAttr.UploadBtnText) }, { "auto", uploaderOptions["auto"]?.ToObject<string>() } }));
 
-                        uploaderScripts.AppendFormat("uploader_{0}=$(\"#{0}-container\").InitUploader({1}),", name, uploaderOptions.ToString(Newtonsoft.Json.Formatting.None));
+                            uploaderScripts.AppendFormat("uploader_{0}=$(\"#{0}-container\").InitUploader({1}),", name, uploaderOptions.ToString(Newtonsoft.Json.Formatting.None));
 
-                        if (!hasUploader)
-                            hasUploader = true;
-                        break;
+                            if (!hasUploader)
+                                hasUploader = true;
+                            break;
+                    }
                 }
-
-                //}
 
                 group.InnerHtml.AppendHtml(controlContainer);
                 group.InnerHtml.AppendHtml(html.ValidationMessage(name));

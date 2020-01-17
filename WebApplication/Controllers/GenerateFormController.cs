@@ -42,12 +42,11 @@ namespace WebApplication.Controllers
     public class ArticleModel
     {
 
-        [Label]
+        [Hide]
         [Hidden]
         public int Id { get; set; }
 
         [TextBox(Placeholder = "Please enter a title")]
-
         [Required(ErrorMessage = "Title is required")]
         [DisplayName("标题")]
         public string Title { get; set; }
@@ -71,19 +70,17 @@ namespace WebApplication.Controllers
         [RadioButton(DataSource = typeof(GenderDataSource), HtmlAttributes = "{class:''}")]
         public int Gender { get; set; }
 
-        [File(HtmlAttributes = "{class:'',style:'display:block'}")]
+        //[File(HtmlAttributes = "{class:'',style:'display:block'}")]
         [Button(ButtonText = "Upload", HtmlAttributes = "{class:'btn btn-primary btn-sm',onclick:'upload();'}")]
+        [Uploader]
         public string Avatar { get; set; }
 
         [DisplayName("Favorite food")]
         [CheckBox(DataSource = typeof(FavoriteFoodDataSource), HtmlAttributes = "{class:''}")]
         public List<string> FavoriteFood { get; set; }
 
-        [Uploader(Multiple = UploaderOptionEnum.True)]
+        [Uploader(Multiple = UploaderOptionEnum.True, FileNumLimit = 10)]
         public List<string> LivePhoto { get; set; }
-
-        [Uploader(Multiple = UploaderOptionEnum.True)]
-        public List<string> LivePhoto2 { get; set; }
 
         [Required(ErrorMessage = "Resume is required")]
         [RichEditor]

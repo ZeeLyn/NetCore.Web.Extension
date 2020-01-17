@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 {
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
     public class DropDownListAttribute : FormControlsAttribute
     {
         public DropDownListAttribute()

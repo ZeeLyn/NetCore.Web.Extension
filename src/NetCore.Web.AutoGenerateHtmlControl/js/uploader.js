@@ -180,7 +180,9 @@ if (window.WebUploader) {
                 },
                 dnd: $wrap.find('.queueList'),
                 paste: options.container,
+
                 accept: options.accept,
+
                 auto: options.auto,
                 formData: options.formData,
                 disableGlobalDnd: true,
@@ -390,9 +392,13 @@ if (window.WebUploader) {
 
                 } else {
                     stats = uploader.getStats();
-                    text = '共' + fileCount + '个（' +
+                    text = '共' +
+                        fileCount +
+                        '个（' +
                         WebUploader.formatSize(fileSize) +
-                        '），已上传' + (stats.successNum - (options.data ? options.data.length : 0)) + '个';
+                        '），已上传' +
+                        (stats.successNum - ((options.data instanceof Array) ? (options.data ? options.data.length : 0) : 1)) +
+                        '个';
 
                     if (stats.uploadFailNum) {
                         text += '，失败' + stats.uploadFailNum + '个';
