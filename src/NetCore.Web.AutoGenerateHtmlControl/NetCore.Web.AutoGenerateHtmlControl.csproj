@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>0.0.12</Version>
+    <Version>0.0.13</Version>
     <Authors>Owen</Authors>
     <Description>NetCore.Web.Extension</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

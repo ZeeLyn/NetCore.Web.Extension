@@ -11,5 +11,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
         }
 
         public string PartialName { get; set; }
+
+        public string Options { get; set; }
     }
 }

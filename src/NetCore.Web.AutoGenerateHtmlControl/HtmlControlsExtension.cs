@@ -256,8 +256,6 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             textArea.MergeAttribute("name", name);
             textArea.MergeAttribute("style", "display:none");
             textArea.InnerHtml.AppendHtml(value);
-            //var script = new TagBuilder("script");
-            //script.InnerHtml.AppendHtml($"");
             container.InnerHtml.AppendHtml(textArea);
             return container;
         }

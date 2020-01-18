@@ -62,7 +62,7 @@
     <script type="text/javascript">
         var uploader1 = $("#uploader1").InitUploader({
             data: "/b1110d9d193b4fd68b3a0c164688ba12.jpg",
-            multiple: true,
+            multiple: false,
             server_url: "http://localhost:50861/api/upload",
             chunk: {
                 chunked: false,
@@ -107,7 +107,7 @@
                 chunkSize: 1024 * 1024 * 2,
                 chunkCheckServerUrl: "/api/upload?action=chunk",
                 chunkMergeServerUrl: "/api/upload?action=merge"
-            }
+            }, fileSingleSizeLimit: 1024 * 1024 * 10,
         });
     </script>
 

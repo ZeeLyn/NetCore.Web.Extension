@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace NetCore.Web.AutoGenerateHtmlControl
+﻿namespace NetCore.Web.AutoGenerateHtmlControl
 {
     public class AutoGenerateFormBuilder
     {
@@ -14,6 +10,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
     public class AutoGenerateFormEditorConfigure
     {
         public string PartialName { get; set; }
+
+        public object Options { get; set; } = new object();
     }
 
     public class AutoGenerateFormUploaderConfigure

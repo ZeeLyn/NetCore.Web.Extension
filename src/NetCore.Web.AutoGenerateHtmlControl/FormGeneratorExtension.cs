@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 using NetCore.Web.AutoGenerateHtmlControl.Attributes;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace NetCore.Web.AutoGenerateHtmlControl
@@ -191,7 +192,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             controlContainer.InnerHtml.AppendHtml(await html.ExRichEditor(name, value?.ToString(), editorPartialName, editorAttr.GetAttributes()));
                             if (string.IsNullOrWhiteSpace(editorPartialName))
                             {
-                                editorScripts.AppendFormat("ClassicEditor.create(document.querySelector(\"#{0}\")).catch(function(err){{alert(err)}}),", name);
+                                var editorOptions = string.IsNullOrWhiteSpace(editorAttr.Options) ? JsonConvert.SerializeObject(options.RichEditorOptions.Options, Formatting.None) : editorAttr.Options;
+                                editorScripts.AppendFormat("ClassicEditor.create(document.querySelector(\"#{0}\"),{1}).catch(function(err){{alert(err)}}),", name, editorOptions);
                             }
                             if (!hasEditor)
                                 hasEditor = true;
@@ -468,7 +470,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                             controlContainer.InnerHtml.AppendHtml(await html.Uploader(name, value?.ToString(), uploaderPartialName, uploaderAttr.GetAttributes(), new Dictionary<string, string> { { "Tips", tips }, { "UploadBtnText", ChooseOptionString(global.Translation.UploadBtnText, uploaderAttr.UploadBtnText) }, { "auto", uploaderOptions["auto"]?.ToObject<string>() } }));
 
-                            uploaderScripts.AppendFormat("uploader_{0}=$(\"#{0}-container\").InitUploader({1}),", name, uploaderOptions.ToString(Newtonsoft.Json.Formatting.None));
+                            uploaderScripts.AppendFormat("uploader_{0}=$(\"#{0}-container\").InitUploader({1}),", name, uploaderOptions.ToString(Formatting.None));
 
                             if (!hasUploader)
                                 hasUploader = true;

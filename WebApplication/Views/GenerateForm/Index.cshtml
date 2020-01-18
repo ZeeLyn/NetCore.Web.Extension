@@ -8,47 +8,48 @@
 <script>
     //此脚本用于生成编辑器和上传组件的模板代码
 
-    //document.addEventListener("DOMContentLoaded", function () {
-    //    if (hasuploader) {
-    //        var uploaders = document.querySelectorAll(".uploader-container");
-    //        if (!window.jQuery) {
-    //            uploaders.forEach(function (item, _) {
-    //                item.innerHTML = '<label style="color:red;">Please install jQuery first.</label>';
-    //            });
-    //            return;
-    //        }
-    //        if (!window.WebUploader) {
-    //            uploaders.forEach(function (item, _) {
-    //                item.innerHTML = '<label style="color:red;">Please install WebUploader first.</label>';
-    //            });
-    //            return;
-    //        }
+    document.addEventListener("DOMContentLoaded", function () {
+        //if (hasuploader) {
+        //    var uploaders = document.querySelectorAll(".uploader-container");
+        //    if (!window.jQuery) {
+        //        uploaders.forEach(function (item, _) {
+        //            item.innerHTML = '<label style="color:red;">Please install jQuery first.</label>';
+        //        });
+        //        return;
+        //    }
+        //    if (!window.WebUploader) {
+        //        uploaders.forEach(function (item, _) {
+        //            item.innerHTML = '<label style="color:red;">Please install WebUploader first.</label>';
+        //        });
+        //        return;
+        //    }
 
-    //        var css = document.createElement('link');
-    //        css.setAttribute("rel", "stylesheet");
-    //        css.setAttribute('href', '/auto-generate-html-control/resources/css/uploader.min.css');
-    //        document.querySelector('header').appendChild(css);
+        //    var css = document.createElement('link');
+        //    css.setAttribute("rel", "stylesheet");
+        //    css.setAttribute('href', '/auto-generate-html-control/resources/css/uploader.min.css');
+        //    document.querySelector('header').appendChild(css);
 
-    //        var lib = document.createElement('script');
-    //        lib.setAttribute('src', '/auto-generate-html-control/resources/js/uploader.min.js');
-    //        lib.addEventListener("load", function () {
-    //            $('#uploader1').InitUploader({});
-    //        });
-    //        document.querySelector("body").appendChild(lib);
-    //    }
+        //    var lib = document.createElement('script');
+        //    lib.setAttribute('src', '/auto-generate-html-control/resources/js/uploader.min.js');
+        //    lib.addEventListener("load", function () {
+        //        $('#uploader1').InitUploader({});
+        //    });
+        //    document.querySelector("body").appendChild(lib);
+        //}
 
-    //    if (haseditor) {
-    //        if (window.ClassicEditor) {
-    //            console.log(111);
-    //            console.log(222);
-    //        }
-    //        else {
-    //            document.querySelectorAll(".editor-container").forEach(function (item, _) {
-    //                item.innerHTML = '<label style="color:red;">Please install CKEditor5 first.</label>';
-    //            });
-    //        }
-    //    }
-    //});
+        //if (haseditor) {
+        //    if (window.ClassicEditor) {
+        //        ClassicEditor.create(document.querySelector("#editor"),{}).catch(function (err) {
+        //            alert(err);
+        //        });
+        //    }
+        //    else {
+        //        document.querySelectorAll(".editor-container").forEach(function (item, _) {
+        //            item.innerHTML = '<label style="color:red;">Please install CKEditor5 first.</label>';
+        //        });
+        //    }
+        //}
+    });
 
 </script>
 
@@ -56,8 +57,39 @@
 
 
 @section Scripts{
+
     <script src="~/lib/webuploader/dist/webuploader.min.js"></script>
     <script src="~/lib/ckeditor/ckeditor5-build-classic/build/ckeditor.js"></script>
+    <script src="~/lib/ckeditor/ckeditor5-build-classic/build/translations/zh-cn.js"></script>
+
+    <script>
+        ClassicEditor.defaultConfig = {
+            toolbar: {
+                items: [
+                    'heading',
+                    '|',
+                    'bold',
+                    'italic',
+                    'link',
+                    'bulletedList',
+                    'numberedList',
+                    '|',
+                    'insertTable',
+                    'imageUpload',
+                    'blockQuote',
+                    '|',
+                    'undo',
+                    'redo',
+                    'sourcecode'
+                ]
+            },
+            ckfinder:
+            {
+                uploadUrl: "/api/upload?target=editor"
+            },
+            language: 'zh-cn'
+        };
+    </script>
 }
 
 @section Styles{

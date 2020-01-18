@@ -19,7 +19,7 @@ if (window.WebUploader) {
                         chunk: block.chunk
                     },
                     success: function (res) {
-                        if (res.data.exist)
+                        if (res.exist)
                             deferred.reject();
                         else
                             deferred.resolve();
@@ -29,7 +29,6 @@ if (window.WebUploader) {
                         deferred.reject();
                     }
                 });
-
             });
             return deferred.promise();
         },
@@ -49,7 +48,7 @@ if (window.WebUploader) {
         afterSendFile: function (file, res) {
             var options = file.options;
             if (!options.chunk.chunked) {
-                options.container.find("#" + file.id).append('<input type="hidden" name="' + options.container.data("form-name") + '" value="' + res.data[0] + '" />');
+                options.container.find("#" + file.id).append('<input type="hidden" name="' + options.container.data("form-name") + '" value="' + res[0] + '" />');
             }
             else {
                 var deferred = WebUploader.Deferred();
@@ -61,7 +60,7 @@ if (window.WebUploader) {
                         chunks: file.chunks
                     },
                     success: function (res) {
-                        options.container.find("#" + file.id).append('<input type="hidden" name="' + options.container.data("form-name") + '" value="' + res.data + '" />');
+                        options.container.find("#" + file.id).append('<input type="hidden" name="' + options.container.data("form-name") + '" value="' + res + '" />');
                         deferred.resolve();
                     },
                     error: function (err) {
@@ -209,7 +208,7 @@ if (window.WebUploader) {
             if (options.data) {
                 var data;
                 if (options.data instanceof Array)
-                    data = options;
+                    data = options.data;
                 else
                     data = [options.data];
                 $(data).each(function (_, item) {

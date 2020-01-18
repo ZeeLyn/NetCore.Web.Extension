@@ -62,9 +62,23 @@ namespace WebApplication
                 builder.UploaderOptions.FileSingleSizeLimit = 1024 * 1024 * 10;
                 builder.UploaderOptions.AutoUpload = true;
                 builder.UploaderOptions.FileBaseUrl = "/upload";
+
+                builder.RichEditorOptions.Options = new
+                {
+                    ckfinder = new
+                    {
+                        uploadUrl = "/api/upload?target=editor"
+                    },
+                    language = "zh-cn",
+                    toolbar = new[] { "heading", "|", "bold", "italic", "link", "bulletedList", "numberedList", "blockQuote", "insertTable", "mediaEmbed", "imageUpload", "undo", "redo" }
+                };
             });
             //services.AddChunkedUploadLocalStorage();
-            services.AddUploadLocalStorage(builder => { builder.RootDirectory = Path.Combine("wwwroot", "upload"); });
+            services.AddUploadLocalStorage(builder =>
+            {
+                builder.RootDirectory = Path.Combine("wwwroot", "upload");
+                builder.AddUploadCompletedHandler<EditorUploadCompletedHandler>();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
