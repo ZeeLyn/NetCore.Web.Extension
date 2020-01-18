@@ -3,13 +3,16 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Version>0.0.12</Version>
-    <Authors>OWEN</Authors>
+    <Authors>Owen</Authors>
+    <Description>NetCore.Web.Extension</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/1100100/NetCore.Web.Extension</RepositoryUrl>
     <PackageProjectUrl>https://github.com/1100100/NetCore.Web.Extension</PackageProjectUrl>
     <PackageId>DotNetCore.Web.AutoGenerateHtmlControl</PackageId>
     <LangVersion>latest</LangVersion>
+    <PackageTags>NetCore.Web.Extension</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -85,7 +88,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 

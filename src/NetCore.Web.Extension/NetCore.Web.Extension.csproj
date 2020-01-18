@@ -2,16 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>OWEN</Authors>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Authors>Owen</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/1100100/NetCore.Web.Extension</RepositoryUrl>
-    <Version>0.0.2</Version>
+    <PackageProjectUrl>https://github.com/1100100/NetCore.Web.Extension</PackageProjectUrl>
+    <Version>0.0.12</Version>
+    <Description>NetCore.Web.Extension</Description>
     <PackageId>DotNetCore.Web.Extension</PackageId>
+    <PackageTags>NetCore.Web.Extension</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.1" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.6.0" />
   </ItemGroup>
 
