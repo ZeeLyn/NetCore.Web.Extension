@@ -14,11 +14,6 @@ namespace NetCore.Web.Extension
         }
         public void OnActionExecuting(ActionExecutingContext context)
         {
-
-        }
-
-        public void OnActionExecuted(ActionExecutedContext context)
-        {
             if (context.ModelState.IsValid) return;
             if (Options.Action != null)
                 Options.Action(context);
@@ -27,6 +22,11 @@ namespace NetCore.Web.Extension
                 var firstError = context.ModelState.Keys.SelectMany(k => context.ModelState[k].Errors).Select(e => e.ErrorMessage).LastOrDefault();
                 context.Result = new BadRequestObjectResult(firstError);
             }
+        }
+
+        public void OnActionExecuted(ActionExecutedContext context)
+        {
+
         }
     }
 }

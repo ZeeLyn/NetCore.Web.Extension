@@ -14,7 +14,7 @@ namespace NetCore.Web.Extension
 
     public class GlobalModelStateOptions
     {
-        public Action<ActionExecutedContext> Action { get; set; }
+        public Action<ActionExecutingContext> Action { get; set; }
     }
 
     public class JwtOptions

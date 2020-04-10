@@ -32,7 +32,7 @@ namespace NetCore.Web.Extension
              });
         }
 
-        public static IServiceCollection AddGlobalModelStateFilter(this IServiceCollection services, Action<ActionExecutedContext> builder)
+        public static IServiceCollection AddGlobalModelStateFilter(this IServiceCollection services, Action<ActionExecutingContext> builder)
         {
             return services.AddGlobalModelStateFilter().AddSingleton(new GlobalModelStateOptions { Action = builder });
         }

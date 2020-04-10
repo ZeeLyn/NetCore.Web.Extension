@@ -40,7 +40,7 @@ namespace WebApplication
             //});
 
             //services.AddGlobalExceptionFilter();
-            //services.AddGlobalModelStateFilter();
+            services.AddGlobalModelStateFilter();
             services.AddJwtBearerAuthentication(options =>
             {
                 options.SecurityKey = "8A94FD8A94F122B0";
@@ -70,7 +70,7 @@ namespace WebApplication
                         uploadUrl = "/api/upload?target=editor"
                     },
                     language = "zh-cn",
-                    toolbar = new[] { "heading", "|", "bold", "italic", "link", "bulletedList", "numberedList", "blockQuote", "insertTable", "mediaEmbed", "imageUpload", "undo", "redo" }
+                    toolbar = new[] { "heading", "|", "bold", "italic", "link", "bulletedList", "numberedList", "blockQuote", "insertTable", "mediaEmbed", "imageUpload", "undo", "redo", "fontsize", "fontcolor", "highlight" }
                 };
             });
             //services.AddChunkedUploadLocalStorage();
