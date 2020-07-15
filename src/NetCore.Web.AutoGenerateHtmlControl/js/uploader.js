@@ -49,6 +49,8 @@ if (window.WebUploader) {
             var options = file.options;
             if (!options.chunk.chunked) {
                 options.container.find("#" + file.id).append('<input type="hidden" name="' + options.container.data("form-name") + '" value="' + res[0] + '" />');
+                if (options.onUploaded)
+                    options.onUploaded(res[0]);
             }
             else {
                 var deferred = WebUploader.Deferred();
@@ -61,6 +63,8 @@ if (window.WebUploader) {
                     },
                     success: function (res) {
                         options.container.find("#" + file.id).append('<input type="hidden" name="' + options.container.data("form-name") + '" value="' + res + '" />');
+                        if (options.onUploaded)
+                            options.onUploaded(res);
                         deferred.resolve();
                     },
                     error: function (err) {
@@ -108,7 +112,9 @@ if (window.WebUploader) {
             thumb: {
                 width: 100, height: 100, quality: 60, crop: true, allowMagnify: false
             },
-            auto: false
+            auto: false,
+            onFileQueued: null,
+            onUploaded: null
         }, options);
 
         var o;
@@ -511,6 +517,8 @@ if (window.WebUploader) {
                 addFile(file);
                 setState('ready');
                 updateTotalProgress();
+                if (options.onFileQueued)
+                    options.onFileQueued(file);
             };
 
             uploader.onFileDequeued = function (file) {
@@ -586,6 +594,6 @@ if (window.WebUploader) {
                 );
             }
         });
-        return o;
+        return { options, uploader: o };
     };
 })(jQuery);

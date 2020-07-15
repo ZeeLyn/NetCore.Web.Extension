@@ -59,9 +59,10 @@ namespace WebApplication
             services.AddAutoGenerateHtmlControl(builder =>
             {
                 builder.UploaderOptions.FormData = new { summary = "this is summary" };
-                builder.UploaderOptions.FileSingleSizeLimit = 1024 * 1024 * 10;
+                builder.UploaderOptions.FileSingleSizeLimit = 1024 * 1024 * 20;
                 builder.UploaderOptions.AutoUpload = true;
                 builder.UploaderOptions.FileBaseUrl = "/upload";
+                builder.UploaderOptions.Accept.Extensions = "jpg,gif,png,bmp,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,mp3";
 
                 builder.RichEditorOptions.Options = new
                 {
@@ -78,6 +79,7 @@ namespace WebApplication
             {
                 builder.RootDirectory = Path.Combine("wwwroot", "upload");
                 builder.AddUploadCompletedHandler<EditorUploadCompletedHandler>();
+                builder.AddAllowFileExtension(".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".mp3");
             });
         }
 
