@@ -33,7 +33,7 @@ namespace WebApplication.Controllers
         }
 
         [HttpPost("post")]
-        public IActionResult Post([FromForm]ArticleModel form)
+        public IActionResult Post([FromForm] ArticleModel form)
         {
             return View("index", form);
         }

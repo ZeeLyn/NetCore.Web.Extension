@@ -92,7 +92,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             var builder = new TagBuilder("textarea");
             builder.MergeAttribute("name", name);
             builder.MergeAttribute("id", name);
-            builder.MergeAttribute("value", value?.ToString());
+            //builder.MergeAttribute("value", value?.ToString());
+            builder.InnerHtml.SetContent(value?.ToString());
             if (!string.IsNullOrWhiteSpace(globalCssClass))
                 builder.MergeAttribute("class", globalCssClass);
             builder.MergeAttributes(htmlAttributes, true);
