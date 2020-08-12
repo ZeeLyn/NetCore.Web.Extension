@@ -40,7 +40,7 @@ namespace WebApplication
             //});
 
             //services.AddGlobalExceptionFilter();
-            services.AddGlobalModelStateFilter();
+            //services.AddGlobalModelStateFilter();
             services.AddJwtBearerAuthentication(options =>
             {
                 options.SecurityKey = "8A94FD8A94F122B0";

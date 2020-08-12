@@ -9,7 +9,13 @@ namespace NetCore.Web.Extension
 {
     public static class PagingExtension
     {
-        public static IHtmlContent Paging(this IHtmlHelper html, HttpContext context, long pages, FormMethod method = FormMethod.Get, Action<PagingOptions> options = default)
+        public static IHtmlContent Pagination(this IHtmlHelper html, HttpContext context, long pages, FormMethod method = FormMethod.Get, Action<PagingOptions> options = default)
+        {
+            return html.Pagination(context, pages, -1, method, options);
+        }
+
+
+        public static IHtmlContent Pagination(this IHtmlHelper html, HttpContext context, long pages, long total, FormMethod method = FormMethod.Get, Action<PagingOptions> options = default)
         {
             var request = context.Request;
             var option = new PagingOptions(request);
@@ -25,6 +31,9 @@ namespace NetCore.Web.Extension
 
             builder.AppendFormat("<ul class=\"pagination {0} {1}\">", PositionStyles[(int)option.Position], SizeStyles[(int)option.Size]);
             var pageIndex = GetPageIndex(request);
+
+            if (total >= 0 && option.ShowPaginationInformation)
+                builder.AppendFormat($"<li class=\"pagination-info d-inline-flex align-items-center mr-3\">{option.PaginationInformationTemplate.Replace("{Total}", total.ToString()).Replace("{PageIndex}", pageIndex.ToString()).Replace("{Pages}", pages.ToString())}</li>");
 
             var prePageUrl = BuildQuery(option, request, pageIndex - 1 < 1 ? 1 : pageIndex - 1);
             builder.AppendFormat("<li class=\"page-item{2}\"><a class=\"page-link\" href=\"{0}\"{3}>{1}</a></li>", post ? $"javascript:{formId}.action='{prePageUrl}';{formId}.submit();" : prePageUrl, option.PreButtonText, pageIndex <= 1 ? " disabled" : "", pageIndex <= 1 ? " tabindex=\"-1\"" : "");
@@ -76,7 +85,6 @@ namespace NetCore.Web.Extension
 
             return html.Raw(builder.ToString());
         }
-
 
         private static readonly string[] AllCharArray = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" };
 
@@ -140,6 +148,17 @@ namespace NetCore.Web.Extension
         public PagerPosition Position { get; set; } = PagerPosition.Right;
 
         public PagerSize Size { get; set; } = PagerSize.Normal;
+
+        /// <summary>
+        /// 分页信息模板
+        /// 占位符
+        /// 总记录数：{Total}
+        /// 当前页面：{PageIndex}
+        /// 总页数：{Pages}
+        /// </summary>
+        public string PaginationInformationTemplate { get; set; } = "{Total} records  {PageIndex}/{Pages}";
+
+        public bool ShowPaginationInformation { get; set; } = true;
     }
 
     public enum PagerPosition
