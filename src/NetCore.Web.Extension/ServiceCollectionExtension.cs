@@ -1,13 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Linq;
+using System.Text;
 
 namespace NetCore.Web.Extension
 {
@@ -73,7 +73,12 @@ namespace NetCore.Web.Extension
                 option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(option => { option.TokenValidationParameters = validationParameters; });
+            }).AddJwtBearer(option =>
+            {
+                option.TokenValidationParameters = validationParameters;
+                if (options.Events != null)
+                    option.Events = options.Events;
+            });
 
             return services.AddSingleton<IJwtGenerator, JwtGenerator>().AddSingleton(options);
         }
@@ -124,6 +129,8 @@ namespace NetCore.Web.Extension
                 option.TicketDataFormat = new JwtCookieDataFormat(validationParameters, options);
                 option.SlidingExpiration = options.SlidingExpiration;
                 option.ExpireTimeSpan = options.ExpireTimeSpan;
+                if (options.Events != null)
+                    option.Events = options.Events;
             });
 
             return services;

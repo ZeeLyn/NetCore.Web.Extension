@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
 
 namespace NetCore.Web.Extension
 {
@@ -30,6 +32,8 @@ namespace NetCore.Web.Extension
         public IEnumerable<string> ValidAudiences { get; set; }
 
         public string SecurityAlgorithm { get; set; } = SecurityAlgorithms.HmacSha512Signature;
+
+        public JwtBearerEvents Events { get; set; }
     }
 
     public class JwtCookieOptions : JwtOptions
@@ -43,5 +47,7 @@ namespace NetCore.Web.Extension
         public bool SlidingExpiration { get; set; }
 
         public TimeSpan ExpireTimeSpan { get; set; }
+
+        public new CookieAuthenticationEvents Events { get; set; }
     }
 }
