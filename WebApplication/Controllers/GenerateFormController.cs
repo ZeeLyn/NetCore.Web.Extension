@@ -65,6 +65,7 @@ namespace WebApplication.Controllers
         public List<string> Hobby { get; set; } = new List<string> { "Tourism", "Draw" };
 
         [TextBox(HtmlAttributes = "{readonly:'readonly'}")]
+        [DateTimeConverter("yyyy-MM-dd")]
         public DateTime Birthday { get; set; }
 
         [RadioButton(DataSource = typeof(GenderDataSource), HtmlAttributes = "{class:''}")]

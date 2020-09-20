@@ -5,7 +5,6 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
     [AttributeUsage(AttributeTargets.Property)]
     public abstract class DataListColumnConvertAttribute : Attribute
     {
-
-        public abstract string Convert(object value);
+        public abstract object Convert(object value);
     }
 }

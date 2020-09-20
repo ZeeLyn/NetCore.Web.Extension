@@ -53,8 +53,15 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 var controlAttrs = prop.GetCustomAttributes<FormControlsAttribute>().ToList();
                 if (!controlAttrs.Any())
                     continue;
+
                 var name = prop.Name;
                 var value = model == null ? null : prop.GetValue(model);
+                var valueConverter = prop.GetCustomAttribute<DataListColumnConvertAttribute>();
+                if (valueConverter != null)
+                {
+                    value = valueConverter.Convert(value);
+                }
+
                 var itemType = prop.PropertyType;
                 var display = prop.GetCustomAttribute<DisplayNameAttribute>();
                 var displayName = display == null ? name : display.DisplayName;

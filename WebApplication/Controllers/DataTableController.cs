@@ -46,6 +46,7 @@ namespace WebApplication.Controllers
 
         [DataListColumn]
         [DisplayName("添加时间")]
+        [DateTimeConverter("yyyy-MM-dd HH:mm:ss")]
         public DateTime CreatedOn { get; set; }
     }
 }
