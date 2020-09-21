@@ -74,7 +74,7 @@ namespace WebApplication.Controllers
         //[File(HtmlAttributes = "{class:'',style:'display:block'}")]
         [Uploader]
         [Button(ButtonText = "Upload", HtmlAttributes = "{class:'btn btn-primary btn-sm',onclick:'upload();'}")]
-        public string Avatar { get; set; }
+        public string Avatar { get; set; } = "/20200715/a97f6ba67dc449e4adccef0ca8512fd0.jpg";
 
         [DisplayName("Favorite food")]
         [CheckBox(DataSource = typeof(FavoriteFoodDataSource), HtmlAttributes = "{class:''}")]

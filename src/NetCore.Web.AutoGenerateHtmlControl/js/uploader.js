@@ -169,6 +169,7 @@ if (window.WebUploader) {
                     return r;
                 })(),
                 footerAddFile = $wrap.find('.footer-add-btn'),
+                canMakeThumbExt = ["jpg", "jpeg", "png", "bmp", "gif"],
                 uploader;
 
             if (!WebUploader.Uploader.support()) {
@@ -212,19 +213,31 @@ if (window.WebUploader) {
             });
 
             if (options.data) {
-                var data;
-                if (options.data instanceof Array)
-                    data = options.data;
-                else
-                    data = [options.data];
-                $(data).each(function (_, item) {
-                    var sp = item.split('/');
-                    url2File(options.fileBaseUrl + item, sp[sp.length - 1], "image/jpeg").then(function (f) {
-                        f.uploaded = true;
-                        f.remote_url = item;
-                        uploader.addFiles(f);
+                setTimeout(function () {
+                    var data;
+                    if (options.data instanceof Array)
+                        data = options.data;
+                    else
+                        data = [options.data];
+                    $(data).each(function (_, item) {
+                        var sp = item.split('/');
+                        const fileName = sp[sp.length - 1];
+                        //如果可以生产缩略图
+                        if (canMakeThumbExt.find(item => item == fileName.split('.')[1])) {
+                            url2File(options.fileBaseUrl + item, fileName, "image/jpeg").then(function (f) {
+                                f.uploaded = true;
+                                f.remote_url = item;
+                                uploader.addFiles(f);
+                            });
+                        } else {
+                            var _file = new File(["0"], sp[sp.length - 1], { type: "image/jpeg" });
+                            _file.uploaded = true;
+                            _file.remote_url = item;
+                            uploader.addFiles(_file);
+                        }
                     });
-                });
+                }, 300);
+
             }
 
             // 当有文件添加进来时执行，负责view的创建
@@ -269,15 +282,24 @@ if (window.WebUploader) {
                 } else {
                     // @todo lazyload
                     $wrap.text('Loading...');
-                    uploader.makeThumb(file, function (error, src) {
-                        if (error) {
-                            //$wrap.text('不能预览');
-                            $wrap.empty().append($('<img class="thumb" src="/auto-generate-html-control/resources/icons/' + file.ext + '.png">'));
-                            return;
-                        }
-                        var img = $('<img src="' + src + '">');
-                        $wrap.empty().append(img);
-                    }, thumbnailWidth, thumbnailHeight);
+
+
+                    uploader.makeThumb(file,
+                        function (error, src) {
+                            if (error) {
+                                //$wrap.text('不能预览');
+                                $wrap.empty()
+                                    .append($(
+                                        '<img class="thumb" src="/auto-generate-html-control/resources/icons/' +
+                                        file.ext +
+                                        '.png">'));
+                                return;
+                            }
+                            var img = $('<img src="' + src + '">');
+                            $wrap.empty().append(img);
+                        },
+                        thumbnailWidth,
+                        thumbnailHeight);
 
                     percentages[file.id] = [file.size, 0];
                     file.rotation = 0;
