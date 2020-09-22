@@ -34,7 +34,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             if (tableMeta.HtmlAttribute != null)
                 table.MergeAttributes(tableMeta.HtmlAttribute, true);
             var header = new TagBuilder("tr");
-            foreach (var column in columnMeta)
+            foreach (var column in columnMeta.FindAll(p => p.Attribute != null))
             {
                 var th = new TagBuilder("th");
                 th.MergeAttribute("scope", "col");
@@ -54,7 +54,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 foreach (var item in dataList)
                 {
                     var tr = new TagBuilder("tr");
-                    foreach (var column in columnMeta)
+                    foreach (var column in columnMeta.FindAll(p => p.Attribute != null))
                     {
                         var td = new TagBuilder("td");
                         if (column.ContentHtmlAttribute != null)
@@ -97,7 +97,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                     TagBuilder listGroup = null;
                     TagBuilder footer = null;
                     IHtmlContentBuilder root = null;
-                    foreach (var column in columnMeta)
+                    foreach (var column in columnMeta.FindAll(p => p.Attribute != null))
                     {
                         switch (column.CardContentContainer)
                         {
@@ -202,7 +202,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                         let display = p.GetCustomAttribute<DisplayNameAttribute>()
                         let attr = p.GetCustomAttribute<DataListColumnAttribute>()
                         let converter = p.GetCustomAttribute<DataListColumnConvertAttribute>()
-                        where attr != null
+                        //where attr != null
                         select new DataColumnMeta
                         {
                             PropertyInfo = p,
@@ -210,12 +210,12 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             DataConverter = converter,
                             DisplayName = display == null ? p.Name : display.DisplayName,
                             Name = p.Name,
-                            FormatPlaceholder = GetFormatPlaceholder(attr),
-                            ValueMapPlaceholder = GetValueMapPlaceholder(attr),
-                            ValueMap = ParsingKeyValue(attr.ValueMap),
-                            ContentHtmlAttribute = ParsingKeyValue(attr.ContentHtmlAttribute),
-                            HeaderHtmlAttribute = ParsingKeyValue(attr.HeaderHtmlAttribute),
-                            CardContentContainer = attr.CardContentContainer
+                            FormatPlaceholder = attr != null ? GetFormatPlaceholder(attr) : null,
+                            ValueMapPlaceholder = attr != null ? GetValueMapPlaceholder(attr) : null,
+                            ValueMap = attr != null ? ParsingKeyValue(attr.ValueMap) : null,
+                            ContentHtmlAttribute = attr != null ? ParsingKeyValue(attr.ContentHtmlAttribute) : null,
+                            HeaderHtmlAttribute = attr != null ? ParsingKeyValue(attr.HeaderHtmlAttribute) : null,
+                            CardContentContainer = attr != null ? attr.CardContentContainer : default
                         }).ToList();
             });
         }
@@ -317,7 +317,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
         public string GetValue(Type type, object obj)
         {
-            if (!string.IsNullOrWhiteSpace(Attribute.Format))
+            if (!string.IsNullOrWhiteSpace(Attribute?.Format))
             {
                 var displayText = Attribute.Format;
                 var metas = DataListHelper.GetDataColumnMeta(type);

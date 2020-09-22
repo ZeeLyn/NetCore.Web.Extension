@@ -44,6 +44,8 @@ namespace WebApplication.Controllers
         [DisplayName("发布")]
         public bool Published { get; set; }
 
+        public string BaseUrl { get; set; } = "/root";
+
         [DataListColumn]
         [DisplayName("添加时间")]
         [DateTimeConverter("yyyy-MM-dd HH:mm:ss")]
