@@ -476,10 +476,13 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                             controlContainer.InnerHtml.AppendHtml(await html.Uploader(name, value?.ToString(), uploaderPartialName, uploaderAttr.GetAttributes(), new Dictionary<string, string> { { "Tips", tips }, { "UploadBtnText", ChooseOptionString(global.Translation.UploadBtnText, uploaderAttr.UploadBtnText) }, { "auto", uploaderOptions["auto"]?.ToObject<string>() } }));
 
-                            uploaderScripts.AppendFormat("uploader_{0}=$(\"#{0}-container\").InitUploader({1}),", name, uploaderOptions.ToString(Formatting.None));
+                            if (string.IsNullOrWhiteSpace(uploaderPartialName))
+                            {
+                                uploaderScripts.AppendFormat("uploader_{0}=$(\"#{0}-container\").InitUploader({1}),", name, uploaderOptions.ToString(Formatting.None));
+                                if (!hasUploader)
+                                    hasUploader = true;
+                            }
 
-                            if (!hasUploader)
-                                hasUploader = true;
                             break;
                     }
                 }
