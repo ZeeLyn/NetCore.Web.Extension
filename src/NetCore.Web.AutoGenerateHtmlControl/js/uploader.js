@@ -232,6 +232,7 @@ if (window.WebUploader) {
                                     queryParams =
                                         `?x-oss-process=image/resize,m_fill,h_${options.thumb.height},w_${options.thumb
                                             .width}`;
+                                    break;
                                 case "cos":
                                     queryParams = "!uploader_thumb_style";
                                     break;
