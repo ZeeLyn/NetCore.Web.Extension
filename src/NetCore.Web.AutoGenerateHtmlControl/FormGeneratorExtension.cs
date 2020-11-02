@@ -469,10 +469,13 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             }
 
                             #endregion
+
+                            uploaderOptions["storeProvider"] = global.StoreProvider.ToString();
+
+
                             //}
 
                             var tips = ChooseOptionString(global.Translation.Tips, uploaderAttr.Tips);
-
 
                             controlContainer.InnerHtml.AppendHtml(await html.Uploader(name, value?.ToString(), uploaderPartialName, uploaderAttr.GetAttributes(), new Dictionary<string, string> { { "Tips", tips }, { "UploadBtnText", ChooseOptionString(global.Translation.UploadBtnText, uploaderAttr.UploadBtnText) }, { "auto", uploaderOptions["auto"]?.ToObject<string>() } }));
 

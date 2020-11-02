@@ -85,6 +85,7 @@ if (window.WebUploader) {
             fileBaseUrl: "",
             serverUrl: "/api/upload",
             multiple: false,
+
             chunk: {
                 chunked: false,
                 chunkSize: 1024 * 1024 * 2,
@@ -114,7 +115,8 @@ if (window.WebUploader) {
             },
             auto: false,
             onFileQueued: null,
-            onUploaded: null
+            onUploaded: null,
+            storeProvider: ""
         }, options);
 
         var o;
@@ -221,10 +223,20 @@ if (window.WebUploader) {
                         data = [options.data];
                     $(data).each(function (_, item) {
                         var sp = item.split('/');
-                        const fileName = sp[sp.length - 1];
+                        const fileName = sp[sp.length - 1].toLowerCase();
                         //如果可以生产缩略图
                         if (canMakeThumbExt.find(item => item == fileName.split('.')[1])) {
-                            url2File(options.fileBaseUrl + item, fileName, "image/jpeg").then(function (f) {
+                            var queryParams = "";
+                            switch (options.storeProvider.toLowerCase()) {
+                                case "oss":
+                                    queryParams =
+                                        `?x-oss-process=image/resize,m_fill,h_${options.thumb.height},w_${options.thumb
+                                            .width}`;
+                                case "cos":
+                                    queryParams = "!uploader_thumb_style";
+                                    break;
+                            }
+                            url2File(options.fileBaseUrl + item + queryParams, fileName, "image/jpeg").then(function (f) {
                                 f.uploaded = true;
                                 f.remote_url = item;
                                 uploader.addFiles(f);

@@ -58,7 +58,23 @@
         /// 缩略图
         /// </summary>
         public ThumbOptions Thumb { get; } = new ThumbOptions();
+
+        /// <summary>
+        /// 上传的文件存储提供者，用于生成缩略图时直接加载缩略图而不下载整个文件
+        /// </summary>
+        public StoreProvider StoreProvider { get; set; } = StoreProvider.DISK;
     }
+
+    /// <summary>
+    /// 上传的文件存储提供者
+    /// </summary>
+    public enum StoreProvider
+    {
+        DISK,
+        OSS,
+        COS
+    }
+
     public class ChunkedOptions
     {
         public bool Enable { get; set; }

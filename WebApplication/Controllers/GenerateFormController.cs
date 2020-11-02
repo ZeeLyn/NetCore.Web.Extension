@@ -28,7 +28,8 @@ namespace WebApplication.Controllers
                 Gender = 2,
                 FavoriteFood = new List<string> { "Eggplant", "Onion" },
                 Resume = "<h1>This is ckeditor5</h1>",
-                Archive = true
+                Archive = true,
+                LivePhoto = new List<string> { "/20201102/d6c5f9f4381248d5915389a7f5cc8978.jpg" }
             });
         }
 

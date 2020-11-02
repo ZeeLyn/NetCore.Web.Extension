@@ -118,6 +118,11 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
         /// 是否允许裁剪。
         /// </summary>
         public UploaderOptionEnum ThumbCrop { get; set; } = UploaderOptionEnum.Inherit;
+
+        ///// <summary>
+        ///// 上传的文件存储提供者
+        ///// </summary>
+        //public StoreProvider StoreProvider { get; set; }
     }
 
 
