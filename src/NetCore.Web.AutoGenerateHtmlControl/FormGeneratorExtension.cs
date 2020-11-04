@@ -19,8 +19,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 {
     public static class FormGeneratorExtension
     {
-        private static readonly ConcurrentDictionary<Type, IEnumerable<PropertyInfo>> ControlAttributes =
-            new ConcurrentDictionary<Type, IEnumerable<PropertyInfo>>();
+        private static readonly ConcurrentDictionary<Type, List<FormPropertyInfo>> ControlAttributes =
+            new ConcurrentDictionary<Type, List<FormPropertyInfo>>();
 
         private static readonly ConcurrentDictionary<Type, IEnumerable<PropertyInfo>> FormAttributes =
             new ConcurrentDictionary<Type, IEnumerable<PropertyInfo>>();
@@ -33,10 +33,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             var serviceProvider = context.RequestServices;
             var options = serviceProvider.GetRequiredService<AutoGenerateFormBuilder>();
 
-            var properties = ControlAttributes.GetOrAdd(type, t =>
-            {
-                return t.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanRead);
-            });
+            var properties = ControlAttributes.GetOrAdd(type, t => new FormProperties(t).Properties);
 
             var form = new TagBuilder("form");
             form.MergeAttribute("method", method.ToString());
@@ -50,36 +47,31 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             var editorScripts = new StringBuilder();
             foreach (var prop in properties)
             {
-                var controlAttrs = prop.GetCustomAttributes<FormControlsAttribute>().ToList();
-                if (!controlAttrs.Any())
-                    continue;
+                var name = prop.PropertyInfo.Name;
+                var value = model == null ? null : prop.PropertyInfo.GetValue(model);
 
-                var name = prop.Name;
-                var value = model == null ? null : prop.GetValue(model);
-                var valueConverter = prop.GetCustomAttribute<DataListColumnConvertAttribute>();
-                if (valueConverter != null)
+                if (prop.DataListColumnConvert != null)
                 {
-                    value = valueConverter.Convert(value);
+                    value = prop.DataListColumnConvert.Convert(value);
                 }
 
-                var itemType = prop.PropertyType;
-                var display = prop.GetCustomAttribute<DisplayNameAttribute>();
-                var displayName = display == null ? name : display.DisplayName;
+                var itemType = prop.PropertyInfo.PropertyType;
+
 
                 var group = new TagBuilder("div");
                 group.MergeAttribute("class", "form-group");
-                if (prop.GetCustomAttribute<HideAttribute>() != null)
+                if (prop.Hide)
                     group.MergeAttribute("style", "display:none");
 
                 var groupName = new TagBuilder("label");
-                groupName.InnerHtml.AppendHtml(displayName);
+                groupName.InnerHtml.AppendHtml(prop.DisplayName);
                 group.InnerHtml.AppendHtml(groupName);
 
 
                 var controlContainer = new TagBuilder("div");
                 controlContainer.AddCssClass($"control-group {name.ToLower()}-control-group");
 
-                foreach (var control in controlAttrs)
+                foreach (var control in prop.Controls)
                 {
                     switch (control.ControlType)
                     {
@@ -129,9 +121,9 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                                 break;
                             }
 
-                            if (typeof(ICollection).IsAssignableFrom(itemType))
+                            if (typeof(IList).IsAssignableFrom(itemType))
                             {
-                                controlContainer.InnerHtml.AppendHtml(html.ExListBox(name, await listBoxDataSource.GetAsync(value as IEnumerable<object>), listBoxAttr.OptionLabel, control.GetAttributes(), globalCssClass));
+                                controlContainer.InnerHtml.AppendHtml(html.ExListBox(name, await listBoxDataSource.GetAsync(((IList)value).Cast<object>()), listBoxAttr.OptionLabel, control.GetAttributes(), globalCssClass));
                             }
                             else
                             {
@@ -156,7 +148,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                         case HtmlControlType.CheckBox:
                             var checkBoxAttr = (CheckBoxAttribute)control;
-                            if (typeof(ICollection).IsAssignableFrom(itemType))
+                            if (typeof(IList).IsAssignableFrom(itemType))
                             {
                                 var checkBoxDataSource = (IDataSource)serviceProvider.GetService(checkBoxAttr.DataSource);
                                 if (checkBoxDataSource == null)
@@ -165,8 +157,9 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                                     controlContainer.InnerHtml.AppendHtml("Please bind the data source.");
                                     break;
                                 }
+
                                 controlContainer.InnerHtml.AppendHtml(html.ExCheckBox(name,
-                                    await checkBoxDataSource.GetAsync(value as IEnumerable<object>),
+                                    await checkBoxDataSource.GetAsync(((IList)value).Cast<object>()),
                                     checkBoxAttr.GetAttributes(), globalCssClass));
                             }
                             else if (typeof(bool).IsAssignableFrom(itemType))
@@ -201,9 +194,10 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             {
                                 var editorOptions = string.IsNullOrWhiteSpace(editorAttr.Options) ? JsonConvert.SerializeObject(options.RichEditorOptions.Options, Formatting.None) : editorAttr.Options;
                                 editorScripts.AppendFormat("ClassicEditor.create(document.querySelector(\"#{0}\"),{1}).catch(function(err){{alert(err)}}),", name, editorOptions);
+                                if (!hasEditor)
+                                    hasEditor = true;
                             }
-                            if (!hasEditor)
-                                hasEditor = true;
+
                             break;
 
                         case HtmlControlType.Uploader:
@@ -477,7 +471,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                             var tips = ChooseOptionString(global.Translation.Tips, uploaderAttr.Tips);
 
-                            controlContainer.InnerHtml.AppendHtml(await html.Uploader(name, value?.ToString(), uploaderPartialName, uploaderAttr.GetAttributes(), new Dictionary<string, string> { { "Tips", tips }, { "UploadBtnText", ChooseOptionString(global.Translation.UploadBtnText, uploaderAttr.UploadBtnText) }, { "auto", uploaderOptions["auto"]?.ToObject<string>() } }));
+                            controlContainer.InnerHtml.AppendHtml(await html.Uploader(name, value, uploaderPartialName, uploaderAttr.GetAttributes(), new Dictionary<string, string> { { "Tips", tips }, { "UploadBtnText", ChooseOptionString(global.Translation.UploadBtnText, uploaderAttr.UploadBtnText) }, { "auto", uploaderOptions["auto"]?.ToObject<string>() } }));
 
                             if (string.IsNullOrWhiteSpace(uploaderPartialName))
                             {

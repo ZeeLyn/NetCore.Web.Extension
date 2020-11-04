@@ -13,11 +13,11 @@ namespace WebApplication
         {
             return await Task.FromResult(new List<SelectListItem>
             {
-                new SelectListItem("Potato", "Potato", values?.Contains("Potato") ?? false),
-                new SelectListItem("Tomato", "Tomato", values?.Contains("Tomato") ?? false),
-                new SelectListItem("Onion", "Onion", values?.Contains("Onion") ?? false),
-                new SelectListItem("Carrot", "Carrot", values?.Contains("Carrot") ?? false),
-                new SelectListItem("Eggplant", "Eggplant", values?.Contains("Eggplant") ?? false)
+                new SelectListItem("Potato", "1", values?.Contains(1) ?? false),
+                new SelectListItem("Tomato", "2", values?.Contains(2) ?? false),
+                new SelectListItem("Onion", "3", values?.Contains(3) ?? false),
+                new SelectListItem("Carrot", "4", values?.Contains(4) ?? false),
+                new SelectListItem("Eggplant", "5", values?.Contains(5) ?? false)
             });
         }
     }

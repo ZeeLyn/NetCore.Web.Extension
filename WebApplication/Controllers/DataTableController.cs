@@ -29,6 +29,7 @@ namespace WebApplication.Controllers
     [DataList(HtmlAttribute = "{id:'table1'}")]
     public class DataTableViewModel
     {
+        //[DisplayOrder(1)]
         [DataListColumn]
         [DisplayName("编号")]
         public int Id { get; set; }

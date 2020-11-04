@@ -202,6 +202,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                         let display = p.GetCustomAttribute<DisplayNameAttribute>()
                         let attr = p.GetCustomAttribute<DataListColumnAttribute>()
                         let converter = p.GetCustomAttribute<DataListColumnConvertAttribute>()
+                        let order = p.GetCustomAttribute<DisplayOrderAttribute>()
                         //where attr != null
                         select new DataColumnMeta
                         {
@@ -215,8 +216,9 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             ValueMap = attr != null ? ParsingKeyValue(attr.ValueMap) : null,
                             ContentHtmlAttribute = attr != null ? ParsingKeyValue(attr.ContentHtmlAttribute) : null,
                             HeaderHtmlAttribute = attr != null ? ParsingKeyValue(attr.HeaderHtmlAttribute) : null,
-                            CardContentContainer = attr != null ? attr.CardContentContainer : default
-                        }).ToList();
+                            CardContentContainer = attr?.CardContentContainer ?? default,
+                            OrderNumber = order?.OrderNumber ?? 0
+                        }).OrderBy(p => p.OrderNumber).ToList();
             });
         }
 
@@ -309,6 +311,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
         public CardContentContainer CardContentContainer { get; internal set; } = CardContentContainer.Body;
 
+        public int OrderNumber { get; set; }
+
         private object GetPlainValue(object obj)
         {
             var value = PropertyInfo.GetValue(obj);
@@ -322,7 +326,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 var displayText = Attribute.Format;
                 var metas = DataListHelper.GetDataColumnMeta(type);
 
-                return FormatPlaceholder.Aggregate(displayText, (current, ph) => current.Replace("{" + ph + "}", metas.First(p => p.Name == ph).GetPlainValue(obj).ToString()));
+                return FormatPlaceholder.Aggregate(displayText, (current, ph) => current.Replace("{" + ph + "}", metas.First(p => p.Name == ph).GetPlainValue(obj)?.ToString()));
             }
 
             var value = GetPlainValue(obj)?.ToString();
@@ -333,7 +337,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 var displayText = ValueMap[value];
                 var metas = DataListHelper.GetDataColumnMeta(type);
 
-                return ValueMapPlaceholder.Aggregate(displayText, (current, ph) => current.Replace("{" + ph + "}", metas.First(p => p.Name == ph).GetPlainValue(obj).ToString()));
+                return ValueMapPlaceholder.Aggregate(displayText, (current, ph) => current.Replace("{" + ph + "}", metas.First(p => p.Name == ph).GetPlainValue(obj)?.ToString()));
             }
             return value;
         }

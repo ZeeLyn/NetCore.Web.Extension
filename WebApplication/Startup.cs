@@ -53,7 +53,7 @@ namespace WebApplication
                 builder.UploaderOptions.AutoUpload = true;
                 builder.UploaderOptions.FileBaseUrl = "/upload";
                 builder.UploaderOptions.Accept.Extensions = "jpg,gif,png,bmp,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,mp3";
-                builder.UploaderOptions.StoreProvider = StoreProvider.OSS;
+                //builder.UploaderOptions.StoreProvider = StoreProvider.OSS;
                 builder.RichEditorOptions.Options = new
                 {
                     ckfinder = new
