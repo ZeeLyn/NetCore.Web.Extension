@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NetCore.Web.Extension
+namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
 {
     public class EmailAttribute : RegularExpressionAttribute
     {
