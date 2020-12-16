@@ -7,7 +7,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/1100100/NetCore.Web.Extension</RepositoryUrl>
     <PackageProjectUrl>https://github.com/1100100/NetCore.Web.Extension</PackageProjectUrl>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Description>NetCore.Web.Extension</Description>
     <PackageId>DotNetCore.Web.Extension</PackageId>
     <PackageTags>NetCore.Web.Extension</PackageTags>
