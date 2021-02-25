@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -65,6 +66,11 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                 var groupName = new TagBuilder("label");
                 groupName.InnerHtml.AppendHtml(prop.DisplayName);
+                if (prop.PropertyInfo.GetCustomAttribute<RequiredAttribute>() != null)
+                {
+                    groupName.InnerHtml.AppendHtml("<span style='color:red;font-weight:bold;'> * </span>");
+                }
+
                 group.InnerHtml.AppendHtml(groupName);
 
 
