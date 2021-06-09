@@ -114,19 +114,12 @@ namespace NetCore.Web.Extension
                 validationParameters.ValidAudiences = options.ValidAudiences;
             }
 
-            services.AddAuthentication(option =>
-            {
-                option.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                option.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                option.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                option.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                option.DefaultSignOutScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            }).AddCookie(option =>
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
             {
                 option.Cookie = options.Cookie;
                 option.LoginPath = options.LoginPath;
                 option.AccessDeniedPath = options.AccessDeniedPath;
-                option.TicketDataFormat = new JwtCookieDataFormat(validationParameters, options);
+                //option.TicketDataFormat = new JwtCookieDataFormat(validationParameters, options);
                 option.SlidingExpiration = options.SlidingExpiration;
                 option.ExpireTimeSpan = options.ExpireTimeSpan;
                 if (options.Events != null)
