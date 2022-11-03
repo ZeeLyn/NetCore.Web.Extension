@@ -33,12 +33,12 @@ namespace WebApplication
 
             //services.AddGlobalExceptionFilter();
             //services.AddGlobalModelStateFilter();
-            //services.AddJwtBearerAuthentication(options =>
-            //{
-            //    options.SecurityKey = "8A94FD8A94F122B0";
-            //    options.ValidIssuer = "Issuer";
-            //    options.ValidAudience = "Audience";
-            //});
+            services.AddJwtBearerAuthentication(options =>
+            {
+                options.SecurityKey = "8A94FD8A94F122B0";
+                options.ValidIssuer = "Issuer";
+                options.ValidAudience = "Audience";
+            });
             services.AddJwtCookieAuthentication(options =>
             {
                 options.SecurityKey = "8A94FDA4354414A0320A72292571DF8BDF3B215B44EC523C5862628A4F77C77E29131382D8937A81A1A0E737406A06C4DE24AB0539375EEE779783F5D4E7FE67";
