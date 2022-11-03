@@ -25,7 +25,12 @@ namespace WebApplication
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.Converters.Add(new DateOnlyConverter());
+                options.SerializerSettings.Converters.Add(new TimeOnlyConverter());
+                options.SerializerSettings.DateFormatString = "yyyy/MM/dd HH:mm:ss";
+            });
             //services.Configure<MvcRazorRuntimeCompilationOptions>(options =>
             //{
             //    options.FileProviders.Add(new EmbeddedFileProvider(typeof(UploaderContext).GetTypeInfo().Assembly));
