@@ -17,6 +17,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl.Attributes
         public string Format { get; set; } = "yyyy-MM-dd HH:mm:ss";
         public override object Convert(object value)
         {
+            if (value == null)
+                return default;
             return DateTime.Parse(value.ToString()).ToString(Format);
         }
     }
