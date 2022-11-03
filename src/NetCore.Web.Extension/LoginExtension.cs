@@ -17,8 +17,6 @@ namespace NetCore.Web.Extension
             var prop = new AuthenticationProperties
             {
                 AllowRefresh = true,
-                ExpiresUtc = DateTimeOffset.UtcNow.Add(expire),
-
                 IsPersistent = true
             };
             prop.Items.Add("issuer", issuer);
