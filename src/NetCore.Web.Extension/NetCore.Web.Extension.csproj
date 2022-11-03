@@ -6,8 +6,8 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>Owen</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/1100100/NetCore.Web.Extension</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/1100100/NetCore.Web.Extension</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/zeelyn/NetCore.Web.Extension</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/zeelyn/NetCore.Web.Extension</PackageProjectUrl>
     <Version>1.0.0</Version>
     <Description>NetCore.Web.Extension</Description>
     <PackageId>DotNetCore.Web.Extension</PackageId>
