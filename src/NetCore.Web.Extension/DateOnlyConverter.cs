@@ -1,5 +1,5 @@
 ﻿
-#if NET6_0
+#if NET6_0 || NET7_0
 
 using System;
 using Newtonsoft.Json;
