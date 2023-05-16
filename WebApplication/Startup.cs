@@ -38,24 +38,24 @@ namespace WebApplication
 
             //services.AddGlobalExceptionFilter();
             //services.AddGlobalModelStateFilter();
-            services.AddJwtBearerAuthentication(options =>
-            {
-                options.SecurityKey = "8A94FD8A94F122B0";
-                options.ValidIssuer = "Issuer";
-                options.ValidAudience = "Audience";
-            });
+
             services.AddJwtCookieAuthentication(options =>
             {
-                options.SecurityKey = "8A94FDA4354414A0320A72292571DF8BDF3B215B44EC523C5862628A4F77C77E29131382D8937A81A1A0E737406A06C4DE24AB0539375EEE779783F5D4E7FE67";
+                options.SecurityKey =
+                    "8A94FDA4354414A0320A72292571DF8BDF3B215B44EC523C5862628A4F77C77E29131382D8937A81A1A0E737406A06C4DE24AB0539375EEE779783F5D4E7FE67";
                 options.ValidIssuer = "test1";
                 options.ValidAudience = "test2";
                 options.Cookie.Name = "access_token";
                 options.LoginPath = "/login";
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
                 options.SlidingExpiration = true;
-
             });
-
+            services.AddJwtBearerAuthentication(options =>
+            {
+                options.SecurityKey = "8A94FD8A94F122B0";
+                options.ValidIssuer = "Issuer";
+                options.ValidAudience = "Audience";
+            });
             //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             //{
             //    options.ExpireTimeSpan = TimeSpan.FromMinutes(2);
@@ -63,7 +63,8 @@ namespace WebApplication
             //});
 
 
-            services.AddCors(option => option.AddPolicy("Cors", policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+            services.AddCors(option =>
+                option.AddPolicy("Cors", policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
             services.AddAutoGenerateHtmlControl(builder =>
             {
                 builder.UploaderOptions.FormData = new { summary = "this is summary" };
@@ -79,7 +80,11 @@ namespace WebApplication
                         uploadUrl = "/api/upload?target=editor"
                     },
                     language = "zh-cn",
-                    toolbar = new[] { "heading", "|", "bold", "italic", "link", "bulletedList", "numberedList", "blockQuote", "insertTable", "mediaEmbed", "imageUpload", "undo", "redo", "fontsize", "fontcolor", "highlight" }
+                    toolbar = new[]
+                    {
+                        "heading", "|", "bold", "italic", "link", "bulletedList", "numberedList", "blockQuote",
+                        "insertTable", "mediaEmbed", "imageUpload", "undo", "redo", "fontsize", "fontcolor", "highlight"
+                    }
                 };
             });
             //services.AddChunkedUploadLocalStorage();
@@ -98,6 +103,7 @@ namespace WebApplication
             {
                 app.UseDeveloperExceptionPage();
             }
+
             app.UseUpload("/api/upload");
             app.UseCors("Cors");
 

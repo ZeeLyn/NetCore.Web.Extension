@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Web;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NetCore.Web.AutoGenerateHtmlControl.Attributes;
@@ -22,7 +23,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
         /// <param name="dataList">数据集合</param>
         /// <param name="operatingBuilder">在table最后一列添加html</param>
         /// <returns></returns>
-        public static IHtmlContent TableView<TModel>(this IHtmlHelper html, IEnumerable<TModel> dataList, Func<TModel, IHtmlContent> operatingBuilder = default)
+        public static IHtmlContent TableView<TModel>(this IHtmlHelper html, IEnumerable<TModel> dataList,
+            Func<TModel, IHtmlContent> operatingBuilder = default)
         {
             var type = typeof(TModel);
             var columnMeta = DataListHelper.GetDataColumnMeta(type);
@@ -43,11 +45,13 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 th.InnerHtml.AppendHtml(column.DisplayName);
                 header.InnerHtml.AppendHtml(th);
             }
+
             if (operatingBuilder != null)
             {
                 var action = new TagBuilder("th");
                 header.InnerHtml.AppendHtml(action);
             }
+
             table.InnerHtml.AppendHtml(header);
             if (dataList != null)
             {
@@ -61,22 +65,25 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             td.MergeAttributes(column.ContentHtmlAttribute, true);
                         td.InnerHtml.AppendHtml(column.GetValue(type, item));
                         tr.InnerHtml.AppendHtml(td);
-
                     }
+
                     if (operatingBuilder != null)
                     {
                         var td = new TagBuilder("td");
                         td.InnerHtml.AppendHtml(operatingBuilder(item));
                         tr.InnerHtml.AppendHtml(td);
                     }
+
                     table.InnerHtml.AppendHtml(tr);
                 }
             }
+
             tableContainer.InnerHtml.AppendHtml(table);
             return tableContainer;
         }
 
-        public static IHtmlContent CardView<TModel>(this IHtmlHelper html, IEnumerable<TModel> dataList, Func<TModel, IHtmlContent> operatingBuilder = default)
+        public static IHtmlContent CardView<TModel>(this IHtmlHelper html, IEnumerable<TModel> dataList,
+            Func<TModel, IHtmlContent> operatingBuilder = default)
         {
             var type = typeof(TModel);
             var columnMeta = DataListHelper.GetDataColumnMeta(type);
@@ -142,14 +149,14 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                                 footer.InnerHtml.AppendHtml(footerItem);
                                 break;
                         }
-
-
                     }
+
                     if (header != null)
                     {
                         header.AddCssClass("card-header");
                         card.InnerHtml.AppendHtml(header);
                     }
+
                     if (root != null)
                     {
                         card.InnerHtml.AppendHtml(root);
@@ -181,17 +188,21 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                     group.InnerHtml.AppendHtml(card);
                 }
             }
+
             return group;
         }
     }
 
     internal class DataListHelper
     {
-        private static readonly Regex Regex = new Regex(@"{\w+?}", RegexOptions.IgnoreCase | RegexOptions.Multiline, TimeSpan.FromSeconds(1));
+        private static readonly Regex Regex = new Regex(@"{\w+?}", RegexOptions.IgnoreCase | RegexOptions.Multiline,
+            TimeSpan.FromSeconds(1));
 
-        private static readonly ConcurrentDictionary<Type, List<DataColumnMeta>> DataColumnMeta = new ConcurrentDictionary<Type, List<DataColumnMeta>>();
+        private static readonly ConcurrentDictionary<Type, List<DataColumnMeta>> DataColumnMeta =
+            new ConcurrentDictionary<Type, List<DataColumnMeta>>();
 
-        private static readonly ConcurrentDictionary<Type, DataMeta> DataMeta = new ConcurrentDictionary<Type, DataMeta>();
+        private static readonly ConcurrentDictionary<Type, DataMeta> DataMeta =
+            new ConcurrentDictionary<Type, DataMeta>();
 
         internal static List<DataColumnMeta> GetDataColumnMeta(Type type)
         {
@@ -199,26 +210,26 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             {
                 var props = t.GetProperties(BindingFlags.Public | BindingFlags.Instance);
                 return (from p in props
-                        let display = p.GetCustomAttribute<DisplayNameAttribute>()
-                        let attr = p.GetCustomAttribute<DataListColumnAttribute>()
-                        let converter = p.GetCustomAttribute<DataListColumnConvertAttribute>()
-                        let order = p.GetCustomAttribute<DisplayOrderAttribute>()
-                        //where attr != null
-                        select new DataColumnMeta
-                        {
-                            PropertyInfo = p,
-                            Attribute = attr,
-                            DataConverter = converter,
-                            DisplayName = display == null ? p.Name : display.DisplayName,
-                            Name = p.Name,
-                            FormatPlaceholder = attr != null ? GetFormatPlaceholder(attr) : null,
-                            ValueMapPlaceholder = attr != null ? GetValueMapPlaceholder(attr) : null,
-                            ValueMap = attr != null ? ParsingKeyValue(attr.ValueMap) : null,
-                            ContentHtmlAttribute = attr != null ? ParsingKeyValue(attr.ContentHtmlAttribute) : null,
-                            HeaderHtmlAttribute = attr != null ? ParsingKeyValue(attr.HeaderHtmlAttribute) : null,
-                            CardContentContainer = attr?.CardContentContainer ?? default,
-                            OrderNumber = order?.OrderNumber ?? 0
-                        }).OrderBy(p => p.OrderNumber).ToList();
+                    let display = p.GetCustomAttribute<DisplayNameAttribute>()
+                    let attr = p.GetCustomAttribute<DataListColumnAttribute>()
+                    let converter = p.GetCustomAttribute<DataListColumnConvertAttribute>()
+                    let order = p.GetCustomAttribute<DisplayOrderAttribute>()
+                    //where attr != null
+                    select new DataColumnMeta
+                    {
+                        PropertyInfo = p,
+                        Attribute = attr,
+                        DataConverter = converter,
+                        DisplayName = display == null ? p.Name : display.DisplayName,
+                        Name = p.Name,
+                        FormatPlaceholder = attr != null ? GetFormatPlaceholder(attr) : null,
+                        ValueMapPlaceholder = attr != null ? GetValueMapPlaceholder(attr) : null,
+                        ValueMap = attr != null ? ParsingKeyValue(attr.ValueMap) : null,
+                        ContentHtmlAttribute = attr != null ? ParsingKeyValue(attr.ContentHtmlAttribute) : null,
+                        HeaderHtmlAttribute = attr != null ? ParsingKeyValue(attr.HeaderHtmlAttribute) : null,
+                        CardContentContainer = attr?.CardContentContainer ?? default,
+                        OrderNumber = order?.OrderNumber ?? 0
+                    }).OrderBy(p => p.OrderNumber).ToList();
             });
         }
 
@@ -248,6 +259,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 if (!hashSet.Contains(v))
                     hashSet.Add(v);
             }
+
             return hashSet;
         }
 
@@ -263,6 +275,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 if (!hashSet.Contains(v))
                     hashSet.Add(v);
             }
+
             return hashSet;
         }
 
@@ -283,6 +296,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             {
                 throw new FormatException(map);
             }
+
             return dic;
         }
     }
@@ -326,7 +340,9 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 var displayText = Attribute.Format;
                 var metas = DataListHelper.GetDataColumnMeta(type);
 
-                return FormatPlaceholder.Aggregate(displayText, (current, ph) => current.Replace("{" + ph + "}", metas.First(p => p.Name == ph).GetPlainValue(obj)?.ToString()));
+                return FormatPlaceholder.Aggregate(displayText,
+                    (current, ph) => current.Replace("{" + ph + "}", HttpUtility.HtmlEncode(
+                        metas.First(p => p.Name == ph).GetPlainValue(obj)?.ToString())));
             }
 
             var value = GetPlainValue(obj)?.ToString();
@@ -337,11 +353,15 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 var displayText = ValueMap[value];
                 var metas = DataListHelper.GetDataColumnMeta(type);
 
-                return ValueMapPlaceholder.Aggregate(displayText, (current, ph) => current.Replace("{" + ph + "}", metas.First(p => p.Name == ph).GetPlainValue(obj)?.ToString()));
+                return ValueMapPlaceholder.Aggregate(displayText,
+                    (current, ph) => current.Replace("{" + ph + "}",
+                        HttpUtility.HtmlEncode(metas.First(p => p.Name == ph).GetPlainValue(obj)?.ToString())));
             }
-            return value;
+
+            return HttpUtility.HtmlEncode(value);
         }
     }
+
     public class DataMeta
     {
         public Dictionary<string, string> HtmlAttribute { get; internal set; }

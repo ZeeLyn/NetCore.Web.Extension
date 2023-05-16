@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>0.1.4</Version>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>0.1.5</Version>
     <Authors>Owen</Authors>
     <Description>NetCore.Web.Extension</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
