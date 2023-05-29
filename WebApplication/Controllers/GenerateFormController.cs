@@ -18,18 +18,10 @@ namespace WebApplication.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            return View(new ArticleModel
+            return View(new News
             {
-                Id = 1024,
-                Title = "This is title",
-                Summary = "This is summary",
-                Profession = "Farmer",
-                Birthday = new DateTime(1986, 10, 12),
-                Gender = 2,
-                FavoriteFood = new List<int> { 1, 3, 4 },
-                Resume = "<h1>This is ckeditor5</h1>",
-                Archive = true,
-                LivePhoto = new List<string> { "/20201102/d6c5f9f4381248d5915389a7f5cc8978.jpg", "/20200117/2d180692d6be45afa8f5e528e836fee6.jpg" }
+                ShowCover = true,
+                Published = true
             });
         }
 
@@ -43,9 +35,8 @@ namespace WebApplication.Controllers
 
     public class ArticleModel
     {
-        [Hide]
-        [Hidden]
-        public int Id { get; set; }
+        [Hide] [Hidden] public int Id { get; set; }
+
         [DisplayOrder(1)]
         [TextBox(Placeholder = "Please enter a title")]
         [Required(ErrorMessage = "Title is required")]

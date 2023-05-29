@@ -27,8 +27,10 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             new ConcurrentDictionary<Type, IEnumerable<PropertyInfo>>();
 
 
-
-        public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, HttpContext context, string url, FormMethod method, TModel model, object htmlAttributes = default, Func<TModel, IHtmlContent> appendHtmlContent = default, bool? antiforgery = default, string globalCssClass = "form-control")
+        public static async Task<IHtmlContent> GenerateFormAsync<TModel>(this IHtmlHelper html, HttpContext context,
+            string url, FormMethod method, TModel model, object htmlAttributes = default,
+            Func<TModel, IHtmlContent> appendHtmlContent = default, bool? antiforgery = default,
+            string globalCssClass = "form-control")
         {
             var type = typeof(TModel);
             var serviceProvider = context.RequestServices;
@@ -82,7 +84,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                     switch (control.ControlType)
                     {
                         case HtmlControlType.Label:
-                            controlContainer.InnerHtml.AppendHtml(html.ExLabel(name, value, control.GetAttributes(), globalCssClass));
+                            controlContainer.InnerHtml.AppendHtml(html.ExLabel(name, value, control.GetAttributes(),
+                                globalCssClass));
                             break;
 
                         case HtmlControlType.Hidden:
@@ -90,15 +93,18 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             break;
 
                         case HtmlControlType.TextBox:
-                            controlContainer.InnerHtml.AppendHtml(html.ExTextBox(name, value, control.GetAttributes(), globalCssClass));
+                            controlContainer.InnerHtml.AppendHtml(html.ExTextBox(name, value, control.GetAttributes(),
+                                globalCssClass));
                             break;
 
                         case HtmlControlType.Password:
-                            controlContainer.InnerHtml.AppendHtml(html.ExPassword(name, value, control.GetAttributes(), globalCssClass));
+                            controlContainer.InnerHtml.AppendHtml(html.ExPassword(name, value, control.GetAttributes(),
+                                globalCssClass));
                             break;
 
                         case HtmlControlType.TextArea:
-                            controlContainer.InnerHtml.AppendHtml(html.ExTextArea(name, value, control.GetAttributes(), globalCssClass));
+                            controlContainer.InnerHtml.AppendHtml(html.ExTextArea(name, value, control.GetAttributes(),
+                                globalCssClass));
                             break;
 
                         case HtmlControlType.DropDownList:
@@ -111,8 +117,10 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                                 controlContainer.InnerHtml.AppendHtml("Please bind the data source.");
                                 break;
                             }
+
                             controlContainer.InnerHtml.AppendHtml(html.ExDropDownList(name,
-                                await dropDownDataSource.GetAsync(value == null ? null : new[] { value }), dropDownAttr.OptionLabel,
+                                await dropDownDataSource.GetAsync(value == null ? null : new[] { value }),
+                                dropDownAttr.OptionLabel,
                                 control.GetAttributes(), globalCssClass));
 
                             break;
@@ -129,26 +137,34 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                             if (typeof(IList).IsAssignableFrom(itemType))
                             {
-                                controlContainer.InnerHtml.AppendHtml(html.ExListBox(name, await listBoxDataSource.GetAsync(((IList)value).Cast<object>()), listBoxAttr.OptionLabel, control.GetAttributes(), globalCssClass));
+                                controlContainer.InnerHtml.AppendHtml(html.ExListBox(name,
+                                    await listBoxDataSource.GetAsync(value == null
+                                        ? new List<object>()
+                                        : ((IList)value).Cast<object>()),
+                                    listBoxAttr.OptionLabel, control.GetAttributes(), globalCssClass));
                             }
                             else
                             {
                                 controlContainer.MergeAttribute("style", "color:red;");
                                 controlContainer.InnerHtml.AppendHtml($"ListBox does not support type {itemType}.");
                             }
+
                             break;
 
                         case HtmlControlType.RadioButton:
                             var radioButtonAttr = (RadioButtonAttribute)control;
-                            var radioButtonDataSource = (IDataSource)serviceProvider.GetService(radioButtonAttr.DataSource);
+                            var radioButtonDataSource =
+                                (IDataSource)serviceProvider.GetService(radioButtonAttr.DataSource);
                             if (radioButtonDataSource == null)
                             {
                                 controlContainer.MergeAttribute("style", "color:red;");
                                 controlContainer.InnerHtml.AppendHtml("Please bind the data source.");
                                 break;
                             }
+
                             controlContainer.InnerHtml.AppendHtml(html.ExRadioButton(name,
-                                await radioButtonDataSource.GetAsync(value == null ? null : new[] { value }), radioButtonAttr.GetAttributes(),
+                                await radioButtonDataSource.GetAsync(value == null ? null : new[] { value }),
+                                radioButtonAttr.GetAttributes(),
                                 globalCssClass));
                             break;
 
@@ -156,7 +172,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             var checkBoxAttr = (CheckBoxAttribute)control;
                             if (typeof(IList).IsAssignableFrom(itemType))
                             {
-                                var checkBoxDataSource = (IDataSource)serviceProvider.GetService(checkBoxAttr.DataSource);
+                                var checkBoxDataSource =
+                                    (IDataSource)serviceProvider.GetService(checkBoxAttr.DataSource);
                                 if (checkBoxDataSource == null)
                                 {
                                     controlContainer.MergeAttribute("style", "color:red;");
@@ -165,29 +182,35 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                                 }
 
                                 controlContainer.InnerHtml.AppendHtml(html.ExCheckBox(name,
-                                    await checkBoxDataSource.GetAsync(((IList)value).Cast<object>()),
+                                    await checkBoxDataSource.GetAsync(value == null
+                                        ? new List<object>()
+                                        : ((IList)value).Cast<object>()),
                                     checkBoxAttr.GetAttributes(), globalCssClass));
                             }
                             else if (typeof(bool).IsAssignableFrom(itemType))
                             {
-                                controlContainer.InnerHtml.AppendHtml(html.ExSingleCheckBox(name, value != null && bool.Parse(value?.ToString()), checkBoxAttr.GetAttributes(), globalCssClass));
+                                controlContainer.InnerHtml.AppendHtml(html.ExSingleCheckBox(name,
+                                    value != null && bool.Parse(value?.ToString()), checkBoxAttr.GetAttributes(),
+                                    globalCssClass));
                             }
                             else
                             {
-
                                 controlContainer.MergeAttribute("style", "color:red;");
                                 controlContainer.InnerHtml.AppendHtml($"CheckBox does not support type {itemType}.");
                             }
+
                             break;
 
                         case HtmlControlType.Button:
                             var buttonAttr = (ButtonAttribute)control;
-                            controlContainer.InnerHtml.AppendHtml(html.Button(buttonAttr.ButtonText, buttonAttr.GetAttributes(),
+                            controlContainer.InnerHtml.AppendHtml(html.Button(buttonAttr.ButtonText,
+                                buttonAttr.GetAttributes(),
                                 globalCssClass));
                             break;
 
                         case HtmlControlType.File:
-                            controlContainer.InnerHtml.AppendHtml(html.ExFile(name, control.GetAttributes(), globalCssClass));
+                            controlContainer.InnerHtml.AppendHtml(html.ExFile(name, control.GetAttributes(),
+                                globalCssClass));
                             break;
 
                         case HtmlControlType.RichEditor:
@@ -195,11 +218,16 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             var editorPartialName = string.IsNullOrWhiteSpace(editorAttr.PartialName)
                                 ? options.RichEditorOptions.PartialName
                                 : editorAttr.PartialName;
-                            controlContainer.InnerHtml.AppendHtml(await html.ExRichEditor(name, value?.ToString(), editorPartialName, editorAttr.GetAttributes()));
+                            controlContainer.InnerHtml.AppendHtml(await html.ExRichEditor(name, value?.ToString(),
+                                editorPartialName, editorAttr.GetAttributes()));
                             if (string.IsNullOrWhiteSpace(editorPartialName))
                             {
-                                var editorOptions = string.IsNullOrWhiteSpace(editorAttr.Options) ? JsonConvert.SerializeObject(options.RichEditorOptions.Options, Formatting.None) : editorAttr.Options;
-                                editorScripts.AppendFormat("ClassicEditor.create(document.querySelector(\"#{0}\"),{1}).catch(function(err){{alert(err)}}),", name, editorOptions);
+                                var editorOptions = string.IsNullOrWhiteSpace(editorAttr.Options)
+                                    ? JsonConvert.SerializeObject(options.RichEditorOptions.Options, Formatting.None)
+                                    : editorAttr.Options;
+                                editorScripts.AppendFormat(
+                                    "ClassicEditor.create(document.querySelector(\"#{0}\"),{1}).catch(function(err){{alert(err)}}),",
+                                    name, editorOptions);
                                 if (!hasEditor)
                                     hasEditor = true;
                             }
@@ -208,7 +236,9 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                         case HtmlControlType.Uploader:
                             var uploaderAttr = (UploaderAttribute)control;
-                            var uploaderPartialName = string.IsNullOrWhiteSpace(uploaderAttr.PartialName) ? options.UploaderOptions.PartialName : uploaderAttr.PartialName;
+                            var uploaderPartialName = string.IsNullOrWhiteSpace(uploaderAttr.PartialName)
+                                ? options.UploaderOptions.PartialName
+                                : uploaderAttr.PartialName;
                             var global = options.UploaderOptions;
                             JToken uploaderOptions = null;
                             //if (string.IsNullOrWhiteSpace(uploaderPartialName))
@@ -239,6 +269,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                                 uploaderOptions["multiple"] = true;
 
                             #region Chunked
+
                             if (ChooseOptionEnum(global.Chunked.Enable, uploaderAttr.Chunked))
                             {
                                 JToken chunk = new JObject
@@ -249,19 +280,23 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                                 if (chunkSize != DefaultOptionValue.ChunkSize)
                                     chunk["chunkSize"] = chunkSize;
 
-                                var checkUrl = ChooseOptionString(global.Chunked.ChunkCheckServerUrl, uploaderAttr.ChunkCheckServerUrl);
+                                var checkUrl = ChooseOptionString(global.Chunked.ChunkCheckServerUrl,
+                                    uploaderAttr.ChunkCheckServerUrl);
                                 if (checkUrl != DefaultOptionValue.ChunkCheckServerUrl)
                                     chunk["chunkCheckServerUrl"] = checkUrl;
 
-                                var mergeUrl = ChooseOptionString(global.Chunked.ChunkMergeServerUrl, uploaderAttr.ChunkMergeServerUrl);
+                                var mergeUrl = ChooseOptionString(global.Chunked.ChunkMergeServerUrl,
+                                    uploaderAttr.ChunkMergeServerUrl);
                                 if (mergeUrl != DefaultOptionValue.ChunkMergeServerUrl)
                                     chunk["chunkMergeServerUrl"] = mergeUrl;
 
                                 uploaderOptions["chunk"] = chunk;
                             }
+
                             #endregion
 
                             #region Accept
+
                             JToken accept = null;
                             //var acceptTitle = ChooseOptionString(global.Accept.Title, uploaderAttr.AcceptTitle);
                             //if (acceptTitle != DefaultOptionValue.AcceptTitle)
@@ -270,14 +305,16 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             //    accept["title"] = acceptTitle;
                             //}
 
-                            var acceptExtensions = ChooseOptionString(global.Accept.Extensions, uploaderAttr.AcceptExtensions);
+                            var acceptExtensions =
+                                ChooseOptionString(global.Accept.Extensions, uploaderAttr.AcceptExtensions);
                             if (acceptExtensions != DefaultOptionValue.AcceptExtensions)
                             {
                                 accept ??= new JObject();
                                 accept["extensions"] = acceptExtensions;
                             }
 
-                            var acceptMineTypes = ChooseOptionString(global.Accept.MimeTypes, uploaderAttr.AcceptMimeTypes);
+                            var acceptMineTypes =
+                                ChooseOptionString(global.Accept.MimeTypes, uploaderAttr.AcceptMimeTypes);
                             if (acceptMineTypes != DefaultOptionValue.AcceptMimeTypes)
                             {
                                 accept ??= new JObject();
@@ -288,45 +325,53 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             {
                                 uploaderOptions["accept"] = accept;
                             }
+
                             #endregion
 
                             #region Translation
+
                             JToken translation = null;
-                            var uploadBtnText = ChooseOptionString(global.Translation.UploadBtnText, uploaderAttr.UploadBtnText);
+                            var uploadBtnText = ChooseOptionString(global.Translation.UploadBtnText,
+                                uploaderAttr.UploadBtnText);
                             if (uploadBtnText != DefaultOptionValue.UploadBtnText)
                             {
                                 translation ??= new JObject();
                                 translation["uploadBtnText"] = uploadBtnText;
                             }
 
-                            var addBtnText = ChooseOptionString(global.Translation.AddFileBtnText, uploaderAttr.AddFileBtnText);
+                            var addBtnText = ChooseOptionString(global.Translation.AddFileBtnText,
+                                uploaderAttr.AddFileBtnText);
                             if (addBtnText != DefaultOptionValue.AddFileBtnText)
                             {
                                 translation ??= new JObject();
                                 translation["addFileBtnText"] = addBtnText;
                             }
 
-                            var pauseBtnText = ChooseOptionString(global.Translation.PauseBtnText, uploaderAttr.PauseBtnText);
+                            var pauseBtnText = ChooseOptionString(global.Translation.PauseBtnText,
+                                uploaderAttr.PauseBtnText);
                             if (pauseBtnText != DefaultOptionValue.PauseBtnText)
                             {
                                 translation ??= new JObject();
                                 translation["pauseBtnText"] = pauseBtnText;
                             }
 
-                            var continueBtnText = ChooseOptionString(global.Translation.ContinueBtnText, uploaderAttr.ContinueBtnText);
+                            var continueBtnText = ChooseOptionString(global.Translation.ContinueBtnText,
+                                uploaderAttr.ContinueBtnText);
                             if (continueBtnText != DefaultOptionValue.ContinueBtnText)
                             {
                                 translation ??= new JObject();
                                 translation["continueBtnText"] = continueBtnText;
                             }
 
-                            var exceedFileNumLimitAlert = ChooseOptionString(global.Translation.ExceedFileNumLimitAlert, uploaderAttr.ExceedFileNumLimitAlert);
+                            var exceedFileNumLimitAlert = ChooseOptionString(global.Translation.ExceedFileNumLimitAlert,
+                                uploaderAttr.ExceedFileNumLimitAlert);
                             if (exceedFileNumLimitAlert != DefaultOptionValue.ExceedFileNumLimitAlert)
                             {
                                 translation["ExceedFileNumLimitAlert"] = exceedFileNumLimitAlert;
                             }
 
-                            var exceedFileSizeLimitAlert = ChooseOptionString(global.Translation.ExceedFileSizeLimitAlert, uploaderAttr.ExceedFileSizeLimitAlert);
+                            var exceedFileSizeLimitAlert = ChooseOptionString(
+                                global.Translation.ExceedFileSizeLimitAlert, uploaderAttr.ExceedFileSizeLimitAlert);
                             if (exceedFileSizeLimitAlert != DefaultOptionValue.ExceedFileSizeLimitAlert)
                             {
                                 translation["ExceedFileSizeLimitAlert"] = exceedFileSizeLimitAlert;
@@ -369,19 +414,22 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                                     compress["crop"] = crop;
                                 }
 
-                                var preserveHeaders = ChooseOptionEnum(global.Compress.PreserveHeaders, uploaderAttr.CompressPreserveHeaders);
+                                var preserveHeaders = ChooseOptionEnum(global.Compress.PreserveHeaders,
+                                    uploaderAttr.CompressPreserveHeaders);
                                 if (!preserveHeaders)
                                 {
                                     compress["preserveHeaders"] = preserveHeaders;
                                 }
 
-                                var noCompressIfLarger = ChooseOptionEnum(global.Compress.NoCompressIfLarger, uploaderAttr.CompressNoCompressIfLarger);
+                                var noCompressIfLarger = ChooseOptionEnum(global.Compress.NoCompressIfLarger,
+                                    uploaderAttr.CompressNoCompressIfLarger);
                                 if (noCompressIfLarger)
                                 {
                                     compress["noCompressIfLarger"] = noCompressIfLarger;
                                 }
 
-                                var compressSize = ChooseOptionInt(global.Compress.CompressSize, uploaderAttr.CompressSize);
+                                var compressSize = ChooseOptionInt(global.Compress.CompressSize,
+                                    uploaderAttr.CompressSize);
                                 if (compressSize != 0)
                                 {
                                     compress["compressSize"] = compressSize;
@@ -393,26 +441,34 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                             #endregion
 
                             #region FormData
+
                             if (uploaderAttr.FormData != null || global.FormData != null)
                             {
-                                uploaderOptions["formData"] = JObject.FromObject(uploaderAttr.FormData ?? global.FormData);
+                                uploaderOptions["formData"] =
+                                    JObject.FromObject(uploaderAttr.FormData ?? global.FormData);
                             }
+
                             #endregion
 
                             #region FileNumLimit
+
                             var fileNumLimit = ChooseOptionInt(global.FileNumLimit, uploaderAttr.FileNumLimit);
                             if (fileNumLimit != DefaultOptionValue.FileNumLimit)
                             {
                                 uploaderOptions["fileNumLimit"] = fileNumLimit;
                             }
+
                             #endregion
 
                             #region FileSingleSizeLimit
-                            var fileSingleSizeLimit = ChooseOptionInt(global.FileSingleSizeLimit, uploaderAttr.FileSingleSizeLimit);
+
+                            var fileSingleSizeLimit = ChooseOptionInt(global.FileSingleSizeLimit,
+                                uploaderAttr.FileSingleSizeLimit);
                             if (fileSingleSizeLimit != DefaultOptionValue.FileSingleSizeLimit)
                             {
                                 uploaderOptions["fileSingleSizeLimit"] = fileSingleSizeLimit;
                             }
+
                             #endregion
 
                             #region Threads
@@ -449,7 +505,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                                 thumb["quality"] = thumbQuality;
                             }
 
-                            var allowMagnify = ChooseOptionEnum(global.Thumb.AllowMagnify, uploaderAttr.ThumbAllowMagnify);
+                            var allowMagnify =
+                                ChooseOptionEnum(global.Thumb.AllowMagnify, uploaderAttr.ThumbAllowMagnify);
                             if (allowMagnify)
                             {
                                 thumb ??= new JObject();
@@ -477,11 +534,22 @@ namespace NetCore.Web.AutoGenerateHtmlControl
 
                             var tips = ChooseOptionString(global.Translation.Tips, uploaderAttr.Tips);
 
-                            controlContainer.InnerHtml.AppendHtml(await html.Uploader(name, value, uploaderPartialName, uploaderAttr.GetAttributes(), new Dictionary<string, string> { { "Tips", tips }, { "UploadBtnText", ChooseOptionString(global.Translation.UploadBtnText, uploaderAttr.UploadBtnText) }, { "auto", uploaderOptions["auto"]?.ToObject<string>() } }));
+                            controlContainer.InnerHtml.AppendHtml(await html.Uploader(name, value, uploaderPartialName,
+                                uploaderAttr.GetAttributes(),
+                                new Dictionary<string, string>
+                                {
+                                    { "Tips", tips },
+                                    {
+                                        "UploadBtnText",
+                                        ChooseOptionString(global.Translation.UploadBtnText, uploaderAttr.UploadBtnText)
+                                    },
+                                    { "auto", uploaderOptions["auto"]?.ToObject<string>() }
+                                }));
 
                             if (string.IsNullOrWhiteSpace(uploaderPartialName))
                             {
-                                uploaderScripts.AppendFormat("uploader_{0}=$(\"#{0}-container\").InitUploader({1}),", name, uploaderOptions.ToString(Formatting.None));
+                                uploaderScripts.AppendFormat("uploader_{0}=$(\"#{0}-container\").InitUploader({1}),",
+                                    name, uploaderOptions.ToString(Formatting.None));
                                 if (!hasUploader)
                                     hasUploader = true;
                             }
@@ -494,6 +562,7 @@ namespace NetCore.Web.AutoGenerateHtmlControl
                 group.InnerHtml.AppendHtml(html.ValidationMessage(name));
                 form.InnerHtml.AppendHtml(group);
             }
+
             if (appendHtmlContent != null)
                 form.InnerHtml.AppendHtml(appendHtmlContent(model));
             if (antiforgery.HasValue && antiforgery.Value)
@@ -501,10 +570,18 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             if (hasUploader || hasEditor)
             {
                 var script = new TagBuilder("script");
-                var scriptString = "document.addEventListener(\"DOMContentLoaded\",function(){if(" + hasUploader.ToString().ToLower() + "){var e=document.querySelectorAll(\".uploader-container\");if(!window.jQuery)return void e.forEach(function(e,t){e.innerHTML=\'<label style=\"color:red;\">Please install jQuery first.</label>\'});if(!window.WebUploader)return void e.forEach(function(e,t){e.innerHTML=\'<label style=\"color:red;\">Please install WebUploader first.</label>\'});var t=document.createElement(\"link\");t.setAttribute(\"rel\",\"stylesheet\"),t.setAttribute(\"href\",\"/auto-generate-html-control/resources/css/uploader.min.css\"),document.querySelector(\"header\").appendChild(t);var r=document.createElement(\"script\");r.setAttribute(\"src\",\"/auto-generate-html-control/resources/js/uploader.min.js\"),r.addEventListener(\"load\",function(){if(window.OnUploaderJsReady)OnUploaderJsReady();" + uploaderScripts.ToString().TrimEnd(',') + "}),document.querySelector(\"body\").appendChild(r)}" + hasEditor.ToString().ToLower() + "&&(window.ClassicEditor?(" + (hasEditor ? editorScripts.ToString().TrimEnd(',') : "a=0") + "):document.querySelectorAll(\".editor-container\").forEach(function(e,t){e.innerHTML=\'<label style=\"color:red;\">Please install CKEditor5 first.</label>\'}))});";
+                var scriptString = "document.addEventListener(\"DOMContentLoaded\",function(){if(" +
+                                   hasUploader.ToString().ToLower() +
+                                   "){var e=document.querySelectorAll(\".uploader-container\");if(!window.jQuery)return void e.forEach(function(e,t){e.innerHTML=\'<label style=\"color:red;\">Please install jQuery first.</label>\'});if(!window.WebUploader)return void e.forEach(function(e,t){e.innerHTML=\'<label style=\"color:red;\">Please install WebUploader first.</label>\'});var t=document.createElement(\"link\");t.setAttribute(\"rel\",\"stylesheet\"),t.setAttribute(\"href\",\"/auto-generate-html-control/resources/css/uploader.min.css\"),document.querySelector(\"header\").appendChild(t);var r=document.createElement(\"script\");r.setAttribute(\"src\",\"/auto-generate-html-control/resources/js/uploader.min.js\"),r.addEventListener(\"load\",function(){if(window.OnUploaderJsReady)OnUploaderJsReady();" +
+                                   uploaderScripts.ToString().TrimEnd(',') +
+                                   "}),document.querySelector(\"body\").appendChild(r)}" +
+                                   hasEditor.ToString().ToLower() + "&&(window.ClassicEditor?(" +
+                                   (hasEditor ? editorScripts.ToString().TrimEnd(',') : "a=0") +
+                                   "):document.querySelectorAll(\".editor-container\").forEach(function(e,t){e.innerHTML=\'<label style=\"color:red;\">Please install CKEditor5 first.</label>\'}))});";
                 script.InnerHtml.AppendHtml(scriptString);
                 form.InnerHtml.AppendHtml(script);
             }
+
             return form;
         }
 
@@ -527,7 +604,8 @@ namespace NetCore.Web.AutoGenerateHtmlControl
             if (obj == null)
                 return null;
             var type = obj.GetType();
-            var props = FormAttributes.GetOrAdd(type, t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance));
+            var props = FormAttributes.GetOrAdd(type,
+                t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance));
             return props.ToDictionary(k => k.Name, v => v.GetValue(obj));
         }
 
