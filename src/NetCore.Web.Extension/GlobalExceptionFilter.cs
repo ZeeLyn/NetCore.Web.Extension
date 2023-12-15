@@ -10,11 +10,13 @@ namespace NetCore.Web.Extension
         private ILogger Logger { get; }
 
         private GlobalExceptionOptions Options { get; }
+
         public GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger, IOptions<GlobalExceptionOptions> options)
         {
             Logger = logger;
             Options = options.Value;
         }
+
         public void OnException(ExceptionContext context)
         {
             if (Options.Action != null)

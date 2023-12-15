@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <!--<TargetFramework>netcoreapp3.1</TargetFramework>-->
-    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>Owen</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/zeelyn/NetCore.Web.Extension</RepositoryUrl>
     <PackageProjectUrl>https://github.com/zeelyn/NetCore.Web.Extension</PackageProjectUrl>
-    <Version>1.1.0</Version>
+    <Version>2.0.0</Version>
     <Description>NetCore.Web.Extension</Description>
     <PackageId>DotNetCore.Web.Extension</PackageId>
     <PackageTags>NetCore.Web.Extension</PackageTags>
@@ -30,7 +30,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.0" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.25.0" />
   </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'== 'net8.0' ">
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.0.3" />
+  </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 </Project>

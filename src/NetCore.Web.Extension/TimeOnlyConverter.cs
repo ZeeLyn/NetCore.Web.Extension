@@ -1,5 +1,4 @@
-﻿
-#if NET6_0 || NET7_0
+﻿#if NET6_0_OR_GREATER
 
 using System;
 using System.Globalization;
@@ -24,7 +23,8 @@ namespace NetCore.Web.Extension
             serializer.Serialize(writer, ((TimeOnly)value).ToString(_format));
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
+            JsonSerializer serializer)
         {
             var jt = JToken.ReadFrom(reader);
             return TimeOnly.Parse(jt.ToString());
