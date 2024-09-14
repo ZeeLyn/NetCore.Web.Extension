@@ -522,8 +522,10 @@ if (window.WebUploader) {
                 updateTotalProgress();
             };
             uploader.onBeforeFileQueued = function (file) {
-                if (state === 'finish')
-                    return false;
+              
+                //if (state === 'finish' && !options.auto)
+                //    return false;
+                return true;
             };
 
             uploader.on("uploadBeforeSend", function (block, data, headers) {

@@ -78,7 +78,7 @@
 .uploader-container .statusBar .progress { border: 1px solid #1483d8; width: 198px; background: #fff; height: unset; position: relative; display: inline-block; text-align: center; color: #6dbfff; position: relative; margin: 5px 10px 0 0; float: left; }
 .uploader-container .statusBar .progress span.percentage { width: 0; height: 100%; left: 0; top: 0; background: #1483d8; position: absolute; }
 .uploader-container .statusBar .progress span.text { position: relative; z-index: 10; }
-
+.uploader-container .statusBar .webuploader-container { position: relative !important; }
 .uploader-container .statusBar .info { float: left; font-size: 13px; color: #666666; margin-top: 6px; }
 .uploader-container .state-complete .file-panel .rotateRight, .uploader-container .state-complete .file-panel .rotateLeft { display: none; }
 

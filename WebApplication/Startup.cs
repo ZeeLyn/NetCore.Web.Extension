@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using NetCore.Web.AutoGenerateHtmlControl;
 using NetCore.Web.Extension;
 using System;
@@ -39,24 +40,45 @@ namespace WebApplication
             //services.AddGlobalExceptionFilter();
             //services.AddGlobalModelStateFilter();
 
-            services.AddJwtCookieAuthentication(options =>
+
+            //services.AddJwtBearerAuthentication(options =>
+            //{
+            //    options.SecurityKey =
+            //        "8A94FDA4354414A0320A72292571DF8BDF3B215B44EC523C5862628A4F77C77E29131382D8937A81A1A0E737406A06C4DE24AB0539375EEE779783F5D4E7FE67";
+            //    options.ValidIssuer = "Issuer";
+            //    options.ValidAudience = "Audience";
+            //});
+
+            //services.AddJwtCookieAuthentication(options =>
+            //{
+            //    options.SecurityKey =
+            //        "8A94FDA4354414A0320A72292571DF8BDF3B215B44EC523C5862628A4F77C77E29131382D8937A81A1A0E737406A06C4DE24AB0539375EEE779783F5D4E7FE67";
+            //    options.ValidIssuer = "test1";
+            //    options.ValidAudience = "test2";
+            //    //options.Cookie.Name = "access_token";
+            //    options.LoginPath = "/login";
+            //    options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
+            //    options.SlidingExpiration = true;
+            //});
+
+            services.AddMultiSchemePolicy(cookie =>
             {
-                options.SecurityKey =
+                cookie.SecurityKey =
                     "8A94FDA4354414A0320A72292571DF8BDF3B215B44EC523C5862628A4F77C77E29131382D8937A81A1A0E737406A06C4DE24AB0539375EEE779783F5D4E7FE67";
-                options.ValidIssuer = "test1";
-                options.ValidAudience = "test2";
-                options.Cookie.Name = "access_token";
-                options.LoginPath = "/login";
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
-                options.SlidingExpiration = true;
-            });
-            services.AddJwtBearerAuthentication(options =>
+                cookie.ValidIssuer = "test1";
+                cookie.ValidAudience = "test2";
+                //options.Cookie.Name = "access_token";
+                cookie.LoginPath = "/login";
+                cookie.ExpireTimeSpan = TimeSpan.FromMinutes(1);
+                cookie.SlidingExpiration = true;
+            }, jwt =>
             {
-                options.SecurityKey =
+                jwt.SecurityKey =
                     "8A94FDA4354414A0320A72292571DF8BDF3B215B44EC523C5862628A4F77C77E29131382D8937A81A1A0E737406A06C4DE24AB0539375EEE779783F5D4E7FE67";
-                options.ValidIssuer = "Issuer";
-                options.ValidAudience = "Audience";
+                jwt.ValidIssuer = "test1";
+                jwt.ValidAudience = "test2";
             });
+
             //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             //{
             //    options.ExpireTimeSpan = TimeSpan.FromMinutes(2);

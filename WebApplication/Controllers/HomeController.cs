@@ -12,9 +12,11 @@ namespace WebApplication.Controllers
 {
     public class HomeController : Controller
     {
-        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [Authorize]
         public async Task<IActionResult> Index()
         {
+            var context = this.ControllerContext.HttpContext.User;
+            Console.WriteLine(User.Identity.IsAuthenticated.ToString());
             ViewBag.Nick = User.GetClaimValue("nick");
             return View();
         }

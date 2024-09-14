@@ -16,13 +16,15 @@ namespace WebApplication.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            Console.WriteLine(User.Identity.IsAuthenticated.ToString());
             return View();
         }
 
         [HttpPost("post")]
-        public async Task<IActionResult> Post([FromForm]Login form)
+        public async Task<IActionResult> Post([FromForm] Login form)
         {
-            await this.SignInAsync(new Dictionary<string, string> { { "nick", form.NickName } }, TimeSpan.FromHours(2), "test1", "test2");
+            await this.SignInAsync(new Dictionary<string, string> { { "nick", form.NickName } }, TimeSpan.FromHours(2),
+                "test1", "test2");
             //var claimId = new Claim("nick", "form.NickName");
             //var claimsIdentity = new ClaimsIdentity(new Claim[] { claimId }, "ShenFenZheng");
             //var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
@@ -38,7 +40,6 @@ namespace WebApplication.Controllers
 
     public class Login
     {
-        [Required]
-        public string NickName { get; set; }
+        [Required] public string NickName { get; set; }
     }
 }

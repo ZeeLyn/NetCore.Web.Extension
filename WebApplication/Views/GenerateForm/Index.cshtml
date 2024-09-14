@@ -68,29 +68,29 @@
         //}
         //console.warn("uploader_LivePhoto", uploader_LivePhoto);
 
-        var timer = setInterval(function () {
-            if (uploader_LivePhoto) {
-                var options = uploader_LivePhoto.options;
-                clearInterval(timer);
-                console.warn(options);
-                options.onFileQueued = function (file) {
-                    console.warn(file.source.source);
-                    var url = URL.createObjectURL(file.source.source);
-                    var audio = new Audio();
-                    audio.src = url;
-                    //audio.load();
-                    audio.oncanplay = function () {
-                        console.warn(audio.duration);
-                    }
-                }
-                options.onUploaded = function (res) {
-                    console.warn(res);
-                }
-                //uploader.onFileQueued = function (e) {
-                //    console.warn(e);
-                //}
-            }
-        }, 1000);
+        // var timer = setInterval(function () {
+        //     if (uploader_LivePhoto) {
+        //         var options = uploader_LivePhoto.options;
+        //         clearInterval(timer);
+        //         console.warn(options);
+        //         options.onFileQueued = function (file) {
+        //             console.warn(file.source.source);
+        //             var url = URL.createObjectURL(file.source.source);
+        //             var audio = new Audio();
+        //             audio.src = url;
+        //             audio.load();
+        //             audio.oncanplay = function () {
+        //                 console.warn(audio.duration);
+        //             }
+        //         }
+        //         options.onUploaded = function (res) {
+        //             console.warn(res);
+        //         }
+        //         uploader.onFileQueued = function (e) {
+        //            console.warn(e);
+        //         }
+        //     }
+        // }, 1000);
         ClassicEditor.defaultConfig = {
             toolbar: {
                 items: [
@@ -132,6 +132,7 @@
         #avatar-input-group input[type='file'] { margin-right: 20px; }
         .checkbox, .radio { flex: 1; }
         .field-validation-error { color: #ff0000; font-size: 11px; }
+
     </style>
 
 }
