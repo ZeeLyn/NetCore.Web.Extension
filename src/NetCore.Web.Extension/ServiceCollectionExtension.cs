@@ -130,7 +130,7 @@ namespace NetCore.Web.Extension
                 option.Cookie = options.Cookie;
                 option.LoginPath = options.LoginPath;
                 option.AccessDeniedPath = options.AccessDeniedPath;
-                //option.TicketDataFormat = new JwtCookieDataFormat(validationParameters, options);
+                option.TicketDataFormat = new JwtCookieDataFormat(validationParameters, options);
                 option.SlidingExpiration = options.SlidingExpiration;
                 option.ExpireTimeSpan = options.ExpireTimeSpan;
                 if (options.Events != null)
