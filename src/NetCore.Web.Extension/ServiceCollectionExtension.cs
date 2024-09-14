@@ -141,11 +141,11 @@ namespace NetCore.Web.Extension
         }
 
         public static IServiceCollection AddMultiSchemePolicy(this IServiceCollection services,
-            Action<JwtCookieOptions> builder,
-            Action<JwtOptions> jwtBuilder)
+            Action<JwtCookieOptions> cookieBuilder,
+            Action<JwtOptions> jwtBuilder, bool shareToken = true)
         {
             var options = new JwtCookieOptions();
-            builder?.Invoke(options);
+            cookieBuilder?.Invoke(options);
             if (string.IsNullOrWhiteSpace(options.SecurityKey))
                 throw new ArgumentNullException(nameof(options.SecurityKey));
             if (options.SecurityKey.Length < 16)
@@ -220,7 +220,8 @@ namespace NetCore.Web.Extension
                 option.Cookie = options.Cookie;
                 option.LoginPath = options.LoginPath;
                 option.AccessDeniedPath = options.AccessDeniedPath;
-                option.TicketDataFormat = new JwtCookieDataFormat(validationParameters, options);
+                if (shareToken)
+                    option.TicketDataFormat = new JwtCookieDataFormat(validationParameters, options);
                 option.SlidingExpiration = options.SlidingExpiration;
                 option.ExpireTimeSpan = options.ExpireTimeSpan;
                 if (options.Events != null)
