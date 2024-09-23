@@ -10,7 +10,8 @@ namespace NetCore.Web.Extension
 {
     public interface IJwtGenerator
     {
-        JwtResult Generate(TimeSpan expire, Dictionary<string, string> claims = null, string issuer = null, string audience = null);
+        JwtResult Generate(TimeSpan expire, Dictionary<string, string> claims = null, string issuer = null,
+            string audience = null);
     }
 
     public class JwtGenerator : IJwtGenerator
@@ -22,14 +23,16 @@ namespace NetCore.Web.Extension
             Options = options;
         }
 
-        public JwtResult Generate(TimeSpan expire, Dictionary<string, string> claims = null, string issuer = null, string audience = null)
+        public JwtResult Generate(TimeSpan expire, Dictionary<string, string> claims = null, string issuer = null,
+            string audience = null)
         {
-            var jwtHeader = new JwtHeader(new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Options.SecurityKey)), Options.SecurityAlgorithm));
+            var jwtHeader = new JwtHeader(new SigningCredentials(
+                new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Options.SecurityKey)), Options.SecurityAlgorithm));
             var now = DateTime.UtcNow;
             var jwtPayload = new JwtPayload(
                 issuer,
                 audience,
-                claims.Select(p => new Claim(p.Key, p.Value)),
+                claims?.Select(p => new Claim(p.Key, p.Value)),
                 now,
                 now.Add(expire),
                 now);
