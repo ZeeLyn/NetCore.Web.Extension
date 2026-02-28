@@ -23,6 +23,12 @@ namespace NetCore.Web.Extension
             Options = options;
         }
 
+        public static string GenerateSecurityKey()
+        {
+            return new StringBuilder().AppendFormat("{0:N}{1:N}{2:N}{3:N}", Guid.NewGuid(), Guid.NewGuid(),
+                Guid.NewGuid(), Guid.NewGuid()).ToString().ToUpper();
+        }
+
         public JwtResult Generate(TimeSpan expire, Dictionary<string, string> claims = null, string issuer = null,
             string audience = null)
         {

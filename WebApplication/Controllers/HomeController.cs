@@ -15,9 +15,8 @@ namespace WebApplication.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            var context = this.ControllerContext.HttpContext.User;
-            Console.WriteLine(User.Identity.IsAuthenticated.ToString());
             ViewBag.Nick = User.GetClaimValue("nick");
+            ViewBag.SecurityKey = JwtGenerator.GenerateSecurityKey();
             return View();
         }
     }
