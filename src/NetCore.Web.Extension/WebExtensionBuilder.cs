@@ -50,4 +50,17 @@ namespace NetCore.Web.Extension
 
         public new CookieAuthenticationEvents Events { get; set; }
     }
+
+    public class JwtSlidingExpirationOptions {
+
+        /// <summary>
+        /// token有效期低于设定值，则刷新token
+        /// </summary>
+        public TimeSpan SlidingExpiration { get; set; } = TimeSpan.FromMinutes(9);
+
+
+        public TimeSpan ExpireTimeSpan { get; set; } = TimeSpan.FromHours(24);
+
+        public string NewTokenHeaderName { get; set; } = "X-Jwt-Token";
+    }
 }

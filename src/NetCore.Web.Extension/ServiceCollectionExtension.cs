@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 
 namespace NetCore.Web.Extension
 {
@@ -38,6 +39,20 @@ namespace NetCore.Web.Extension
             Action<ActionExecutingContext> builder)
         {
             return services.AddGlobalModelStateFilter().AddSingleton(new GlobalModelStateOptions { Action = builder });
+        }
+
+
+        public static IServiceCollection AddJwtSlidingExpiration(this IServiceCollection services,Action<JwtSlidingExpirationOptions> builder=null) {
+            var options = new JwtSlidingExpirationOptions();
+            builder?.Invoke(options);
+            services.AddSingleton(options);
+            return services;
+        }
+
+        public static void UseJwtSlidingExpiration(this IApplicationBuilder app) {
+
+            app.UseMiddleware<JwtRefreshMiddleware>();
+
         }
 
         public static IServiceCollection AddJwtBearerAuthentication(this IServiceCollection services,
@@ -80,6 +95,7 @@ namespace NetCore.Web.Extension
                 option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                
             }).AddJwtBearer(option =>
             {
                 option.TokenValidationParameters = validationParameters;

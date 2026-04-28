@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using NetCore.Web.AutoGenerateHtmlControl;
 using NetCore.Web.Extension;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UploadMiddleware.Core;
 using UploadMiddleware.LocalStorage;
@@ -77,7 +78,10 @@ namespace WebApplication
                     "8A94FDA4354414A0320A72292571DF8BDF3B215B44EC523C5862628A4F77C77E29131382D8937A81A1A0E737406A06C4DE24AB0539375EEE779783F5D4E7FE67";
                 jwt.ValidIssuer = "test1";
                 jwt.ValidAudience = "test2";
+                jwt.ValidIssuers=new List<string> { "test1" };
+                jwt.ValidAudiences= new List<string> { "test2" };
             });
+            services.AddJwtSlidingExpiration();
 
             //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             //{
@@ -133,6 +137,7 @@ namespace WebApplication
             app.UseStaticFiles();
             app.UseAutoGenerateHtmlControl();
             app.UseRouting();
+            app.UseJwtSlidingExpiration();
             app.UseAuthentication();
             app.UseAuthorization();
 
