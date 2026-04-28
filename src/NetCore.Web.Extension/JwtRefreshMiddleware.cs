@@ -69,10 +69,11 @@
         {
             try
             {
-                var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                var token = context.Request.Headers["Authorization"].FirstOrDefault();
+                token= !string.IsNullOrWhiteSpace(token) && token.StartsWith("Bearer", StringComparison.OrdinalIgnoreCase) ? token.Substring(6) : token;
                 if (!string.IsNullOrWhiteSpace(token))
                 {
-                    var principal = JwtGenerator.GetPrincipalFromToken(token, out _);
+                    var principal = JwtGenerator.GetPrincipalFromToken(token.Trim(), out _);
                     var exp = principal.FindFirstValue("exp");
                     var expTime = long.Parse(exp);
                     var e = DateTimeOffset.Now.Add(_slidingExpirationOptions.SlidingExpiration).ToUnixTimeSeconds();
