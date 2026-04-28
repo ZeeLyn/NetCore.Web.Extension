@@ -56,7 +56,7 @@ namespace NetCore.Web.Extension
         /// <summary>
         /// token有效期低于设定值，则刷新token
         /// </summary>
-        public TimeSpan SlidingExpiration { get; set; } = TimeSpan.FromMinutes(9);
+        public TimeSpan SlidingExpiration { get; set; } = TimeSpan.FromMinutes(10);
 
 
         public TimeSpan ExpireTimeSpan { get; set; } = TimeSpan.FromHours(24);
