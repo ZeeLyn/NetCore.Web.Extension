@@ -24,12 +24,6 @@
         JwtResult Generate(TimeSpan expire, Dictionary<string, string> claims = null, string issuer = null,
             string audience = null);
 
-        /// <summary>
-        /// The GetPrincipalFromToken
-        /// </summary>
-        /// <param name="token">The token<see cref="string"/></param>
-        /// <returns>The <see cref="ClaimsPrincipal"/></returns>
-        ClaimsPrincipal GetPrincipalFromToken(string token, out SecurityToken securityToken);
     }
 
     /// <summary>
@@ -91,33 +85,6 @@
             };
         }
 
-        /// <summary>
-        /// The GetPrincipalFromToken
-        /// </summary>
-        /// <param name="token">The token<see cref="string"/></param>
-        /// <param name="issuer">The issuer<see cref="string"/></param>
-        /// <param name="audience">The audience<see cref="string"/></param>
-        /// <returns>The <see cref="ClaimsPrincipal"/></returns>
-        public ClaimsPrincipal GetPrincipalFromToken(string token, out SecurityToken securityToken)
-        {
-            var tokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Options.SecurityKey)),
-
-                //ValidateLifetime = false // 允许过期Token解析
-            };
-            if (Options.ValidIssuers is not null)
-                tokenValidationParameters.ValidIssuers=Options.ValidIssuers;
-            if (Options.ValidAudiences is not null)
-                tokenValidationParameters.ValidAudiences=Options.ValidAudiences;
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken _securityToken);
-            securityToken=_securityToken;
-            return principal;
-        }
+       
     }
 }

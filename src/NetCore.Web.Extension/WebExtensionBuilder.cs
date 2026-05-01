@@ -61,6 +61,6 @@ namespace NetCore.Web.Extension
 
         public TimeSpan ExpireTimeSpan { get; set; } = TimeSpan.FromHours(24);
 
-        public string NewTokenHeaderName { get; set; } = "X-Jwt-Token";
+        public string NewTokenHeaderName { get; set; } = "x-token";
     }
 }

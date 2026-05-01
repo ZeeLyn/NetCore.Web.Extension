@@ -69,17 +69,14 @@
         {
             try
             {
-                var token = context.Request.Headers["Authorization"].FirstOrDefault();
-                token= !string.IsNullOrWhiteSpace(token) && token.StartsWith("Bearer", StringComparison.OrdinalIgnoreCase) ? token.Substring(6) : token;
-                if (!string.IsNullOrWhiteSpace(token))
+                if (context.User.Identity.IsAuthenticated)
                 {
-                    var principal = JwtGenerator.GetPrincipalFromToken(token.Trim(), out _);
-                    var exp = principal.FindFirstValue("exp");
+                    var exp = context.User.FindFirstValue("exp");
                     var expTime = long.Parse(exp);
                     var e = DateTimeOffset.Now.Add(_slidingExpirationOptions.SlidingExpiration).ToUnixTimeSeconds();
                     if (expTime<=e)
                     {
-                        var claims = principal.Claims.Where(x => !excludeClaims.Contains(x.Type)).ToDictionary(x => x.Type, x => x.Value);
+                        var claims = context.User.Claims.Where(x => !excludeClaims.Contains(x.Type)).ToDictionary(x => x.Type, x => x.Value);
                         var jwt = JwtGenerator.Generate(_slidingExpirationOptions.ExpireTimeSpan, claims, options.ValidIssuer, options.ValidAudience);
                         context.Response.Headers[_slidingExpirationOptions.NewTokenHeaderName]= jwt.Token;
                     }

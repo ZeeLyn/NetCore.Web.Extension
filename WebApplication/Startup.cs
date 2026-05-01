@@ -137,10 +137,10 @@ namespace WebApplication
             app.UseStaticFiles();
             app.UseAutoGenerateHtmlControl();
             app.UseRouting();
-            app.UseJwtSlidingExpiration();
+            
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseJwtSlidingExpiration();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

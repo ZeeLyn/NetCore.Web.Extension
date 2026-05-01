@@ -49,6 +49,10 @@ namespace NetCore.Web.Extension
             return services;
         }
 
+        /// <summary>
+        /// 一定要用在UseAuthorization的后面
+        /// </summary>
+        /// <param name="app"></param>
         public static void UseJwtSlidingExpiration(this IApplicationBuilder app) {
 
             app.UseMiddleware<JwtRefreshMiddleware>();
