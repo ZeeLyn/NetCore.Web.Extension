@@ -44,8 +44,19 @@ namespace NetCore.Web.Extension
                 foreach (var identity in principal.Identities)
                     foreach (var claim in identity.FindAll(PropertiesClaim).ToArray())
                         identity.RemoveClaim(claim);
-                properties.IssuedUtc = new DateTimeOffset(jwt.ValidFrom);
-                properties.ExpiresUtc = new DateTimeOffset(jwt.ValidTo);
+                var now = DateTimeOffset.UtcNow;
+                var expires = new DateTimeOffset(jwt.ValidTo);
+                var issued = properties.IssuedUtc ?? (jwt.Payload.ContainsKey(JwtRegisteredClaimNames.Iat)
+                    ? new DateTimeOffset(jwt.IssuedAt) : (DateTimeOffset?)null);
+                // nbf 不是签发时间；无法确定正常票据寿命时只验证，不自动续期。
+                if (!issued.HasValue || issued.Value > now || issued.Value >= expires ||
+                    expires - issued.Value > Options.ExpireTimeSpan)
+                {
+                    issued = now;
+                    properties.AllowRefresh = false;
+                }
+                properties.IssuedUtc = issued;
+                properties.ExpiresUtc = expires;
                 properties.Items["issuer"] = jwt.Issuer;
                 properties.Items["audience"] = jwt.Audiences.FirstOrDefault();
                 return new AuthenticationTicket(principal, properties, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -82,6 +93,8 @@ namespace NetCore.Web.Extension
             // 不把旧 JWT 的时间及签发信息带入新票据，否则续期后仍可能沿用旧 exp。
             var claims = data.Principal.Claims.Where(claim => claim.Type != "exp" && claim.Type != "nbf" &&
                 claim.Type != "iat" && claim.Type != "iss" && claim.Type != PropertiesClaim)
+                .Select(claim => claim.Properties.TryGetValue(JwtSecurityTokenHandler.ShortClaimTypeProperty, out var originalType)
+                    ? new Claim(originalType, claim.Value, claim.ValueType) : claim)
                 .Append(new Claim(PropertiesClaim, Base64UrlEncoder.Encode(PropertiesSerializer.Default.Serialize(data.Properties))))
                 .ToArray();
             var payload = new JwtPayload(issuer ?? Options.ValidIssuer,

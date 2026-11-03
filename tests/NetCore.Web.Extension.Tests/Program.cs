@@ -14,12 +14,14 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NetCore.Web.Extension;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text;
+using Newtonsoft.Json;
 
 var key = JwtGenerator.GenerateSecurityKey();
 var checks = 0;
@@ -40,18 +42,22 @@ void Jwt(JwtOptions options, bool issuer = true)
 }
 
 string Token(TimeSpan lifetime, string issuer = "issuer", string audience = "audience",
-    string algorithm = SecurityAlgorithms.HmacSha512, string signingKey = null, bool multiple = false)
+    string algorithm = SecurityAlgorithms.HmacSha512, string signingKey = null, bool multiple = false,
+    bool includeNotBefore = true, bool includeIssuedAt = true, TimeSpan? age = null)
 {
-    var claims = new List<Claim> { new("nick", "bearer"), new("role", "reader") };
+    var claims = new List<Claim> { new("nick", "bearer"), new("sub", "user-123"), new("role", "reader") };
     if (multiple)
     {
         claims.Add(new Claim("role", "writer"));
         claims.Add(new Claim("aud", "other-audience"));
     }
     var now = DateTime.UtcNow;
-    return new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(issuer, audience, claims,
-        now.AddHours(-1), now.Add(lifetime),
-        new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey ?? key)), algorithm)));
+    var issued = now.Subtract(age ?? TimeSpan.FromMinutes(4));
+    var payload = new JwtPayload(issuer, audience, claims, null, now.Add(lifetime), includeIssuedAt ? issued : null);
+    if (includeNotBefore)
+        payload[JwtRegisteredClaimNames.Nbf] = EpochTime.GetIntDate(issued);
+    return new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
+        new JwtHeader(new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey ?? key)), algorithm)), payload));
 }
 
 foreach (var mode in new[] { "bearer", "cookie", "jwt-cookie", "multi", "multi-jwt", "no-issuer", "custom" })
@@ -175,6 +181,30 @@ foreach (var mode in new[] { "bearer", "cookie", "jwt-cookie", "multi", "multi-j
                 .Split(';')[0]["test-auth=".Length..];
             var renewedCookieToken = new JwtSecurityTokenHandler().ReadJwtToken(Uri.UnescapeDataString(renewedCookieValue));
             Check(renewedCookieToken.Audiences.Count() == 2, $"{mode}: JWT Cookie preserves multiple audiences");
+            Check(renewedCookieToken.Subject == "user-123" && renewedCookieToken.Claims.Count(claim => claim.Type == "role") == 2,
+                $"{mode}: JWT Cookie preserves original claim names");
+            var renewedTicket = cookieOptions.TicketDataFormat.Unprotect(Uri.UnescapeDataString(renewedCookieValue));
+            Check(renewedTicket.Principal.FindFirstValue(ClaimTypes.NameIdentifier) == "user-123" && renewedTicket.Principal.IsInRole("reader"),
+                $"{mode}: JWT Cookie preserves .NET claim mapping");
+            foreach (var includeNotBefore in new[] { false, true })
+            {
+                var withoutIssuedAt = Token(TimeSpan.FromMinutes(1), includeNotBefore: includeNotBefore, includeIssuedAt: false);
+                var noIssuedResponse = await Get("/check/any", cookieValue: "test-auth=" + withoutIssuedAt);
+                Check(noIssuedResponse.IsSuccessStatusCode && !noIssuedResponse.Headers.Contains("Set-Cookie"),
+                    $"{mode}: unknown issue time must not trigger renewal (nbf={includeNotBefore})");
+            }
+            var withoutNotBefore = Token(TimeSpan.FromMinutes(1), includeNotBefore: false);
+            var noNotBeforeResponse = await Get("/check/any", cookieValue: "test-auth=" + withoutNotBefore);
+            Check(noNotBeforeResponse.IsSuccessStatusCode && noNotBeforeResponse.Headers.Contains("Set-Cookie"),
+                $"{mode}: iat supports renewal without nbf");
+            var noNotBeforeCookie = noNotBeforeResponse.Headers.GetValues("Set-Cookie").Single(value => value.StartsWith("test-auth="))
+                .Split(';')[0]["test-auth=".Length..];
+            var noNotBeforeJwt = new JwtSecurityTokenHandler().ReadJwtToken(Uri.UnescapeDataString(noNotBeforeCookie));
+            Check(noNotBeforeJwt.ValidTo <= DateTime.UtcNow.Add(cookieOptions.ExpireTimeSpan), $"{mode}: bounded renewed lifetime");
+            var ancientIssuedResponse = await Get("/check/any", cookieValue: "test-auth=" +
+                Token(TimeSpan.FromMinutes(1), age: TimeSpan.FromDays(30000)));
+            Check(ancientIssuedResponse.IsSuccessStatusCode && !ancientIssuedResponse.Headers.Contains("Set-Cookie"),
+                $"{mode}: excessive original lifetime must not trigger renewal");
             Check(cookieOptions.TicketDataFormat.Unprotect(Token(TimeSpan.FromMinutes(5), algorithm: SecurityAlgorithms.HmacSha256)) == null,
                 $"{mode}: JWT Cookie wrong algorithm");
             Check(cookieOptions.TicketDataFormat.Unprotect(Token(TimeSpan.FromMinutes(5), issuer: "wrong")) == null,
@@ -248,6 +278,57 @@ state.AddModelError("field", new InvalidOperationException("private-secret"), ne
 var actionContext = new ActionExecutingContext(new ActionContext(new DefaultHttpContext(), new(), new(), state), new List<IFilterMetadata>(), new Dictionary<string, object>(), new object());
 new GlobalModelStateFilter(Options.Create(new GlobalModelStateOptions())).OnActionExecuting(actionContext);
 Check(actionContext.Result is BadRequestObjectResult result && result.Value is string value && value.Length > 0 && !value.Contains("private-secret"), "exception-only model error");
+
+var principal = new ClaimsPrincipal(new ClaimsIdentity(new[]
+{
+    new Claim("id", "6fbb4cfe-3527-4415-b877-03874d7919e3"), new Claim("count", "42"),
+    new Claim("day", "Monday"), new Claim("numeric-day", "1"), new Claim("empty", " "), new Claim("invalid", "invalid")
+}));
+Check(principal.GetClaimValue<Guid>("id") == Guid.Parse("6fbb4cfe-3527-4415-b877-03874d7919e3"), "Guid claim");
+Check(principal.GetClaimValue<Guid?>("id") == principal.GetClaimValue<Guid>("id"), "nullable Guid claim");
+Check(principal.GetClaimValue<int?>("count") == 42, "nullable integer claim");
+Check(principal.GetClaimValue<int>("count") == 42 && principal.GetClaimValue<string>("count") == "42", "existing claim conversions");
+Check(principal.GetClaimValue<DayOfWeek>("day") == DayOfWeek.Monday && principal.GetClaimValue<DayOfWeek?>("numeric-day") == DayOfWeek.Monday, "enum claims");
+Check(principal.GetClaimValue<Guid?>("missing") == null && principal.GetClaimValue<int?>("empty") == null, "empty claims");
+try
+{
+    principal.GetClaimValue<Guid>("invalid");
+    throw new InvalidOperationException("Invalid Guid claim was accepted");
+}
+catch (FormatException) { checks++; }
+
+var originalCulture = CultureInfo.CurrentCulture;
+try
+{
+    foreach (var culture in new[] { "en-US", "zh-CN" })
+    {
+        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(culture);
+        foreach (var format in new[] { "yyyy/MM/dd", "dd/MM/yyyy", "yyyyMMdd" })
+        {
+            var date = new DateOnly(2026, 11, 3);
+            var converter = new DateOnlyConverter(format);
+            var json = JsonConvert.SerializeObject(date, converter);
+            Check(JsonConvert.DeserializeObject<DateOnly>(json, converter) == date, $"DateOnly round trip: {culture}, {format}");
+        }
+        foreach (var format in new[] { "HH:mm:ss", "HHmmss", "hh:mm:ss tt" })
+        {
+            var time = new TimeOnly(15, 30, 45);
+            var converter = new TimeOnlyConverter(format);
+            var json = JsonConvert.SerializeObject(time, converter);
+            Check(JsonConvert.DeserializeObject<TimeOnly>(json, converter) == time, $"TimeOnly round trip: {culture}, {format}");
+        }
+    }
+    var settings = new JsonSerializerSettings { Culture = CultureInfo.GetCultureInfo("fr-FR") };
+    settings.Converters.Add(new DateOnlyConverter("dd MMMM yyyy"));
+    var localizedDate = new DateOnly(2026, 11, 3);
+    var localizedJson = JsonConvert.SerializeObject(localizedDate, settings);
+    Check(localizedJson.Contains("novembre") && JsonConvert.DeserializeObject<DateOnly>(localizedJson, settings) == localizedDate,
+        "DateOnly uses serializer culture");
+}
+finally
+{
+    CultureInfo.CurrentCulture = originalCulture;
+}
 Console.WriteLine($"PASS: {checks} assertions ({System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription})");
 
 [ApiController]

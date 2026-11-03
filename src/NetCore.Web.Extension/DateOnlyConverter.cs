@@ -19,14 +19,14 @@ namespace NetCore.Web.Extension
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            serializer.Serialize(writer, ((DateOnly)value).ToString(_format));
+            serializer.Serialize(writer, ((DateOnly)value).ToString(_format, serializer.Culture));
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
             JsonSerializer serializer)
         {
             var jt = JToken.ReadFrom(reader);
-            return DateOnly.Parse(jt.ToString());
+            return DateOnly.ParseExact(jt.ToString(), _format, serializer.Culture);
         }
 
         public override bool CanConvert(Type objectType)

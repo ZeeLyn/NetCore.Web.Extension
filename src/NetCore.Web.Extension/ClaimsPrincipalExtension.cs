@@ -17,7 +17,12 @@ namespace NetCore.Web.Extension
             var value = principal.GetClaimValue(type);
             if (string.IsNullOrWhiteSpace(value))
                 return default;
-            return (TValue)Convert.ChangeType(value, typeof(TValue));
+            var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
+            if (targetType == typeof(Guid))
+                return (TValue)(object)Guid.Parse(value);
+            if (targetType.IsEnum)
+                return (TValue)Enum.Parse(targetType, value);
+            return (TValue)Convert.ChangeType(value, targetType);
         }
 
         public static TValue GetClaimValueFromJson<TValue>(this ClaimsPrincipal principal, string type)

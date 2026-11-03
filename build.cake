@@ -1,15 +1,26 @@
-#addin Cake.Git
-
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
 
 var output=Argument<string>("output", "Output");
-var version=Argument<string>("version", "0.1.4");
+var projectFile="src/NetCore.Web.Extension/NetCore.Web.Extension.csproj";
+var version=Argument<string>("version", XmlPeek(projectFile,"/Project/PropertyGroup/Version"));
 var target = Argument<string>("target", "Default");
 var release = Argument<bool>("release", true);
 var nugetApiKey = Argument<string>("nugetApiKey", null);
-var currentBranch = Argument<string>("currentBranch", GitBranchCurrent("./").FriendlyName);
+var currentBranch = Argument<string>("currentBranch", "");
+if(string.IsNullOrEmpty(currentBranch))
+{
+   IEnumerable<string> branchOutput;
+   var exitCode = StartProcess("git", new ProcessSettings {
+      Arguments = "branch --show-current",
+      RedirectStandardOutput = true,
+      Silent = true
+   }, out branchOutput);
+   if(exitCode != 0)
+      throw new Exception("Failed to read the current Git branch.");
+   currentBranch = branchOutput.FirstOrDefault() ?? "";
+}
 var configuration=release?"Release":"Debug";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -32,17 +43,10 @@ Teardown(ctx =>
 // TASKS
 ///////////////////////////////////////////////////////////////////////////////
 
-Task("UpdateVersion").DoesForEach(GetFiles("src/NetCore.Web.Extension/NetCore.Web.Extension.csproj"),(file)=>{
+Task("UpdateVersion").DoesForEach(GetFiles(projectFile),(file)=>{
    Information("Update Version:"+file);
-   XmlPoke(file,"/Project/PropertyGroup/Version",version);
-   XmlPoke(file,"/Project/PropertyGroup/GeneratePackageOnBuild","false");
-   XmlPoke(file,"/Project/PropertyGroup/Description","NetCore.Web.Extension");
-   XmlPoke(file,"/Project/PropertyGroup/PackageProjectUrl","https://github.com/1100100/NetCore.Web.Extension");
-   XmlPoke(file,"/Project/PropertyGroup/RepositoryUrl","https://github.com/1100100/NetCore.Web.Extension");
-   XmlPoke(file,"/Project/PropertyGroup/PackageTags","NetCore.Web.Extension");
-   //XmlPoke(file,"/Project/PropertyGroup/PackageIcon","icon.png");
-   XmlPoke(file,"/Project/PropertyGroup/Authors","Owen");
-   XmlPoke(file,"/Project/PropertyGroup/PackageLicenseExpression","MIT");
+   if(XmlPeek(file,"/Project/PropertyGroup/Version") != version)
+      XmlPoke(file,"/Project/PropertyGroup/Version",version);
 });
 
 Task("Restore").Does(()=>{
@@ -65,10 +69,11 @@ Task("CleanPackage").Does(()=>{
 Task("Pack")
 .IsDependentOn("CleanPackage")
 .IsDependentOn("UpdateVersion")
-.DoesForEach(GetFiles("src/NetCore.Web.Extension/NetCore.Web.Extension.csproj"),(file)=>{
+.DoesForEach(GetFiles(projectFile),(file)=>{
    DotNetCorePack(file.ToString(),new DotNetCorePackSettings{
       OutputDirectory=output,
-      Configuration=configuration
+      Configuration=configuration,
+      MSBuildSettings=new DotNetCoreMSBuildSettings().WithProperty("GeneratePackageOnBuild","false")
    });
 });
 

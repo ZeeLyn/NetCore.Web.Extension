@@ -1,6 +1,6 @@
 # NetCore.Web.Extension
 
-ASP.NET Core 的 JWT / Cookie 认证、MVC 全局异常和 ModelState 验证扩展。NuGet 包名为 `DotNetCore.Web.Extension`，命名空间仍为 `NetCore.Web.Extension`，保留 .NET 7 / 8 / 9 / 10 目标框架。
+ASP.NET Core 的 JWT / Cookie 认证、MVC 全局异常和 ModelState 验证扩展。当前版本 `4.0.0`，NuGet 包名为 `DotNetCore.Web.Extension`，命名空间仍为 `NetCore.Web.Extension`，保留 .NET 7 / 8 / 9 / 10 目标框架。
 
 ## 认证注册
 
@@ -85,6 +85,8 @@ services.AddMultiSchemePolicy(cookie =>
 
 JWT Cookie 只有签名，没有加密，claims 和票据属性可被读取，不应存放秘密数据；一般网页登录可使用上述普通 Cookie 模式。JWT Cookie 现在保留签发时间、过期时间、持久化及 `AllowRefresh` 等票据属性，以便 Cookie 自动续期正确工作。`JwtCookieOptions.SlidingExpiration` 仍默认关闭，`ExpireTimeSpan` 默认 14 天，Cookie 默认 HttpOnly、SameSite=Lax。
 
+自动续期使用已保存的票据签发时间或 JWT 的 `iat`，不把 `nbf` 当成签发时间。缺少签发时间、签发时间异常或原票据寿命超过 `ExpireTimeSpan` 时，合法 Token 仍可验证，但不会自动续期。续期保留 `sub`、`role` 等原始字段名，同时维持 .NET 的 `ClaimTypes.NameIdentifier` / `IsInRole` 读取行为。
+
 ## 中间件与 JWT 续期
 
 ```csharp
@@ -136,7 +138,11 @@ MVC 异常过滤器覆盖 MVC 控制器执行阶段，不覆盖任意中间件�
 - 默认算法仍为 HS512；密钥按 UTF-8 字节长度检查，HS256 / HS384 / HS512 分别至少需要 32 / 48 / 64 字节。弱密钥在注册时直接报错。生成和验证统一使用 UTF-8。
 - 新令牌使用标准 JOSE 算法短名称，同时接受原配置算法的旧 URI 名称；不会放行其他签名算法。
 - 默认异常响应从包含异常消息的 HTTP 400 改为通用 HTTP 500；可用现有回调定制。
-- 删除 AutoGenerateHtmlControl、分页扩展及其演示、依赖和旧备份项目。依赖这些公开类型的应用需要迁移；发布时应使用新的主版本。当前包版本未自动调整。
+- 删除 AutoGenerateHtmlControl、分页扩展及其演示、依赖和旧备份项目。依赖这些公开类型的应用需要迁移，本次发布版本调整为 `4.0.0`。
+- `DateOnlyConverter` / `TimeOnlyConverter` 读写统一使用配置格式和 JSON 序列化器的 `Culture`；输入必须匹配对应格式。
+- `GetClaimValue<TValue>` 支持 `Guid`、枚举及其可空类型，空值行为保持不变，格式非法的值仍抛出异常。
+- JwtBearer 按目标框架更新到相应主版本的最新稳定版（2026-11-03 核对 NuGet）：`7.0.20`、`8.0.33`、`9.0.22`、`10.0.14`。
+- Cake 打包默认读取项目版本，保留显式 `--version` 覆盖；不再重写其他包元数据，读取分支使用 Git 命令，不再依赖 Cake.Git 插件。
 
 ## 本地验证
 
