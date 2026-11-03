@@ -32,7 +32,7 @@ Teardown(ctx =>
 // TASKS
 ///////////////////////////////////////////////////////////////////////////////
 
-Task("UpdateVersion").DoesForEach(GetFiles("**/NetCore.Web*.csproj"),(file)=>{
+Task("UpdateVersion").DoesForEach(GetFiles("src/NetCore.Web.Extension/NetCore.Web.Extension.csproj"),(file)=>{
    Information("Update Version:"+file);
    XmlPoke(file,"/Project/PropertyGroup/Version",version);
    XmlPoke(file,"/Project/PropertyGroup/GeneratePackageOnBuild","false");
@@ -65,7 +65,7 @@ Task("CleanPackage").Does(()=>{
 Task("Pack")
 .IsDependentOn("CleanPackage")
 .IsDependentOn("UpdateVersion")
-.DoesForEach(GetFiles("**/NetCore.Web*.csproj"),(file)=>{
+.DoesForEach(GetFiles("src/NetCore.Web.Extension/NetCore.Web.Extension.csproj"),(file)=>{
    DotNetCorePack(file.ToString(),new DotNetCorePackSettings{
       OutputDirectory=output,
       Configuration=configuration
@@ -81,7 +81,7 @@ Task("Push")
    };
    if(currentBranch=="master")
    {
-      foreach (var package in GetFiles("Output/*.nupkg"))
+      foreach (var package in GetFiles(output + "/DotNetCore.Web.Extension." + version + ".nupkg"))
       {
          NuGetPush(package,nuGetPushSettings);
       }

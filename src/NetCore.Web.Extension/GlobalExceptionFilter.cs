@@ -24,8 +24,14 @@ namespace NetCore.Web.Extension
             else
             {
                 Logger.LogError(context.Exception, "Unhandled exception");
-                context.Result = new BadRequestObjectResult(context.Exception.Message);
+                context.Result = new ObjectResult(new ProblemDetails
+                {
+                    Status = 500,
+                    Title = "An unexpected error occurred."
+                }) { StatusCode = 500 };
             }
+            if (context.Result != null)
+                context.ExceptionHandled = true;
         }
     }
 }

@@ -19,8 +19,10 @@ namespace NetCore.Web.Extension
                 Options.Action(context);
             else
             {
-                var firstError = context.ModelState.Keys.SelectMany(k => context.ModelState[k].Errors).Select(e => e.ErrorMessage).LastOrDefault();
-                context.Result = new BadRequestObjectResult(firstError);
+                var errorMessage = context.ModelState.Values.SelectMany(value => value.Errors)
+                    .Select(error => error.ErrorMessage).LastOrDefault(message => !string.IsNullOrWhiteSpace(message))
+                    ?? "The request contains invalid data.";
+                context.Result = new BadRequestObjectResult(errorMessage);
             }
         }
 

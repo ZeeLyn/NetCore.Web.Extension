@@ -1,5 +1,6 @@
 ﻿@model WebApplication.Controllers.Login
 <form action="/login/post" method="post">
+    @Html.AntiForgeryToken()
     @Html.TextBoxFor(p => p.NickName, new { placeholder = "nick name" })
     <button>Sign In</button>
 </form>

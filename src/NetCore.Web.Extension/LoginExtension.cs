@@ -13,11 +13,18 @@ namespace NetCore.Web.Extension
     {
         public static async Task SignInAsync(this ControllerBase controller, Dictionary<string, string> claims, TimeSpan expire, string issuer = null, string audience = null)
         {
+            if (claims == null)
+                throw new ArgumentNullException(nameof(claims));
+            if (expire <= TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException(nameof(expire));
+            var now = DateTimeOffset.UtcNow;
             var claimsIdentity = new ClaimsIdentity(claims.Select(p => new Claim(p.Key, p.Value)), CookieAuthenticationDefaults.AuthenticationScheme);
             var prop = new AuthenticationProperties
             {
                 AllowRefresh = true,
-                IsPersistent = true
+                IsPersistent = true,
+                IssuedUtc = now,
+                ExpiresUtc = now.Add(expire)
             };
             prop.Items.Add("issuer", issuer);
             prop.Items.Add("audience", audience);

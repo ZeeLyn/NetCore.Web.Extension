@@ -12,6 +12,7 @@
 		<Description>NetCore.Web.Extension</Description>
 		<PackageId>DotNetCore.Web.Extension</PackageId>
 		<PackageTags>NetCore.Web.Extension</PackageTags>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)'== 'net7.0' ">
@@ -29,5 +30,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 </Project>

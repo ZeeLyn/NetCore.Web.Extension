@@ -38,7 +38,12 @@ namespace NetCore.Web.Extension
 
     public class JwtCookieOptions : JwtOptions
     {
-        public CookieBuilder Cookie { get; set; } = new CookieBuilder();
+        public CookieBuilder Cookie { get; set; } = new CookieBuilder
+        {
+            HttpOnly = true,
+            SameSite = SameSiteMode.Lax,
+            SecurePolicy = CookieSecurePolicy.SameAsRequest
+        };
 
         public string AccessDeniedPath { get; set; }
 
@@ -46,7 +51,7 @@ namespace NetCore.Web.Extension
 
         public bool SlidingExpiration { get; set; }
 
-        public TimeSpan ExpireTimeSpan { get; set; }
+        public TimeSpan ExpireTimeSpan { get; set; } = TimeSpan.FromDays(14);
 
         public new CookieAuthenticationEvents Events { get; set; }
     }

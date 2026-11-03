@@ -1,15 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Linq;
-using System.Text;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
 
 namespace NetCore.Web.Extension
 {
@@ -17,46 +13,47 @@ namespace NetCore.Web.Extension
     {
         public static IServiceCollection AddGlobalExceptionFilter(this IServiceCollection services)
         {
-            return services.Configure<MvcOptions>(options => { options.Filters.Add<GlobalExceptionFilter>(); });
+            services.AddOptions<GlobalExceptionOptions>();
+            return services.Configure<MvcOptions>(options => options.Filters.Add<GlobalExceptionFilter>());
         }
 
         public static IServiceCollection AddGlobalExceptionFilter(this IServiceCollection services,
             Action<ExceptionContext, ILogger> builder)
         {
-            return services.AddGlobalExceptionFilter().AddSingleton(new GlobalExceptionOptions { Action = builder });
+            return services.AddGlobalExceptionFilter().Configure<GlobalExceptionOptions>(options => options.Action = builder);
         }
 
         public static IServiceCollection AddGlobalModelStateFilter(this IServiceCollection services)
         {
-            services.Configure<MvcOptions>(options => { options.Filters.Add<GlobalModelStateFilter>(); });
-            return services.Configure<ApiBehaviorOptions>(options =>
-            {
-                options.SuppressModelStateInvalidFilter = true;
-            });
+            services.AddOptions<GlobalModelStateOptions>();
+            services.Configure<MvcOptions>(options => options.Filters.Add<GlobalModelStateFilter>());
+            return services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
         }
 
         public static IServiceCollection AddGlobalModelStateFilter(this IServiceCollection services,
             Action<ActionExecutingContext> builder)
         {
-            return services.AddGlobalModelStateFilter().AddSingleton(new GlobalModelStateOptions { Action = builder });
+            return services.AddGlobalModelStateFilter().Configure<GlobalModelStateOptions>(options => options.Action = builder);
         }
 
-
-        public static IServiceCollection AddJwtSlidingExpiration(this IServiceCollection services,Action<JwtSlidingExpirationOptions> builder=null) {
+        public static IServiceCollection AddJwtSlidingExpiration(this IServiceCollection services,
+            Action<JwtSlidingExpirationOptions> builder = null)
+        {
             var options = new JwtSlidingExpirationOptions();
             builder?.Invoke(options);
-            services.AddSingleton(options);
-            return services;
+            if (options.SlidingExpiration < TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException(nameof(options.SlidingExpiration));
+            if (options.ExpireTimeSpan <= TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException(nameof(options.ExpireTimeSpan));
+            if (string.IsNullOrWhiteSpace(options.NewTokenHeaderName))
+                throw new ArgumentException("NewTokenHeaderName is required.", nameof(options.NewTokenHeaderName));
+            return services.AddSingleton(options);
         }
 
-        /// <summary>
-        /// 一定要用在UseAuthorization的后面
-        /// </summary>
-        /// <param name="app"></param>
-        public static void UseJwtSlidingExpiration(this IApplicationBuilder app) {
-
+        /// <summary>放在 UseAuthentication、UseAuthorization 之后，控制器端点之前。</summary>
+        public static void UseJwtSlidingExpiration(this IApplicationBuilder app)
+        {
             app.UseMiddleware<JwtRefreshMiddleware>();
-
         }
 
         public static IServiceCollection AddJwtBearerAuthentication(this IServiceCollection services,
@@ -64,196 +61,95 @@ namespace NetCore.Web.Extension
         {
             var options = new JwtOptions();
             builder?.Invoke(options);
-            if (string.IsNullOrWhiteSpace(options.SecurityKey))
-                throw new ArgumentNullException(nameof(options.SecurityKey));
-            if (options.SecurityKey.Length < 16)
-                throw new ArgumentOutOfRangeException(nameof(options.SecurityKey),
-                    "SecurityKey length cannot be less than 16.");
-            var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(options.SecurityKey));
-            var validationParameters = new TokenValidationParameters
+            var validationParameters = JwtGenerator.CreateValidationParameters(options);
+            services.AddAuthentication(authentication =>
             {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = signingKey,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            };
-
-            if (!string.IsNullOrWhiteSpace(options.ValidIssuer) ||
-                options.ValidIssuers != null && options.ValidIssuers.Any())
-            {
-                validationParameters.ValidateIssuer = true;
-                validationParameters.ValidIssuer = options.ValidIssuer;
-                validationParameters.ValidIssuers = options.ValidIssuers;
-            }
-
-            if (!string.IsNullOrWhiteSpace(options.ValidAudience) ||
-                options.ValidAudiences != null && options.ValidAudiences.Any())
-            {
-                validationParameters.ValidateAudience = true;
-                validationParameters.ValidAudience = options.ValidAudience;
-                validationParameters.ValidAudiences = options.ValidAudiences;
-            }
-
-            services.AddAuthentication(option =>
-            {
-                option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                
+                authentication.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                authentication.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                authentication.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(option =>
             {
                 option.TokenValidationParameters = validationParameters;
                 if (options.Events != null)
                     option.Events = options.Events;
             });
-
             return services.AddSingleton<IJwtGenerator, JwtGenerator>().AddSingleton(options);
         }
 
+        /// <summary>使用 ASP.NET Core 数据保护票据的普通 Cookie 登录，不需要 JWT 密钥。</summary>
+        public static IServiceCollection AddCookieAuthentication(this IServiceCollection services,
+            Action<CookieAuthenticationOptions> builder = null)
+        {
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options => builder?.Invoke(options));
+            return services;
+        }
+
+        /// <summary>保留兼容入口：Cookie 的内容是已签名的 JWT。</summary>
         public static IServiceCollection AddJwtCookieAuthentication(this IServiceCollection services,
             Action<JwtCookieOptions> builder)
         {
             var options = new JwtCookieOptions();
             builder?.Invoke(options);
-            if (string.IsNullOrWhiteSpace(options.SecurityKey))
-                throw new ArgumentNullException(nameof(options.SecurityKey));
-            if (options.SecurityKey.Length < 16)
-                throw new ArgumentOutOfRangeException(nameof(options.SecurityKey),
-                    "SecurityKey length cannot be less than 16.");
-            var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(options.SecurityKey));
-            var validationParameters = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = signingKey,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            };
-
-            if (!string.IsNullOrWhiteSpace(options.ValidIssuer) ||
-                options.ValidIssuers != null && options.ValidIssuers.Any())
-            {
-                validationParameters.ValidateIssuer = true;
-                validationParameters.ValidIssuer = options.ValidIssuer;
-                validationParameters.ValidIssuers = options.ValidIssuers;
-            }
-
-            if (!string.IsNullOrWhiteSpace(options.ValidAudience) ||
-                options.ValidAudiences != null && options.ValidAudiences.Any())
-            {
-                validationParameters.ValidateAudience = true;
-                validationParameters.ValidAudience = options.ValidAudience;
-                validationParameters.ValidAudiences = options.ValidAudiences;
-            }
-
+            var validationParameters = JwtGenerator.CreateValidationParameters(options);
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
             {
-                option.Cookie = options.Cookie;
-                option.LoginPath = options.LoginPath;
-                option.AccessDeniedPath = options.AccessDeniedPath;
+                ConfigureCookie(option, options);
                 option.TicketDataFormat = new JwtCookieDataFormat(validationParameters, options);
-                option.SlidingExpiration = options.SlidingExpiration;
-                option.ExpireTimeSpan = options.ExpireTimeSpan;
-                if (options.Events != null)
-                    option.Events = options.Events;
             });
-
             return services;
         }
 
+        /// <summary>同时支持 Bearer 和 Cookie；shareToken=false 时 Cookie 使用普通加密票据。</summary>
         public static IServiceCollection AddMultiSchemePolicy(this IServiceCollection services,
-            Action<JwtCookieOptions> cookieBuilder,
-            Action<JwtOptions> jwtBuilder, bool shareToken = true)
+            Action<JwtCookieOptions> cookieBuilder, Action<JwtOptions> jwtBuilder, bool shareToken = true)
         {
-            var options = new JwtCookieOptions();
-            cookieBuilder?.Invoke(options);
-            if (string.IsNullOrWhiteSpace(options.SecurityKey))
-                throw new ArgumentNullException(nameof(options.SecurityKey));
-            if (options.SecurityKey.Length < 16)
-                throw new ArgumentOutOfRangeException(nameof(options.SecurityKey),
-                    "SecurityKey length cannot be less than 16.");
-            var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(options.SecurityKey));
-            var validationParameters = new TokenValidationParameters
+            if (shareToken)
+                services.AddJwtCookieAuthentication(cookieBuilder);
+            else
             {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = signingKey,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            };
-
-            if (!string.IsNullOrWhiteSpace(options.ValidIssuer) ||
-                options.ValidIssuers != null && options.ValidIssuers.Any())
-            {
-                validationParameters.ValidateIssuer = true;
-                validationParameters.ValidIssuer = options.ValidIssuer;
-                validationParameters.ValidIssuers = options.ValidIssuers;
+                var options = new JwtCookieOptions();
+                cookieBuilder?.Invoke(options);
+                services.AddCookieAuthentication(cookie => ConfigureCookie(cookie, options));
             }
-
-            if (!string.IsNullOrWhiteSpace(options.ValidAudience) ||
-                options.ValidAudiences != null && options.ValidAudiences.Any())
+            services.AddJwtBearerAuthentication(jwtBuilder);
+            const string scheme = "JwtOrCookie";
+            services.AddAuthentication(options =>
             {
-                validationParameters.ValidateAudience = true;
-                validationParameters.ValidAudience = options.ValidAudience;
-                validationParameters.ValidAudiences = options.ValidAudiences;
-            }
-
-
-            var jwtOptions = new JwtOptions();
-            jwtBuilder?.Invoke(jwtOptions);
-            if (string.IsNullOrWhiteSpace(jwtOptions.SecurityKey))
-                throw new ArgumentNullException(nameof(jwtOptions.SecurityKey));
-            if (jwtOptions.SecurityKey.Length < 16)
-                throw new ArgumentOutOfRangeException(nameof(jwtOptions.SecurityKey),
-                    "SecurityKey length cannot be less than 16.");
-            var jwtSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtOptions.SecurityKey));
-            var jwtValidationParameters = new TokenValidationParameters
+                options.DefaultScheme = scheme;
+                options.DefaultAuthenticateScheme = scheme;
+                options.DefaultChallengeScheme = scheme;
+                options.DefaultForbidScheme = scheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignOutScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddPolicyScheme(scheme, scheme, options =>
             {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = jwtSigningKey,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            };
-
-            if (!string.IsNullOrWhiteSpace(jwtOptions.ValidIssuer) ||
-                jwtOptions.ValidIssuers != null && jwtOptions.ValidIssuers.Any())
-            {
-                jwtValidationParameters.ValidateIssuer = true;
-                jwtValidationParameters.ValidIssuer = jwtOptions.ValidIssuer;
-                jwtValidationParameters.ValidIssuers = jwtOptions.ValidIssuers;
-            }
-
-            if (!string.IsNullOrWhiteSpace(jwtOptions.ValidAudience) ||
-                jwtOptions.ValidAudiences != null && jwtOptions.ValidAudiences.Any())
-            {
-                jwtValidationParameters.ValidateAudience = true;
-                jwtValidationParameters.ValidAudience = jwtOptions.ValidAudience;
-                jwtValidationParameters.ValidAudiences = jwtOptions.ValidAudiences;
-            }
-
-
-            services.AddAuthentication(option =>
-            {
-                option.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                option.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                option.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            }).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, option =>
-            {
-                option.Cookie = options.Cookie;
-                option.LoginPath = options.LoginPath;
-                option.AccessDeniedPath = options.AccessDeniedPath;
-                if (shareToken)
-                    option.TicketDataFormat = new JwtCookieDataFormat(validationParameters, options);
-                option.SlidingExpiration = options.SlidingExpiration;
-                option.ExpireTimeSpan = options.ExpireTimeSpan;
-                if (options.Events != null)
-                    option.Events = options.Events;
-            }).AddJwtBearer(option =>
-            {
-                option.TokenValidationParameters = jwtValidationParameters;
-                if (jwtOptions.Events != null)
-                    option.Events = jwtOptions.Events;
+                // 显式传入 Bearer 时验证失败就返回 401，不能回退到已登录的 Cookie。
+                options.ForwardDefaultSelector = context =>
+                {
+                    var authorization = context.Request.Headers.Authorization.ToString().TrimStart();
+                    return authorization.StartsWith("Bearer", StringComparison.OrdinalIgnoreCase) &&
+                           (authorization.Length == 6 || char.IsWhiteSpace(authorization[6]))
+                        ? JwtBearerDefaults.AuthenticationScheme
+                        : CookieAuthenticationDefaults.AuthenticationScheme;
+                };
+                options.ForwardSignIn = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.ForwardSignOut = CookieAuthenticationDefaults.AuthenticationScheme;
             });
+            return services;
+        }
 
-            return services.AddSingleton<IJwtGenerator, JwtGenerator>().AddSingleton(jwtOptions);
+        private static void ConfigureCookie(CookieAuthenticationOptions target, JwtCookieOptions source)
+        {
+            target.Cookie = source.Cookie;
+            if (source.LoginPath != null)
+                target.LoginPath = source.LoginPath;
+            if (source.AccessDeniedPath != null)
+                target.AccessDeniedPath = source.AccessDeniedPath;
+            target.SlidingExpiration = source.SlidingExpiration;
+            target.ExpireTimeSpan = source.ExpireTimeSpan;
+            if (source.Events != null)
+                target.Events = source.Events;
         }
     }
 }
